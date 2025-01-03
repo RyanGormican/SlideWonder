@@ -167,7 +167,7 @@ const Select = ({ slides, setSlides, handleGridClick }) => {
               <Card onClick={() => handleGridClick(slide.id)}>
                 <CardContent>
                   <Typography variant="h6"></Typography>
-                  <div style={{ maxHeight: 75, overflowY: 'auto' }}>
+                  <div style={{ minHeight:150, maxHeight: 150, overflowY: 'auto' }}>
                    
                      
                   </div>
