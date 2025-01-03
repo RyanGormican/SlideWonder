@@ -200,10 +200,10 @@ function Present({ currentSlide, setView }) {
         className="hover-area"
         style={{
           position: 'absolute',
-          top: 0,
+          bottom: 0,
           left: 0,
           width: '100vw',
-          height: '100vh',
+          height: '10vh',
           zIndex:'1',
         }}
         onMouseEnter={() => setHovering(true)}  // Set hovering state to true

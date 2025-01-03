@@ -11,16 +11,24 @@ function SlideManager({ slides, setSlides, currentSlide, setCurrentSlide }) {
   const canvasRef = useRef(null);
   const canvasInstance = useRef(null);
 
-  const updateSlideData = (updatedSlide) => {
-    const updatedSlides = slides.map((slide) =>
-      slide.id === updatedSlide.id ? updatedSlide : slide
-    );
-    setSlides(updatedSlides);
-    localStorage.setItem(
-      'SlideWonderdata',
-      JSON.stringify({ slides: updatedSlides })
-    );
+const updateSlideData = (updatedSlide) => {
+
+  const updatedSlideWithDate = {
+    ...updatedSlide,
+    lastUpdated: Date.now(),
   };
+
+  const updatedSlides = slides.map((slide) =>
+    slide.id === updatedSlideWithDate.id ? updatedSlideWithDate : slide
+  );
+
+  setSlides(updatedSlides);
+  localStorage.setItem(
+    'SlideWonderdata',
+    JSON.stringify({ slides: updatedSlides })
+  );
+};
+
 
   const addCanvasToDeck = () => {
     if (!currentSlide) {
