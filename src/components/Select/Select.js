@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Grid, Card, CardContent, Typography, IconButton, TextField, List, ListItem, ListItemText } from '@mui/material';
 import { Icon } from '@iconify/react';
-import { generateColumns, generateRows, saveSlideToLocalStorage } from '../Helper';
+import { saveSlideToLocalStorage } from '../Helper';
 import InfoModal from '../InfoModal/InfoModal';
 import { saveAs } from 'file-saver'; // To help with file download
 const Select = ({ slides, setSlides, handleGridClick }) => {
@@ -43,8 +43,7 @@ const Select = ({ slides, setSlides, handleGridClick }) => {
     const currentTimestamp = Date.now();
     const newSlide = {
       title: `New Slide ${slides.length + 1}`,
-      columns: generateColumns(),
-      rows: generateRows(),
+      deck: [], 
       id: currentTimestamp,
       dateCreated: currentDate,
       lastUpdated: currentDate,

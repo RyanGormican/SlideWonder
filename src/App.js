@@ -31,12 +31,7 @@ function App() {
       <div className="App">
         <Navigate toggleFeedbackModal={() => setIsModalOpen(!isModalOpen)} />
         <div className="title">SlideWonder</div>
-              <Icon
-                icon="mingcute:back-line"
-                width="24"
-                height="24"
-                onClick={() => setView('select')}
-              />
+
         {view === 'select' ? (
           <Select
             slides={slides}
@@ -48,12 +43,26 @@ function App() {
             }}
           />
         ) : (
+        <div>
+            <Icon
+            icon="mingcute:back-line"
+            width="24"
+            height="24"
+            onClick={() => setView('select')}
+            />
+            <Icon
+            icon="gg:play-button"
+            width="24"
+            height="24"
+            onClick={() => setView('present')}
+            />
           <SlideManager
             slides={slides}
             setSlides={setSlides}
             currentSlide={currentSlide}
             setCurrentSlide={setCurrentSlide}
           />
+          </div>
         )}
         {isModalOpen && <Feedback isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />}
       </div>
