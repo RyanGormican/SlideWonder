@@ -1,6 +1,12 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\public",
+    "\\src",
+    "\\src\\components",
+    "\\src\\components\\Feedback",
+    "\\src\\components\\InfoModal",
+    "\\src\\components\\Select"
   ],
   "PreviewInSolutionExplorer": false
 }

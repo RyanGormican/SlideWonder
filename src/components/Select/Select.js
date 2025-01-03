@@ -3,7 +3,7 @@ import { Grid, Card, CardContent, Typography, IconButton, TextField, List, ListI
 import { Icon } from '@iconify/react';
 import { generateColumns, generateRows, saveSlideToLocalStorage } from '../Helper';
 import InfoModal from '../InfoModal/InfoModal';
-
+import { saveAs } from 'file-saver'; // To help with file download
 const Select = ({ slides, setSlides, handleGridClick }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [editingTitle, setEditingTitle] = useState(null);
@@ -104,6 +104,22 @@ const Select = ({ slides, setSlides, handleGridClick }) => {
       direction: 'asc', // Reset direction to ascending when changing the field
     }));
   };
+  // Function to convert slide data to CSV
+  const convertToCSV = (slide) => {
+    const header = slide.columns.map(col => col.title).join(',');
+    const rows = slide.rows.map(row => 
+      slide.columns.map(col => row[col.key] || '').join(',')
+    ).join('\n');
+
+    return `${header}\n${rows}`;
+  };
+
+  // Function to download CSV
+  const handleDownloadCSV = (slide) => {
+    const csvData = convertToCSV(slide);
+    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+    saveAs(blob, `${slide.title}.csv`);
+  };
 
   return (
     <div>
@@ -174,6 +190,9 @@ const Select = ({ slides, setSlides, handleGridClick }) => {
                     {slide.title}
                   </Typography>
                 )}
+                <IconButton onClick={() => handleDownloadCSV(slide)}>
+                  <Icon icon="mdi:download" width="24" height="24" />
+                </IconButton>
                 <IconButton onClick={() => handleInfoClick(slide)}>
                   <Icon icon="material-symbols:info" width="24" height="24" />
                 </IconButton>
