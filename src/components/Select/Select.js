@@ -9,7 +9,7 @@ const Select = ({ slides, setSlides, handleGridClick }) => {
   const [editingTitle, setEditingTitle] = useState(null);
   const [newTitle, setNewTitle] = useState('');
   const [selectedSlide, setSelectedSlide] = useState(null);
-  const [sortOrder, setSortOrder] = useState({ field: 'name', direction: 'asc' });
+  const [sortOrder, setSortOrder] = useState({ field: 'dateCreated', direction: 'asc' });
   const [viewType, setViewType] = useState('grid'); // State to toggle between grid and list view
 
   // Filter slides based on search query

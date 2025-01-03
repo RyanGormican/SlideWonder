@@ -5,6 +5,7 @@ import './App.css';
 import Feedback from './components/Feedback/Feedback';
 import Navigate from './components/Navigate';
 import Select from './components/Select/Select';
+import Present from './components/Present/Present';
 import SlideManager from './components/Slide/SlideManager';
 import { Icon } from '@iconify/react';
 function App() {
@@ -28,42 +29,50 @@ function App() {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="App">
+<div className={`App ${view !== 'present' ? 'not-present' : 'present'}`}>
+        {view !== 'present' && (
+    <>
         <Navigate toggleFeedbackModal={() => setIsModalOpen(!isModalOpen)} />
         <div className="title">SlideWonder</div>
+   </>
+  )}
 
-        {view === 'select' ? (
-          <Select
-            slides={slides}
-            setSlides={setSlides}
-            handleGridClick={(id) => {
-              const selectedSlide = slides.find((slide) => slide.id === id);
-              setCurrentSlide(selectedSlide);
-              setView('slide');
-            }}
-          />
-        ) : (
-        <div>
-            <Icon
-            icon="mingcute:back-line"
-            width="24"
-            height="24"
-            onClick={() => setView('select')}
-            />
-            <Icon
-            icon="gg:play-button"
-            width="24"
-            height="24"
-            onClick={() => setView('present')}
-            />
-          <SlideManager
-            slides={slides}
-            setSlides={setSlides}
-            currentSlide={currentSlide}
-            setCurrentSlide={setCurrentSlide}
-          />
-          </div>
-        )}
+ {view === 'select' ? (
+  <Select
+    slides={slides}
+    setSlides={setSlides}
+    handleGridClick={(id) => {
+      const selectedSlide = slides.find((slide) => slide.id === id);
+      setCurrentSlide(selectedSlide);
+      setView('slide');
+    }}
+  />
+) : view === 'slide' ? (
+  <div       style={{textAlign: 'center'}}>
+    <Icon
+      icon="mingcute:back-line"
+      width="24"
+      height="24"
+      onClick={() => setView('select')}
+    />
+    <Icon
+      icon="gg:play-button"
+      width="24"
+      height="24"
+      onClick={() => setView('present')}
+    />
+    <SlideManager
+      slides={slides}
+      setSlides={setSlides}
+      currentSlide={currentSlide}
+      setCurrentSlide={setCurrentSlide}
+    />
+  </div>
+) : view === 'present' && (
+  <div>
+    <Present currentSlide={currentSlide} setView={setView}/>
+  </div>
+)}
         {isModalOpen && <Feedback isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />}
       </div>
     </DndProvider>
