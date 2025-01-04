@@ -162,8 +162,8 @@ const updateSlideData = (updatedSlide) => {
       text: 'New Text', // Placeholder text
       x: xPercentage,  // Position as percentage
       y: yPercentage,  // Position as percentage
-      fontSize: selectedContent?.size || 12,   
-      fill: selectedContent?.color || '#000000',
+      fontSize: selectedContent?.fontSize || 12,   
+      fill: selectedContent?.fill || '#000000',
     };
     currentCanvasData.content.push(newTextObject);
     }
@@ -174,8 +174,8 @@ const updateSlideData = (updatedSlide) => {
       id: Date.now(),
       x: xPercentage,  
       y: yPercentage, 
-     radius: selectedContent?.size || 12,   
-     fill: selectedContent?.color || '#000000',
+     radius: selectedContent?.radius || 12,   
+     fill: selectedContent?.fill || '#000000',
     };
     currentCanvasData.content.push(newCircle);
     }
@@ -187,9 +187,9 @@ const updateSlideData = (updatedSlide) => {
       id: Date.now(),
       x: xPercentage,  
       y: yPercentage, 
-      height:  selectedContent?.size || 12,  
-      width: selectedContent?.size || 12,
-      fill: selectedContent?.color || '#000000',
+      height:  selectedContent?.height || 12,  
+      width: selectedContent?.width || 12,
+      fill: selectedContent?.fill || '#000000',
     };
     currentCanvasData.content.push(newSquare);
     }
@@ -203,7 +203,7 @@ const updateSlideData = (updatedSlide) => {
       y: yPercentage, 
       height:  selectedContent?.size || 12,  
       width: selectedContent?.size || 12,
-      fill: selectedContent?.color || '#000000',
+      fill: selectedContent?.fill || '#000000',
     };
     currentCanvasData.content.push(newTriangle);
     }
