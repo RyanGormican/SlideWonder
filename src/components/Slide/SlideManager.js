@@ -10,7 +10,7 @@ function SlideManager({ slides, setSlides, currentSlide, setCurrentSlide }) {
   const [toggleMode, setToggleMode] = useState(null);
   const canvasRef = useRef(null);
   const canvasInstance = useRef(null);
-
+  const [selectedContent, setSelectedContent] = useState([]);
 const updateSlideData = (updatedSlide) => {
 
   const updatedSlideWithDate = {
@@ -69,7 +69,7 @@ const updateSlideData = (updatedSlide) => {
     updateSlideData(updatedSlide);
   };
 
-  const handleColorChange = (event) => {
+  const handleBackgroundColorChange = (event) => {
     const newColor = event.target.value;
     setBackgroundColor(newColor);
 
@@ -85,7 +85,7 @@ const updateSlideData = (updatedSlide) => {
 
   const handleObjectModified = (e) => {
   const object = e.target;
-
+  console.log(object);
   // Create a shallow copy of the current slide
   const updatedSlide = { 
     ...currentSlide, 
@@ -107,6 +107,8 @@ const updateSlideData = (updatedSlide) => {
                       text: object.textLines ? object.textLines[0] : item.text,
                       fontSize: object.fontSize,
                       color: object.fill,
+                      scaleX: object.scaleX,
+                      scaleY: object.scaleY,
                     }
                   : item
               )
@@ -151,6 +153,8 @@ const updateSlideData = (updatedSlide) => {
       currentCanvasData.content = [];
     }
 
+    if (toggleMode === 'text')
+    {
     // Append the new text object to the content of the canvas
     const newTextObject = {
       type: 'text',
@@ -158,11 +162,51 @@ const updateSlideData = (updatedSlide) => {
       text: 'New Text', // Placeholder text
       x: xPercentage,  // Position as percentage
       y: yPercentage,  // Position as percentage
-      fontSize: 12,    // Default font size
+      fontSize: selectedContent.size || 12,   
+      fill: selectedContent.color || 'black',
     };
-
     currentCanvasData.content.push(newTextObject);
-
+    }
+        if (toggleMode === 'circle')
+    {
+    const newCircle = {
+      type: 'circle',
+      id: Date.now(),
+      x: xPercentage,  
+      y: yPercentage, 
+     radius: selectedContent.size || 12,   
+     fill: selectedContent.color || 'black',
+    };
+    currentCanvasData.content.push(newCircle);
+    }
+        if (toggleMode === 'square')
+    {
+    // Append the new text object to the content of the canvas
+    const newSquare = {
+      type: 'square',
+      id: Date.now(),
+      x: xPercentage,  
+      y: yPercentage, 
+      height:  selectedContent.size || 12,  
+      width: selectedContent.size || 12,
+      fill: selectedContent.color || 'black',
+    };
+    currentCanvasData.content.push(newSquare);
+    }
+    if (toggleMode === 'triangle')
+    {
+    // Append the new text object to the content of the canvas
+    const newTriangle = {
+      type: 'triangle',
+      id: Date.now(),
+      x: xPercentage,  
+      y: yPercentage, 
+      height:  selectedContent.size || 12,  
+      width: selectedContent.size || 12,
+      fill: selectedContent.color || 'black',
+    };
+    currentCanvasData.content.push(newTriangle);
+    }
     // Update the current slide with the new content
     setCurrentSlide(updatedSlide);
     updateSlideData(updatedSlide);
@@ -193,12 +237,80 @@ const updateSlideData = (updatedSlide) => {
       renderCanvasContent(canvasInstance.current, updatedSlide.deck[0].content,800,600); 
 
       canvasInstance.current.on('object:modified', handleObjectModified);
-      
+      canvasInstance.current.on('selected', (e) => {
+      const selectedObjects =  canvasInstance.current.getActiveObjects();
+      console.log(selectedObjects);
+      if (selectedObjects) {
+        setSelectedContent(selectedObjects[0]);
+        console.log(selectedContent.fill);
+      }
+    });
       return () => {
         canvasInstance.current.dispose();
       };
     }
   }, [currentCanvas, currentSlide]);
+
+  
+  // Handle color change
+  const handleColorChange = (event) => {
+
+    const newColor = event.target.value;
+
+    if (selectedContent && selectedContent.id) {
+      const updatedSlide = {
+        ...currentSlide,
+        deck: currentSlide.deck.map((canvas) => {
+          if (canvas.id === currentCanvas) {
+            return {
+              ...canvas,
+              content: canvas.content.map((item) =>
+                item.id === selectedContent.id ? { ...item, fill: newColor } : item
+              ),
+            };
+          }
+          return canvas;
+        }),
+      };
+      setCurrentSlide(updatedSlide);
+      updateSlideData(updatedSlide);
+    }
+    setSelectedContent((prevContent) => ({ ...prevContent, fill: newColor }));
+  };
+
+  // Handle fontSize or radius change
+  const handleSizeChange = (event) => {
+    const newSize = event.target.value;
+    if (selectedContent && selectedContent.id) {
+      const updatedSlide = {
+        ...currentSlide,
+        deck: currentSlide.deck.map((canvas) => {
+          if (canvas.id === currentCanvas) {
+            return {
+              ...canvas,
+              content: canvas.content.map((item) =>
+                item.id === selectedContent.id
+                  ? {
+                      ...item,
+                      fontSize: item.type === 'text' ? newSize : item.fontSize,
+                      radius: item.type === 'circle' ? newSize : item.radius,
+                    }
+                  : item
+              ),
+            };
+          }
+          return canvas;
+        }),
+      };
+      setCurrentSlide(updatedSlide);
+      updateSlideData(updatedSlide);
+    }
+    setSelectedContent((prevContent) => ({
+      ...prevContent,
+      fontSize: prevContent.type === 'text' ? newSize : prevContent.fontSize,
+      radius: prevContent.type === 'circle' ? newSize : prevContent.radius,
+    }));
+  };
 
   return (
     <div className="main-container">
@@ -227,27 +339,101 @@ const updateSlideData = (updatedSlide) => {
                 ref={canvasRef}
               ></canvas>
             </div>
-            <div className="canvas-controls" style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
-              <input
-                type="color"
-                value={backgroundColor}
-                onChange={handleColorChange}
-                style={{ cursor: 'pointer' }}
-              />
-              <Icon
-                icon="humbleicons:text"
-                width="24"
-                height="24"
-                onClick={() => setToggleMode('text')}
-                style={{
-                  cursor: 'pointer',
-                  backgroundColor: toggleMode === 'text' ? '#e0e0e0' : '#fff',
-                  padding: '5px',
-                  borderRadius: '50%',
-                }}
-              />
-            </div>
-          </div>
+         <div className="canvas-controls" style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px', alignItems: 'center' }}>
+  <div style={{ display: 'flex', alignItems: 'center' }}>
+    <Icon icon="material-symbols-light:background-grid-small-sharp" width="24" height="24" style={{ marginRight: '5px' }} />
+    <label htmlFor="background-color" style={{ marginRight: '10px' }}>Background Color:</label>
+    <input
+      id="background-color"
+      type="color"
+      value={backgroundColor}
+      onChange={handleBackgroundColorChange}
+      style={{ cursor: 'pointer' }}
+    />
+  </div>
+
+  <div style={{ display: 'flex', alignItems: 'center' }}>
+    <Icon icon="mdi:shape" width="24" height="24" style={{ marginRight: '5px' }} />
+    <label htmlFor="content-color" style={{ marginRight: '10px' }}>Content Color:</label>
+    <input
+      id="content-color"
+      type="color"
+      key={selectedContent.fill}
+      value={selectedContent.fill || '000000'}
+      onChange={handleColorChange}
+      style={{ cursor: 'pointer' }}
+    />
+  </div>
+
+  <div style={{ display: 'flex', alignItems: 'center' }}>
+    <label htmlFor="size-range" style={{ marginRight: '10px' }}>Content Size:</label>
+    <input
+      id="size-range"
+      type="range"
+      min="1"
+      max="100"
+      value={selectedContent.fontSize || selectedContent.radius || 12}
+      onChange={handleSizeChange}
+      style={{ width: '100px' }}
+    />
+  </div>
+
+  <div style={{ display: 'flex', alignItems: 'center' }}>
+    <Icon
+      icon="humbleicons:text"
+      width="24"
+      height="24"
+      onClick={() => setToggleMode('text')}
+      style={{
+        cursor: 'pointer',
+        backgroundColor: toggleMode === 'text' ? '#e0e0e0' : '#fff',
+        padding: '5px',
+        borderRadius: '50%',
+        marginLeft: '10px',
+      }}
+    />
+    <Icon
+      icon="material-symbols:circle"
+      width="24"
+      height="24"
+      onClick={() => setToggleMode('circle')}
+      style={{
+        cursor: 'pointer',
+        backgroundColor: toggleMode === 'circle' ? '#e0e0e0' : '#fff',
+        padding: '5px',
+        borderRadius: '50%',
+        marginLeft: '10px',
+      }}
+    />
+    <Icon
+      icon="material-symbols:square"
+      width="24"
+      height="24"
+      onClick={() => setToggleMode('square')}
+      style={{
+        cursor: 'pointer',
+        backgroundColor: toggleMode === 'square' ? '#e0e0e0' : '#fff',
+        padding: '5px',
+        borderRadius: '50%',
+        marginLeft: '10px',
+      }}
+    />
+       <Icon
+      icon="mdi:triangle"
+      width="24"
+      height="24"
+      onClick={() => setToggleMode('triangle')}
+      style={{
+        cursor: 'pointer',
+        backgroundColor: toggleMode === 'triangle' ? '#e0e0e0' : '#fff',
+        padding: '5px',
+        borderRadius: '50%',
+        marginLeft: '10px',
+      }}
+    />
+  </div>
+</div>
+</div>
         )}
       </div>
     </div>
