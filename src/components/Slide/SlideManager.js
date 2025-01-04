@@ -106,7 +106,7 @@ const updateSlideData = (updatedSlide) => {
                       angle: object.angle,
                       text: object.textLines ? object.textLines[0] : item.text,
                       fontSize: object.fontSize,
-                      color: object.fill,
+                      color: object.fill || 'black',
                       scaleX: object.scaleX,
                       scaleY: object.scaleY,
                     }
@@ -162,8 +162,8 @@ const updateSlideData = (updatedSlide) => {
       text: 'New Text', // Placeholder text
       x: xPercentage,  // Position as percentage
       y: yPercentage,  // Position as percentage
-      fontSize: selectedContent.size || 12,   
-      fill: selectedContent.color || 'black',
+      fontSize: selectedContent?.size || 12,   
+      fill: selectedContent?.color || '#000000',
     };
     currentCanvasData.content.push(newTextObject);
     }
@@ -174,8 +174,8 @@ const updateSlideData = (updatedSlide) => {
       id: Date.now(),
       x: xPercentage,  
       y: yPercentage, 
-     radius: selectedContent.size || 12,   
-     fill: selectedContent.color || 'black',
+     radius: selectedContent?.size || 12,   
+     fill: selectedContent?.color || '#000000',
     };
     currentCanvasData.content.push(newCircle);
     }
@@ -187,9 +187,9 @@ const updateSlideData = (updatedSlide) => {
       id: Date.now(),
       x: xPercentage,  
       y: yPercentage, 
-      height:  selectedContent.size || 12,  
-      width: selectedContent.size || 12,
-      fill: selectedContent.color || 'black',
+      height:  selectedContent?.size || 12,  
+      width: selectedContent?.size || 12,
+      fill: selectedContent?.color || '#000000',
     };
     currentCanvasData.content.push(newSquare);
     }
@@ -201,9 +201,9 @@ const updateSlideData = (updatedSlide) => {
       id: Date.now(),
       x: xPercentage,  
       y: yPercentage, 
-      height:  selectedContent.size || 12,  
-      width: selectedContent.size || 12,
-      fill: selectedContent.color || 'black',
+      height:  selectedContent?.size || 12,  
+      width: selectedContent?.size || 12,
+      fill: selectedContent?.color || '#000000',
     };
     currentCanvasData.content.push(newTriangle);
     }
@@ -237,7 +237,7 @@ const updateSlideData = (updatedSlide) => {
       renderCanvasContent(canvasInstance.current, updatedSlide.deck[0].content,800,600); 
 
       canvasInstance.current.on('object:modified', handleObjectModified);
-      canvasInstance.current.on('selected', (e) => {
+      canvasInstance.current.on('selection:created', (e) => {
       const selectedObjects =  canvasInstance.current.getActiveObjects();
       console.log(selectedObjects);
       if (selectedObjects) {
@@ -311,6 +311,58 @@ const updateSlideData = (updatedSlide) => {
       radius: prevContent.type === 'circle' ? newSize : prevContent.radius,
     }));
   };
+  useEffect(() => {
+  const handleKeyDown = (event) => {
+    if (event.key === 'Backspace' && selectedContent?.id) {
+      event.preventDefault();
+
+      const updatedSlide = {
+        ...currentSlide,
+        deck: currentSlide.deck.map((canvas) => {
+          if (canvas.id === currentCanvas) {
+            return {
+              ...canvas,
+              content: canvas.content.filter((item) => item.id !== selectedContent.id),
+            };
+          }
+          return canvas;
+        }),
+      };
+
+      setCurrentSlide(updatedSlide);
+      updateSlideData(updatedSlide);
+      setSelectedContent(null); // Clear selection after deletion
+    }
+  };
+
+  window.addEventListener('keydown', handleKeyDown);
+  return () => {
+    window.removeEventListener('keydown', handleKeyDown);
+  };
+}, [selectedContent, currentCanvas, currentSlide]);
+
+const copyCanvas = (canvasId) => {
+  const canvasToCopy = currentSlide.deck.find((canvas) => canvas.id === canvasId);
+
+  if (!canvasToCopy) {
+    console.error('Canvas not found');
+    return;
+  }
+
+  const copiedCanvas = {
+    ...canvasToCopy,
+    id: Date.now(), // Assign a new unique ID
+  };
+
+  const updatedSlide = {
+    ...currentSlide,
+    deck: [...currentSlide.deck, copiedCanvas],
+  };
+
+  setCurrentSlide(updatedSlide);
+  updateSlideData(updatedSlide);
+};
+
 
   return (
     <div className="main-container">
@@ -324,6 +376,7 @@ const updateSlideData = (updatedSlide) => {
               moveCanvas={moveCanvas}
               setCurrentCanvas={setCurrentCanvas}
               deleteCanvas={deleteCanvas}
+              copyCanvas={copyCanvas}
             />
           ))}
         </div>
@@ -358,8 +411,8 @@ const updateSlideData = (updatedSlide) => {
     <input
       id="content-color"
       type="color"
-      key={selectedContent.fill}
-      value={selectedContent.fill || '000000'}
+      key={selectedContent?.fill || '000000'}
+      value={selectedContent?.fill || '000000'}
       onChange={handleColorChange}
       style={{ cursor: 'pointer' }}
     />
@@ -372,7 +425,7 @@ const updateSlideData = (updatedSlide) => {
       type="range"
       min="1"
       max="100"
-      value={selectedContent.fontSize || selectedContent.radius || 12}
+      value={selectedContent?.fontSize || selectedContent?.radius || 12}
       onChange={handleSizeChange}
       style={{ width: '100px' }}
     />

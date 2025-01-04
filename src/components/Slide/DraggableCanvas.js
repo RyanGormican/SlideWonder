@@ -6,7 +6,7 @@ import { Canvas } from 'fabric';
 
 const ITEM_TYPE = 'CANVAS_ITEM';
 
-function DraggableCanvas({ canvas, index, moveCanvas, setCurrentCanvas, deleteCanvas }) {
+function DraggableCanvas({ canvas, index, moveCanvas, setCurrentCanvas, deleteCanvas, copyCanvas }) {
   const dragCanvasRef = useRef(null); // Reference to the <canvas> DOM element
   const dragInstance = useRef(null); // Reference to the fabric.Canvas instance
 
@@ -39,7 +39,7 @@ function DraggableCanvas({ canvas, index, moveCanvas, setCurrentCanvas, deleteCa
       });
 
       // Render content on the canvas
-      renderCanvasContent(dragInstance.current, canvas.content, 300, 200,false);
+      renderCanvasContent(dragInstance.current, canvas.content, 300, 200, false);
 
       return () => {
         dragInstance.current.dispose(); // Clean up the canvas instance
@@ -50,7 +50,7 @@ function DraggableCanvas({ canvas, index, moveCanvas, setCurrentCanvas, deleteCa
   return (
     <div
       ref={(node) => dragRef(dropRef(node))}
-      className="canvas-item "
+      className="canvas-item"
       style={{
         marginBottom: '10px',
         border: '1px solid #ccc',
@@ -59,34 +59,82 @@ function DraggableCanvas({ canvas, index, moveCanvas, setCurrentCanvas, deleteCa
         cursor: 'grab',
         position: 'relative',
       }}
-       onClick={() => setCurrentCanvas(canvas.id)}
+      onClick={() => setCurrentCanvas(canvas.id)}
     >
-    <div className="locked">
-      <canvas
-        ref={dragCanvasRef}
-        id={`canvas-preview-${canvas.id}`}
-        width="300"
-        height="200"
-      ></canvas>
+      <div className="locked">
+        <canvas
+          ref={dragCanvasRef}
+          id={`canvas-preview-${canvas.id}`}
+          width="300"
+          height="200"
+        ></canvas>
       </div>
-      {/* Delete icon */}
-      <Icon
-        icon="mdi:trash"
-        width="24"
-        height="24"
-        className="delete-icon"
-        onClick={() => deleteCanvas(canvas.id)}
+      {/* Wrapper for stacked controls */}
+      <div
         style={{
           position: 'absolute',
           top: '10px',
-          right: '10px',
-          color: 'red',
-          cursor: 'pointer',
-          background: '#fff',
-          borderRadius: '50%',
-          padding: '4px',
+          right: '5px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '2vh', 
         }}
-      />
+      >
+        {/* Index */}
+        <div
+          style={{
+            fontSize: '14px',
+            fontWeight: 'bold',
+            backgroundColor: '#fff',
+            borderRadius: '50%',
+            width: '24px',
+            height: '24px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            border: '1px solid #ccc',
+          }}
+        >
+          {index + 1}
+        </div>
+        {/* Delete icon */}
+        <Icon
+          icon="mdi:trash"
+          width="24"
+          height="24"
+          className="delete-icon"
+          onClick={() => deleteCanvas(canvas.id)}
+          style={{
+            color: 'red',
+            cursor: 'pointer',
+            background: '#fff',
+            borderRadius: '50%',
+            padding: '4px',
+            border: '1px solid #ccc',
+          }}
+        />
+        {/* Copy icon */}
+        <Icon
+          icon="mdi:content-copy"
+          width="24"
+          height="24"
+          className="copy-icon"
+          onClick={(e) => {
+            e.stopPropagation();
+            copyCanvas(canvas.id);
+          }}
+          style={{
+            color: '#4caf50',
+            cursor: 'pointer',
+            background: '#fff',
+            borderRadius: '50%',
+            padding: '4px',
+            border: '1px solid #ccc',
+          }}
+        />
+      </div>
     </div>
   );
 }

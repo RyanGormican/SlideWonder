@@ -15,8 +15,8 @@ export const renderCanvasContent = (canvas, content, width, height) => {
         const text = new IText(item.text, {
           left: relativeX,
           top: relativeY,
-          fontSize: item.fontSize || 30,
-          fill: item.color || 'black',
+          fontSize: item?.fontSize || 30,
+          fill: item?.fill || 'black',
           angle: item.angle || 0,
           id: item.id,
           scaleX: item.scaleX || 1,
@@ -39,21 +39,14 @@ export const renderCanvasContent = (canvas, content, width, height) => {
         const circle = new Circle({
           left: relativeX,
           top: relativeY,
-          radius: item.radius || 12,
-          fill: item.fill || 'black',
-          angle: item.angle || 0,
+          radius: item?.radius || 12,
+          fill: item?.fill || 'black',
+          angle: item?.angle || 0,
           id: item.id,
           scaleX: item.scaleX || 1,
           scaleY: item.scaleY || 1,
           editable: true,
         });
-
-        // Ensure text stays within canvas boundaries
-        circle.set({
-          left: Math.max(0, Math.min(circle.left, width - circle.width)),
-          top: Math.max(0, Math.min(circle.top, height - circle.height)),
-        });
-
         // Add circle to canvas
         canvas.add(circle);
       }else if (item.type === 'square') {
@@ -63,9 +56,9 @@ export const renderCanvasContent = (canvas, content, width, height) => {
         const square = new Rect({
           left: relativeX,
           top: relativeY,
-          height: item.height || 12,
-          width: item.width || 12,
-          fill: item.fill || 'black',
+          height: item?.height || 12,
+          width: item?.width || 12,
+          fill: item?.fill || 'black',
           angle: item.angle || 0,
           id: item.id,
           scaleX: item.scaleX || 1,
@@ -90,7 +83,7 @@ export const renderCanvasContent = (canvas, content, width, height) => {
           top: relativeY,
           height: item.height || 12,
           width: item.width || 12,
-          fill: item.fill || 'black',
+          fill: item?.fill || 'black',
           angle: item.angle || 0,
           id: item.id,
           scaleX: item.scaleX || 1,
