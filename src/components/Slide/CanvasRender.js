@@ -65,7 +65,8 @@ export const renderCanvasContent = (canvas, content, width, height) => {
           scaleY: item.scaleY || 1,
           editable: true,
         });
-
+        console.log(square.height);
+        console.log(square.width)
         // Ensure text stays within canvas boundaries
         square.set({
           left: Math.max(0, Math.min(square.left, width - square.width)),

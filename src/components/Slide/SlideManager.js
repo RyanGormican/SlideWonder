@@ -242,7 +242,6 @@ const updateSlideData = (updatedSlide) => {
       console.log(selectedObjects);
       if (selectedObjects) {
         setSelectedContent(selectedObjects[0]);
-        console.log(selectedContent.fill);
       }
     });
       return () => {
@@ -257,7 +256,7 @@ const updateSlideData = (updatedSlide) => {
 
     const newColor = event.target.value;
 
-    if (selectedContent && selectedContent.id) {
+    if (selectedContent && selectedContent?.id) {
       const updatedSlide = {
         ...currentSlide,
         deck: currentSlide.deck.map((canvas) => {
@@ -294,6 +293,8 @@ const updateSlideData = (updatedSlide) => {
                       ...item,
                       fontSize: item.type === 'text' ? newSize : item.fontSize,
                       radius: item.type === 'circle' ? newSize : item.radius,
+                      height: item.type === 'square' ? newSize : item.height,
+                      width: item.type === 'square' ? newSize : item.width,
                     }
                   : item
               ),
@@ -309,6 +310,8 @@ const updateSlideData = (updatedSlide) => {
       ...prevContent,
       fontSize: prevContent.type === 'text' ? newSize : prevContent.fontSize,
       radius: prevContent.type === 'circle' ? newSize : prevContent.radius,
+      height: prevContent.type === 'square' ? newSize : prevContent.height,
+      width: prevContent.type === 'square' ? newSize : prevContent.width,
     }));
   };
   useEffect(() => {
@@ -425,7 +428,7 @@ const copyCanvas = (canvasId) => {
       type="range"
       min="1"
       max="100"
-      value={selectedContent?.fontSize || selectedContent?.radius || 12}
+      value={selectedContent?.fontSize || selectedContent?.radius || selectedContent?.height || 12}
       onChange={handleSizeChange}
       style={{ width: '100px' }}
     />

@@ -9,9 +9,9 @@ const Select = ({ slides, setSlides, handleGridClick }) => {
   const [editingTitle, setEditingTitle] = useState(null);
   const [newTitle, setNewTitle] = useState('');
   const [selectedSlide, setSelectedSlide] = useState(null);
-  const [sortOrder, setSortOrder] = useState({ field: 'dateCreated', direction: 'asc' });
+  const [sortOrder, setSortOrder] = useState({ field: 'lastUpdated', direction: 'desc' });
   const [viewType, setViewType] = useState('grid'); // State to toggle between grid and list view
-
+ const [hoveredDate, setHoveredDate] = useState({});
   // Filter slides based on search query
   const filteredSlides = slides.filter(slide =>
     slide.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -104,14 +104,26 @@ const Select = ({ slides, setSlides, handleGridClick }) => {
     }));
   };
   // Function to convert slide data to CSV
-  const convertToCSV = (slide) => {
-    const header = slide.columns.map(col => col.title).join(',');
-    const rows = slide.rows.map(row => 
-      slide.columns.map(col => row[col.key] || '').join(',')
-    ).join('\n');
+const convertToCSV = (slide) => {
+  // Check if slide is a valid object
+  if (!slide || typeof slide !== 'object') {
+    console.error('Invalid slide data');
+    return ''; // Return an empty string if the slide is invalid
+  }
 
-    return `${header}\n${rows}`;
-  };
+  // Create header row based on the slide's properties
+  const header = Object.keys(slide).join(',');
+
+  // Create row from slide values
+  const row = Object.values(slide).map(value => {
+    // If the value is an object or array, convert it to a string 
+    return typeof value === 'object' ? JSON.stringify(value) : value;
+  }).join(',');
+
+  return `${header}\n${row}`;
+};
+
+
 
   // Function to download CSV
   const handleDownloadCSV = (slide) => {
@@ -119,7 +131,30 @@ const Select = ({ slides, setSlides, handleGridClick }) => {
     const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
     saveAs(blob, `${slide.title}.csv`);
   };
+const timeAgo = (date) => {
+  const now = new Date();
+  const diff = now - new Date(date); // Difference in milliseconds
 
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const weeks = Math.floor(days / 7);
+  const months = Math.floor(days / 30);
+  const years = Math.floor(days / 365);
+
+  if (years > 0) return `${years} year${years > 1 ? 's' : ''} ago`;
+  if (months > 0) return `${months} month${months > 1 ? 's' : ''} ago`;
+  if (weeks > 0) return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
+  if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
+  if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+  if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+  return `${seconds} second${seconds > 1 ? 's' : ''} ago`;
+};
+
+  const formatDate = (date) => {
+    return new Date(date).toLocaleString(); 
+  };
   return (
     <div>
       {/* Search bar and view toggle buttons */}
@@ -139,7 +174,7 @@ const Select = ({ slides, setSlides, handleGridClick }) => {
         </IconButton>
 
         <IconButton onClick={toggleSortOrder}>
-          <Icon icon={`mdi:arrow-${sortOrder.direction === 'asc' ? 'down' : 'up'}`} width="24" height="24" />
+          <Icon icon={`mdi:arrow-${sortOrder.direction === 'asc' ? 'up' : 'down'}`} width="24" height="24" />
         </IconButton>
         <IconButton onClick={() => changeSortField('name')}>
           <Typography style={{ fontWeight: sortOrder.field === 'name' ? 'bold' : 'normal' }}>
@@ -211,29 +246,43 @@ const Select = ({ slides, setSlides, handleGridClick }) => {
           </Grid>
         </Grid>
       ) : (
-        <List>
-          {sortedSlides.map((slide, index) => (
-            <ListItem button key={index} onClick={() => handleGridClick(slide.id)}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                {/* Title Section */}
-                <ListItemText 
-                  primary={slide.title}
-                  style={{ fontWeight: 'bold' }}
-                />
+       <List>
+  {sortedSlides.map((slide, index) => (
+    <ListItem button key={index} onClick={() => handleGridClick(slide.id)}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+        {/* Title Section */}
+        <ListItemText 
+          primary={slide.title}
+          style={{ fontWeight: 'bold' }}
+        />
 
-                {/* Creation Date Section */}
-                <div style={{ fontSize: '14px', color: '#555', marginLeft: '16px' }}>
-                  <strong>Created: </strong>{new Date(slide.dateCreated).toLocaleDateString()}
-                </div>
+        {/* Creation Date Section */}
+        <div
+          style={{ fontSize: '14px', color: '#555', marginLeft: '16px' }}
+          onMouseEnter={() => setHoveredDate(prev => ({ ...prev, [slide.id]: 'created' }))}
+          onMouseLeave={() => setHoveredDate(prev => ({ ...prev, [slide.id]: null }))}
+        >
+          <strong>Created: </strong>
+          {hoveredDate[slide.id] === 'created'
+            ? formatDate(slide.dateCreated)
+            : timeAgo(slide.dateCreated)}
+        </div>
 
-                {/* Last Updated Date Section */}
-                <div style={{ fontSize: '14px', color: '#555', marginLeft: '16px' }}>
-                  <strong>Last Updated: </strong>{new Date(slide.lastUpdated).toLocaleDateString()}
-                </div>
-              </div>
-            </ListItem>
-          ))}
-        </List>
+        {/* Last Updated Date Section */}
+        <div
+          style={{ fontSize: '14px', color: '#555', marginLeft: '16px' }}
+          onMouseEnter={() => setHoveredDate(prev => ({ ...prev, [slide.id]: 'updated' }))}
+          onMouseLeave={() => setHoveredDate(prev => ({ ...prev, [slide.id]: null }))}
+        >
+          <strong>Last Updated: </strong>
+          {hoveredDate[slide.id] === 'updated'
+            ? formatDate(slide.lastUpdated)
+            : timeAgo(slide.lastUpdated)}
+        </div>
+      </div>
+    </ListItem>
+  ))}
+</List>
       )}
 
       <InfoModal
