@@ -5,19 +5,23 @@ import { Icon } from '@iconify/react';
 
 function Present({ currentSlide, setView }) {
   const [currentCanvasIndex, setCurrentCanvasIndex] = useState(0);
-  const [hovering, setHovering] = useState(false);  // New state to handle hover
-  const [fullscreen, setFullscreen] = useState(false);  // To track fullscreen state
+  const [hovering, setHovering] = useState(false);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [autoPlay, setAutoPlay] = useState(false);
+  const [autoPlayDelay, setAutoPlayDelay] = useState(5); // Initial value in seconds
+  const [loop, setLoop] = useState(false);
+
   const canvasRef = useRef(null);
   const canvasInstance = useRef(null);
-  const controlsRef = useRef(null);  // Ref for the controls area
+  const controlsRef = useRef(null);
+  const hoverTimeoutRef = useRef(null);
+  const autoPlayTimerRef = useRef(null);
 
   const currentCanvasData = currentSlide?.deck[currentCanvasIndex];
 
-  // Function to initialize and render the canvas
   const initializeCanvas = () => {
     if (!currentCanvasData || !canvasRef.current) return;
 
-    // Initialize fabric.Canvas instance
     canvasInstance.current = new Canvas(canvasRef.current, {
       width: window.innerWidth,
       height: window.innerHeight,
@@ -25,25 +29,18 @@ function Present({ currentSlide, setView }) {
       backgroundColor: currentCanvasData.backgroundColor || '#ffffff',
     });
 
-    // Render content on the canvas
     renderCanvasContent(canvasInstance.current, currentCanvasData.content, window.innerWidth, window.innerHeight);
   };
 
-  // Fullscreen change listener
   useEffect(() => {
     const handleFullscreenChange = () => {
       setFullscreen(document.fullscreenElement !== null);
-      // Re-initialize the canvas when entering or exiting fullscreen
       initializeCanvas();
     };
 
-    // Listen for fullscreen change events
     document.addEventListener('fullscreenchange', handleFullscreenChange);
-
-    // Initialize the canvas when the component mounts
     initializeCanvas();
 
-    // Cleanup on unmount
     return () => {
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
       if (canvasInstance.current) {
@@ -52,28 +49,54 @@ function Present({ currentSlide, setView }) {
     };
   }, [currentCanvasIndex, currentCanvasData]);
 
-  // Keyboard event listener effect
   useEffect(() => {
     const handleKeyDown = (e) => {
       switch (e.key) {
         case 'Escape':
-          setView('slide'); // Escape to the slide view
+          setView('slide');
           break;
         case 'ArrowRight':
-          goToNextCanvas(); // Next canvas (slide)
+        case 'Enter':
+        case ' ':
+          goToNextCanvas();
           break;
         case 'ArrowLeft':
-          goToPreviousCanvas(); // Previous canvas (slide)
+        case 'Shift+ ':
+          goToPreviousCanvas();
+          break;
+        case 'f':
+          toggleFullscreen();
+          break;
+        case 'Home':
+          // Jump to the first canvas
+          setCurrentCanvasIndex(0);
+          break;
+        case 'End':
+          // Jump to the last canvas
+          setCurrentCanvasIndex(currentSlide.deck.length - 1);
+          break;
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+          // Jump to a specific slide (1-9)
+          const slideIndex = parseInt(e.key) - 1;
+          if (slideIndex < currentSlide.deck.length) {
+            setCurrentCanvasIndex(slideIndex);
+          }
           break;
         default:
           break;
       }
     };
 
-    // Add event listener when component mounts
     window.addEventListener('keydown', handleKeyDown);
 
-    // Clean up event listener when component unmounts
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
@@ -82,6 +105,8 @@ function Present({ currentSlide, setView }) {
   const goToNextCanvas = () => {
     if (currentCanvasIndex < currentSlide.deck.length - 1) {
       setCurrentCanvasIndex(currentCanvasIndex + 1);
+    } else if (loop) {
+      setCurrentCanvasIndex(0); // Go back to the beginning if loop is enabled
     }
   };
 
@@ -91,29 +116,63 @@ function Present({ currentSlide, setView }) {
     }
   };
 
-  // Detect clicks outside the controls area
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  };
+
+  const startHoverTimer = () => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+
+    hoverTimeoutRef.current = setTimeout(() => {
+      setHovering(false);
+    }, 3000);
+  };
+
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (controlsRef.current && !controlsRef.current.contains(event.target)) {
-        setHovering(!hovering);
-      }
+    const handleMouseMove = () => {
+      setHovering(true);
+      startHoverTimer();
     };
 
-    // Add click event listener for outside clicks
-    document.addEventListener('click', handleClickOutside);
+    window.addEventListener('mousemove', handleMouseMove);
 
-    // Cleanup on unmount
     return () => {
-      document.removeEventListener('click', handleClickOutside);
+      window.removeEventListener('mousemove', handleMouseMove);
     };
   }, []);
+
+  // Autoplay functionality
+  useEffect(() => {
+    if (autoPlay) {
+      autoPlayTimerRef.current = setInterval(() => {
+        goToNextCanvas();
+      }, autoPlayDelay * 1000); // Delay in seconds (with decimal support)
+    } else if (autoPlayTimerRef.current) {
+      clearInterval(autoPlayTimerRef.current);
+    }
+
+    return () => {
+      if (autoPlayTimerRef.current) {
+        clearInterval(autoPlayTimerRef.current);
+      }
+    };
+  }, [autoPlay, autoPlayDelay, currentCanvasIndex]);
 
   if (!currentSlide || !currentSlide.deck || currentSlide.deck.length === 0) {
     return <div>No content to present!</div>;
   }
 
+  // Calculate progress percentage
+  const progress = ((currentCanvasIndex + 1) / currentSlide.deck.length) * 100;
+
   return (
-    <div className="present-container" style={{ textAlign: 'center', position: 'relative' }}>
+    <div className="present-container" style={{ textAlign: 'center', position: 'relative', cursor: hovering ? 'auto' : 'none' }}>
       {/* Canvas */}
       <div
         style={{
@@ -130,7 +189,7 @@ function Present({ currentSlide, setView }) {
         <canvas ref={canvasRef} id="presentation-canvas" />
       </div>
 
-      {/* Navigation Buttons */}
+      {/* Navigation and Autoplay Controls */}
       <div
         ref={controlsRef}
         className="present-controls"
@@ -138,22 +197,21 @@ function Present({ currentSlide, setView }) {
           position: 'absolute',
           bottom: '20px',
           left: '50%',
-          transform: 'translateX(-50%)', 
-          display: hovering ? 'flex' : 'none',  
+          transform: 'translateX(-50%)',
+          display: hovering ? 'flex' : 'none',
           zIndex: '3',
           gap: '10px',
-          backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
           padding: '15px',
-          borderRadius: '0', 
+          borderRadius: '0',
+          alignItems: 'center',
         }}
-        onMouseEnter={() => setHovering(true)}  
-        onMouseLeave={() => setHovering(false)}  
       >
         {/* Back Button */}
         <div
           style={{
             cursor: 'pointer',
-            color: '#fff', 
+            color: '#fff',
           }}
         >
           <Icon
@@ -193,9 +251,61 @@ function Present({ currentSlide, setView }) {
         >
           Next
         </button>
+
+        {/* Progress Bar */}
+        <div style={{ width: '200px', marginLeft: '20px' }}>
+          <div style={{ width: '100%', backgroundColor: 'rgba(0, 0, 0, 0.5)', height: '8px', borderRadius: '4px' }}>
+            <div
+              style={{
+                width: `${progress}%`,
+                height: '100%',
+                backgroundColor: '#4caf50',
+                borderRadius: '4px',
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Slide Info */}
+        <p style={{ color: '#fff', marginLeft: '10px' }}>
+          Slide {currentCanvasIndex + 1} of {currentSlide.deck.length}
+        </p>
+
+        {/* Autoplay Toggle and Delay */}
+        <div style={{ color: '#fff' }}>
+          <input
+            type="checkbox"
+            checked={autoPlay}
+            onChange={(e) => setAutoPlay(e.target.checked)}
+          />
+          Auto Play
+          {autoPlay && (
+            <div>
+              <label htmlFor="delay">Delay (seconds):</label>
+              <input
+                id="delay"
+                type="number"
+                value={autoPlayDelay}
+                onChange={(e) => setAutoPlayDelay(parseFloat(e.target.value))}
+                min="0.1"
+                step="0.1"
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Loop Toggle */}
+        <div style={{ color: '#fff' }}>
+          <input
+            type="checkbox"
+            checked={loop}
+            onChange={(e) => setLoop(e.target.checked)}
+          />
+          Loop
+        </div>
       </div>
 
-      {/* Show buttons and back icon on hover */}
+      {/* Hover Area */}
       <div
         className="hover-area"
         style={{
@@ -203,11 +313,19 @@ function Present({ currentSlide, setView }) {
           bottom: 0,
           left: 0,
           width: '100vw',
-          height: '10vh',
-          zIndex:'1',
+          height: '100vh',
+          zIndex: '1',
         }}
-        onMouseEnter={() => setHovering(true)}  // Set hovering state to true
-        onMouseLeave={() => setHovering(false)}  // Set hovering state to false
+        onMouseEnter={() => {
+          setHovering(true);
+          startHoverTimer();
+        }}
+        onMouseLeave={() => {
+          setHovering(false);
+          if (hoverTimeoutRef.current) {
+            clearTimeout(hoverTimeoutRef.current);
+          }
+        }}
       />
     </div>
   );

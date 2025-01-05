@@ -83,12 +83,23 @@ const updateSlideData = (updatedSlide) => {
     }
   };
 
-  const handleObjectModified = (e) => {
+ const handleObjectModified = (e) => {
   const object = e.target;
-  console.log(object);
+  const contentType = getSelectedContentType(object.id); // Get the content type
+
+  // Declare width and height with let so they can be reassigned
+  let width = object.width ? (object.width / 800) * 100 : 1;
+  let height = object.height ? (object.height / 600) * 100 : 1;
+
+  // If the content type is square, set width and height to the minimum of the two
+  if (contentType === 'square') {
+    const minDimension = Math.min(width, height);
+    width = height = minDimension; // Make height and width equal
+  }
+
   // Create a shallow copy of the current slide
-  const updatedSlide = { 
-    ...currentSlide, 
+  const updatedSlide = {
+    ...currentSlide,
     deck: currentSlide.deck.map((canvas) => {
       if (canvas.id === currentCanvas) {
         // Modify the canvas content if it matches the current canvas
@@ -98,19 +109,19 @@ const updateSlideData = (updatedSlide) => {
             ? canvas.content.map((item) =>
                 item.id === object.id
                   ? {
-  ...item,
-  x: (object.left / 800) * 100,
-  y: (object.top / 600) * 100,
-  width: object.width ? (object.width / 800) * 100 : 1,
-  radius: object.radius ? (object.radius / Math.min(800, 600)) * 100 : 1,
-  height: object.height ? (object.height / 600) * 100 : 1,
-  angle: object.angle,
-  text: object.textLines ? object.textLines[0] : item.text,
-  fontSize: object.fontSize ? (object.fontSize / Math.min(800, 600)) * 100 : 12,
-  color: object.fill || 'black',
-  scaleX: object.scaleX || 1,
-  scaleY: object.scaleY || 1,
-}
+                      ...item,
+                      x: (object.left / 800) * 100,
+                      y: (object.top / 600) * 100,
+                      width: width,
+                      radius: object.radius ? (object.radius / Math.min(800, 600)) * 100 : 1,
+                      height: height,
+                      angle: object.angle,
+                      text: object.textLines ? object.textLines[0] : item.text,
+                      fontSize: object.fontSize ? (object.fontSize / Math.min(800, 600)) * 100 : 12,
+                      color: object.fill || 'black',
+                      scaleX: object.scaleX || 1,
+                      scaleY: object.scaleY || 1,
+                    }
                   : item
               )
             : [],
@@ -119,10 +130,13 @@ const updateSlideData = (updatedSlide) => {
       return canvas;
     }),
   };
+
   // Update state and persist changes
   setCurrentSlide(updatedSlide);
   updateSlideData(updatedSlide);
 };
+
+
 
 
   const handleCanvasClick = (event) => {
@@ -222,7 +236,12 @@ const updateSlideData = (updatedSlide) => {
       const selectedObjects =  canvasInstance.current.getActiveObjects();
       if (selectedObjects) {
         setSelectedContent(selectedObjects[0]);
-        console.log(selectedObjects[0]);
+      }
+    });
+          canvasInstance.current.on('selection:updated', (e) => {
+      const selectedObjects =  canvasInstance.current.getActiveObjects();
+      if (selectedObjects) {
+        setSelectedContent(selectedObjects[0]);
       }
     });
       return () => {
@@ -392,14 +411,10 @@ const getSelectedContentType = (selectedContentId) => {
   if (!selectedContentId) return null;  // Ensure selectedContentId is valid
 
   const currentCanvasData = currentSlide?.deck.find((canvas) => canvas.id === currentCanvas);
-  console.log("CANVAS")
-  console.log(currentCanvasData);
   if (!currentCanvasData || !currentCanvasData.content) return null;  // Return null if canvas or content is not found
 
   // Find the selected content item in the content array
   const selectedContentItem = currentCanvasData.content.find((item) => item.id === selectedContentId);
-  console.log(selectedContentItem);
-  console.log("ITEM");
   // Return the .type of the selected content item (if found)
   return selectedContentItem ? selectedContentItem.type : null;
 };
@@ -407,9 +422,7 @@ const getSelectedContentType = (selectedContentId) => {
 
 
 const getSizeValue = (selectedContent) => {
-console.log(selectedContent);
   const contentType = getSelectedContentType(selectedContent.id);
-  console.log(contentType);
   switch(contentType) {
     case 'text':
       return selectedContent?.fontSize || 12;

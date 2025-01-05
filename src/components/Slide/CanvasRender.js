@@ -10,8 +10,8 @@ const calculateRelativeProps = (width, height, xPercent, yPercent, size = {}) =>
   const relativeSize = {
     width: size.width ? (width * size.width) / 100 : 12,
     height: size.height ? (height * size.height) / 100 : 12,
-    radius: size.radius ? (Math.min(width, height) * size.radius) / 100 : 12,  // For radius, use the smaller dimension
-    fontSize: size.fontSize ? (Math.min(width, height) * size.fontSize) / 100 : 12,  // Calculate relative font size
+    radius: size.radius ? (Math.min(width, height) * size.radius) / 100 : 1,  // For radius, use the smaller dimension
+    fontSize: size.fontSize  ? (Math.min(width, height) * size.fontSize) / 100 : 12,  // Calculate relative font size
   };
 
   return {
@@ -66,10 +66,11 @@ export const renderCanvasContent = (canvas, content, width, height) => {
         canvas.add(circle);
 
       } else if (item.type === 'square') {
+ 
         const square = new Rect({
           ...commonProps,
           width: relWidth || 12,  // Use the relative width calculation
-          height: relHeight || 12,  // Use the relative height calculation
+          height: relWidth || 12,  // Use the relative height calculation
         });
         canvas.add(square);
 
