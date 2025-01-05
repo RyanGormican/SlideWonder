@@ -416,7 +416,7 @@ console.log(selectedContent);
     case 'circle':
       return selectedContent?.radius || 12;
     case 'triangle':
-    case 'rect':
+    case 'square':
       return selectedContent?.height || 12;
     default:
       return 12;
