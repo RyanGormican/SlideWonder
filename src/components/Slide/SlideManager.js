@@ -421,7 +421,7 @@ const getSelectedContentType = (selectedContentId) => {
 
 
 const getSizeValue = (selectedContent) => {
-  const contentType = getSelectedContentType(selectedContent.id);
+  const contentType = getSelectedContentType(selectedContent?.id);
   switch(contentType) {
     case 'text':
       return selectedContent?.fontSize || 12;
