@@ -112,12 +112,12 @@ const updateSlideData = (updatedSlide) => {
                       ...item,
                       x: (object.left / 800) * 100,
                       y: (object.top / 600) * 100,
-                      width: width,
-                      radius: object.radius ? (object.radius / Math.min(800, 600)) * 100 : 1,
-                      height: height,
+                      width:  object.width ? (object.width / 800) * 100 : 1,
+                      radius: object.radius ? (object.radius / 700) * 100 : 1,
+                      height:  object.height ? (object.height / 600) * 100 : 1,
                       angle: object.angle,
                       text: object.textLines ? object.textLines[0] : item.text,
-                      fontSize: object.fontSize ? (object.fontSize / Math.min(800, 600)) * 100 : 12,
+                      fontSize: object.fontSize ? (object.fontSize / 700) * 100 : 12,
                       color: object.fill || 'black',
                       scaleX: object.scaleX || 1,
                       scaleY: object.scaleY || 1,
@@ -180,23 +180,23 @@ const updateSlideData = (updatedSlide) => {
 
   if (toggleMode === 'circle') {
     const newCircle = createNewObject('circle', {
-      radius: selectedContent?.radius ? (selectedContent?.radius / canvasWidth) * 100 : 12,
+      radius: selectedContent?.radius ? (selectedContent?.radius / 700) * 100 : 12,
     });
     currentCanvasData.content.push(newCircle);
   }
 
   if (toggleMode === 'square') {
     const newSquare = createNewObject('square', {
-      width: selectedContent?.width ? (selectedContent?.width / canvasWidth) * 100 : 12,
-      height: selectedContent?.height ? (selectedContent?.height / canvasHeight) * 100 : 12,
+      width: selectedContent?.width ? (selectedContent?.width / 700) * 100 : 12,
+      height: selectedContent?.height ? (selectedContent?.height / 700) * 100 : 12,
     });
     currentCanvasData.content.push(newSquare);
   }
 
   if (toggleMode === 'triangle') {
     const newTriangle = createNewObject('triangle', {
-      width: selectedContent?.size ? (selectedContent?.size / canvasWidth) * 100 : 12,
-      height: selectedContent?.size ? (selectedContent?.size / canvasHeight) * 100 : 12,
+      width: selectedContent?.size ? (selectedContent?.size / 700) * 100 : 12,
+      height: selectedContent?.size ? (selectedContent?.size / 700) * 100 : 12,
     });
     currentCanvasData.content.push(newTriangle);
   }
@@ -424,12 +424,12 @@ const getSizeValue = (selectedContent) => {
   const contentType = getSelectedContentType(selectedContent?.id);
   switch(contentType) {
     case 'text':
-      return selectedContent?.fontSize || 12;
+      return (selectedContent?.fontSize / 700) * 100 || 12;
     case 'circle':
-      return selectedContent?.radius || 12;
+      return (selectedContent?.radius / 700) * 100 || 12;
     case 'triangle':
     case 'square':
-      return selectedContent?.height || 12;
+      return (selectedContent?.height / 700) * 100 || 12;
     default:
       return 12;
   }
