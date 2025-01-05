@@ -98,18 +98,19 @@ const updateSlideData = (updatedSlide) => {
             ? canvas.content.map((item) =>
                 item.id === object.id
                   ? {
-                      ...item,
-                      x: (object.left/800 * 100),
-                      y: (object.top/600 * 100),
-                      width: object.width,
-                      height: object.height,
-                      angle: object.angle,
-                      text: object.textLines ? object.textLines[0] : item.text,
-                      fontSize: object.fontSize,
-                      color: object.fill || 'black',
-                      scaleX: object.scaleX,
-                      scaleY: object.scaleY,
-                    }
+  ...item,
+  x: (object.left / 800) * 100,
+  y: (object.top / 600) * 100,
+  width: object.width ? (object.width / 800) * 100 : 1,
+  radius: object.radius ? (object.radius / Math.min(800, 600)) * 100 : 1,
+  height: object.height ? (object.height / 600) * 100 : 1,
+  angle: object.angle,
+  text: object.textLines ? object.textLines[0] : item.text,
+  fontSize: object.fontSize,
+  color: object.fill || 'black',
+  scaleX: object.scaleX || 1,
+  scaleY: object.scaleY || 1,
+}
                   : item
               )
             : [],
@@ -125,94 +126,74 @@ const updateSlideData = (updatedSlide) => {
 
 
   const handleCanvasClick = (event) => {
-    if (toggleMode === null) return;
+  if (toggleMode === null) return;
 
-    const canvasElement = event.target;
-    const canvasWidth = canvasElement.width;
-    const canvasHeight = canvasElement.height;
+  const canvasElement = event.target;
+  const canvasWidth = canvasElement.width;
+  const canvasHeight = canvasElement.height;
 
-    // Get mouse position relative to canvas
-    const x = event.nativeEvent.offsetX;
-    const y = event.nativeEvent.offsetY;
+  // Get mouse position relative to canvas
+  const xPercentage = (event.nativeEvent.offsetX / canvasWidth) * 100;
+  const yPercentage = (event.nativeEvent.offsetY / canvasHeight) * 100;
 
-    // Calculate percentage position
-    const xPercentage = (x / canvasWidth) * 100;
-    const yPercentage = (y / canvasHeight) * 100;
+  const updatedSlide = { ...currentSlide };
+  const currentCanvasData = updatedSlide.deck.find((canvas) => canvas.id === currentCanvas);
 
-    const updatedSlide = { ...currentSlide };
+  if (!currentCanvasData) {
+    console.error("Canvas with id", currentCanvas, "not found.");
+    return;
+  }
 
-    const currentCanvasData = updatedSlide.deck.find((canvas) => canvas.id === currentCanvas);
+  // Initialize content if it is null
+  currentCanvasData.content = currentCanvasData.content || [];
 
-    if (!currentCanvasData) {
-      console.error("Canvas with id", currentCanvas, "not found.");
-      return;
-    }
+  const createNewObject = (type, additionalProperties) => ({
+    type,
+    id: Date.now(),
+    x: xPercentage,
+    y: yPercentage,
+    fill: selectedContent?.fill || '#000000',
+    ...additionalProperties,
+  });
 
-    // Initialize content if it is null
-    if (!currentCanvasData.content) {
-      currentCanvasData.content = [];
-    }
-
-    if (toggleMode === 'text')
-    {
-    // Append the new text object to the content of the canvas
-    const newTextObject = {
-      type: 'text',
-      id: Date.now(),
-      text: 'New Text', // Placeholder text
-      x: xPercentage,  // Position as percentage
-      y: yPercentage,  // Position as percentage
-      fontSize: selectedContent?.fontSize || 12,   
-      fill: selectedContent?.fill || '#000000',
-    };
+  if (toggleMode === 'text') {
+    const newTextObject = createNewObject('text', {
+      text: 'New Text',
+      fontSize: selectedContent?.fontSize || 12,
+    });
     currentCanvasData.content.push(newTextObject);
-    }
-        if (toggleMode === 'circle')
-    {
-    const newCircle = {
-      type: 'circle',
-      id: Date.now(),
-      x: xPercentage,  
-      y: yPercentage, 
-     radius: selectedContent?.radius || 12,   
-     fill: selectedContent?.fill || '#000000',
-    };
-    currentCanvasData.content.push(newCircle);
-    }
-        if (toggleMode === 'square')
-    {
-    // Append the new text object to the content of the canvas
-    const newSquare = {
-      type: 'square',
-      id: Date.now(),
-      x: xPercentage,  
-      y: yPercentage, 
-      height:  selectedContent?.height || 12,  
-      width: selectedContent?.width || 12,
-      fill: selectedContent?.fill || '#000000',
-    };
-    currentCanvasData.content.push(newSquare);
-    }
-    if (toggleMode === 'triangle')
-    {
-    // Append the new text object to the content of the canvas
-    const newTriangle = {
-      type: 'triangle',
-      id: Date.now(),
-      x: xPercentage,  
-      y: yPercentage, 
-      height:  selectedContent?.size || 12,  
-      width: selectedContent?.size || 12,
-      fill: selectedContent?.fill || '#000000',
-    };
-    currentCanvasData.content.push(newTriangle);
-    }
-    // Update the current slide with the new content
-    setCurrentSlide(updatedSlide);
-    updateSlideData(updatedSlide);
+  } 
 
-    setToggleMode(null);
-  };
+  if (toggleMode === 'circle') {
+    const newCircle = createNewObject('circle', {
+      radius: selectedContent?.radius ? (selectedContent?.radius / canvasWidth) * 100 : 12,
+    });
+    currentCanvasData.content.push(newCircle);
+  }
+
+  if (toggleMode === 'square') {
+    const newSquare = createNewObject('square', {
+      width: selectedContent?.width ? (selectedContent?.width / canvasWidth) * 100 : 12,
+      height: selectedContent?.height ? (selectedContent?.height / canvasHeight) * 100 : 12,
+    });
+    currentCanvasData.content.push(newSquare);
+  }
+
+  if (toggleMode === 'triangle') {
+    const newTriangle = createNewObject('triangle', {
+      width: selectedContent?.size ? (selectedContent?.size / canvasWidth) * 100 : 12,
+      height: selectedContent?.size ? (selectedContent?.size / canvasHeight) * 100 : 12,
+    });
+    currentCanvasData.content.push(newTriangle);
+  }
+
+  // Update the current slide with the new content
+  setCurrentSlide(updatedSlide);
+  updateSlideData(updatedSlide);
+
+  setToggleMode(null);
+};
+
 
   useEffect(() => {
     const currentCanvasData = currentSlide?.deck.find((canvas) => canvas.id === currentCanvas);
@@ -237,9 +218,8 @@ const updateSlideData = (updatedSlide) => {
       renderCanvasContent(canvasInstance.current, updatedSlide.deck[0].content,800,600); 
 
       canvasInstance.current.on('object:modified', handleObjectModified);
-      canvasInstance.current.on('selection:created', (e) => {
+      canvasInstance.current.on('selection:updated', (e) => {
       const selectedObjects =  canvasInstance.current.getActiveObjects();
-      console.log(selectedObjects);
       if (selectedObjects) {
         setSelectedContent(selectedObjects[0]);
       }
@@ -277,43 +257,54 @@ const updateSlideData = (updatedSlide) => {
     setSelectedContent((prevContent) => ({ ...prevContent, fill: newColor }));
   };
 
-  // Handle fontSize or radius change
-  const handleSizeChange = (event) => {
-    const newSize = event.target.value;
-    if (selectedContent && selectedContent.id) {
-      const updatedSlide = {
-        ...currentSlide,
-        deck: currentSlide.deck.map((canvas) => {
-          if (canvas.id === currentCanvas) {
-            return {
-              ...canvas,
-              content: canvas.content.map((item) =>
-                item.id === selectedContent.id
-                  ? {
-                      ...item,
-                      fontSize: item.type === 'text' ? newSize : item.fontSize,
-                      radius: item.type === 'circle' ? newSize : item.radius,
-                      height: item.type === 'square' ? newSize : item.height,
-                      width: item.type === 'square' ? newSize : item.width,
-                    }
-                  : item
-              ),
-            };
-          }
-          return canvas;
-        }),
-      };
-      setCurrentSlide(updatedSlide);
-      updateSlideData(updatedSlide);
-    }
-    setSelectedContent((prevContent) => ({
-      ...prevContent,
-      fontSize: prevContent.type === 'text' ? newSize : prevContent.fontSize,
-      radius: prevContent.type === 'circle' ? newSize : prevContent.radius,
-      height: prevContent.type === 'square' ? newSize : prevContent.height,
-      width: prevContent.type === 'square' ? newSize : prevContent.width,
-    }));
+ const handleSizeChange = (event) => {
+  const newSize = event.target.value;
+
+  if (!selectedContent || !selectedContent.id) return;
+
+  const updatedSlide = {
+    ...currentSlide,
+    deck: currentSlide.deck.map((canvas) => {
+      if (canvas.id === currentCanvas) {
+        return {
+          ...canvas,
+          content: canvas.content.map((item) =>
+            item.id === selectedContent.id
+              ? {
+                  ...item,
+                  ...getUpdatedProperties(item, newSize),
+                }
+              : item
+          ),
+        };
+      }
+      return canvas;
+    }),
   };
+
+  setCurrentSlide(updatedSlide);
+  updateSlideData(updatedSlide);
+
+  setSelectedContent((prevContent) => ({
+    ...prevContent,
+    ...getUpdatedProperties(prevContent, newSize),
+  }));
+};
+
+const getUpdatedProperties = (item, newSize) => {
+  switch (item.type) {
+    case 'text':
+      return { fontSize: newSize };
+    case 'circle':
+      return { radius: newSize };
+    case 'square':
+    case 'triangle':
+      return { height: newSize, width: newSize };
+    default:
+      return {};
+  }
+};
+
   useEffect(() => {
   const handleKeyDown = (event) => {
     if (event.key === 'Backspace' && selectedContent?.id) {
@@ -366,134 +357,234 @@ const copyCanvas = (canvasId) => {
   updateSlideData(updatedSlide);
 };
 
+const handleScaleChange = (event, axis) => {
+  const newValue = parseFloat(event.target.value);
+  const updatedSlide = {
+    ...currentSlide,
+    deck: currentSlide.deck.map((canvas) => {
+      if (canvas.id === currentCanvas) {
+        return {
+          ...canvas,
+          content: canvas.content.map((item) =>
+            item.id === selectedContent?.id
+              ? {
+                  ...item,
+                  [axis === 'x' ? 'scaleX' : 'scaleY']: newValue,
+                }
+              : item
+          ),
+        };
+      }
+      return canvas;
+    }),
+  };
 
-  return (
-    <div className="main-container">
-      <div className="scrollable-column">
-        <div className="canvas-list" key={JSON.stringify(slides)}>
-          {currentSlide?.deck.map((canvas, index) => (
-            <DraggableCanvas
-              key={canvas.id}
-              index={index}
-              canvas={canvas}
-              moveCanvas={moveCanvas}
-              setCurrentCanvas={setCurrentCanvas}
-              deleteCanvas={deleteCanvas}
-              copyCanvas={copyCanvas}
-            />
-          ))}
-        </div>
-        <button onClick={addCanvasToDeck}>Add Slide</button>
+  setCurrentSlide(updatedSlide);
+  updateSlideData(updatedSlide);
+
+  setSelectedContent((prevContent) => ({
+    ...prevContent,
+    [axis === 'x' ? 'scaleX' : 'scaleY']: newValue,
+  }));
+};
+
+return (
+  <div className="main-container">
+    <div className="scrollable-column">
+      <div className="canvas-list" key={JSON.stringify(slides)}>
+        {currentSlide?.deck.map((canvas, index) => (
+          <DraggableCanvas
+            key={canvas.id}
+            index={index}
+            canvas={canvas}
+            moveCanvas={moveCanvas}
+            setCurrentCanvas={setCurrentCanvas}
+            deleteCanvas={deleteCanvas}
+            copyCanvas={copyCanvas}
+          />
+        ))}
       </div>
-
-      <div className="canvas-container">
-        {currentCanvas && (
-          <div>
-            <div onClick={handleCanvasClick}>
-              <canvas
-                id="canvas"
-                ref={canvasRef}
-              ></canvas>
-            </div>
-         <div className="canvas-controls" style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px', alignItems: 'center' }}>
-  <div style={{ display: 'flex', alignItems: 'center' }}>
-    <Icon icon="material-symbols-light:background-grid-small-sharp" width="24" height="24" style={{ marginRight: '5px' }} />
-    <label htmlFor="background-color" style={{ marginRight: '10px' }}>Background Color:</label>
-    <input
-      id="background-color"
-      type="color"
-      value={backgroundColor}
-      onChange={handleBackgroundColorChange}
-      style={{ cursor: 'pointer' }}
-    />
-  </div>
-
-  <div style={{ display: 'flex', alignItems: 'center' }}>
-    <Icon icon="mdi:shape" width="24" height="24" style={{ marginRight: '5px' }} />
-    <label htmlFor="content-color" style={{ marginRight: '10px' }}>Content Color:</label>
-    <input
-      id="content-color"
-      type="color"
-      key={selectedContent?.fill || '000000'}
-      value={selectedContent?.fill || '000000'}
-      onChange={handleColorChange}
-      style={{ cursor: 'pointer' }}
-    />
-  </div>
-
-  <div style={{ display: 'flex', alignItems: 'center' }}>
-    <label htmlFor="size-range" style={{ marginRight: '10px' }}>Content Size:</label>
-    <input
-      id="size-range"
-      type="range"
-      min="1"
-      max="100"
-      value={selectedContent?.fontSize || selectedContent?.radius || selectedContent?.height || 12}
-      onChange={handleSizeChange}
-      style={{ width: '100px' }}
-    />
-  </div>
-
-  <div style={{ display: 'flex', alignItems: 'center' }}>
-    <Icon
-      icon="humbleicons:text"
-      width="24"
-      height="24"
-      onClick={() => setToggleMode('text')}
-      style={{
-        cursor: 'pointer',
-        backgroundColor: toggleMode === 'text' ? '#e0e0e0' : '#fff',
-        padding: '5px',
-        borderRadius: '50%',
-        marginLeft: '10px',
-      }}
-    />
-    <Icon
-      icon="material-symbols:circle"
-      width="24"
-      height="24"
-      onClick={() => setToggleMode('circle')}
-      style={{
-        cursor: 'pointer',
-        backgroundColor: toggleMode === 'circle' ? '#e0e0e0' : '#fff',
-        padding: '5px',
-        borderRadius: '50%',
-        marginLeft: '10px',
-      }}
-    />
-    <Icon
-      icon="material-symbols:square"
-      width="24"
-      height="24"
-      onClick={() => setToggleMode('square')}
-      style={{
-        cursor: 'pointer',
-        backgroundColor: toggleMode === 'square' ? '#e0e0e0' : '#fff',
-        padding: '5px',
-        borderRadius: '50%',
-        marginLeft: '10px',
-      }}
-    />
-       <Icon
-      icon="mdi:triangle"
-      width="24"
-      height="24"
-      onClick={() => setToggleMode('triangle')}
-      style={{
-        cursor: 'pointer',
-        backgroundColor: toggleMode === 'triangle' ? '#e0e0e0' : '#fff',
-        padding: '5px',
-        borderRadius: '50%',
-        marginLeft: '10px',
-      }}
-    />
-  </div>
-</div>
-</div>
-        )}
-      </div>
+      <button onClick={addCanvasToDeck}>Add Slide</button>
     </div>
-  );
+
+    <div className="canvas-container">
+      {currentCanvas && (
+        <div>
+          <div onClick={handleCanvasClick}>
+            <canvas
+              id="canvas"
+              ref={canvasRef}
+            ></canvas>
+          </div>
+          <div
+            className="canvas-controls"
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              marginTop: '10px',
+              alignItems: 'center',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <Icon
+                icon="material-symbols-light:background-grid-small-sharp"
+                width="24"
+                height="24"
+                style={{ marginRight: '5px' }}
+              />
+              <label htmlFor="background-color" style={{ marginRight: '10px' }}>
+                Background Color:
+              </label>
+              <input
+                id="background-color"
+                type="color"
+                value={backgroundColor}
+                onChange={handleBackgroundColorChange}
+                style={{ cursor: 'pointer' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <Icon icon="mdi:shape" width="24" height="24" style={{ marginRight: '5px' }} />
+              <label htmlFor="content-color" style={{ marginRight: '10px' }}>
+                Content Color:
+              </label>
+              <input
+                id="content-color"
+                type="color"
+                key={selectedContent?.fill || '000000'}
+                value={selectedContent?.fill || '000000'}
+                onChange={handleColorChange}
+                style={{ cursor: 'pointer' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                <label htmlFor="x-scale-range" style={{ marginRight: '10px' }}>
+                  X Scale:
+                </label>
+                <input
+                  id="x-scale-range"
+                  type="range"
+                  min="1"
+                  max="100"
+                  value={selectedContent?.scaleX || 1}
+                   onChange={(e) => handleScaleChange(e, 'x')}
+                  style={{ width: '100px' }}
+                />
+                <input
+                  type="number"
+                  value={selectedContent?.scaleX || 1}
+                 onChange={(e) => handleScaleChange(e, 'x')}
+                  style={{ width: '50px', marginLeft: '10px' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                <label htmlFor="y-scale-range" style={{ marginRight: '10px' }}>
+                  Y Scale:
+                </label>
+                <input
+                  id="y-scale-range"
+                  type="range"
+                  min="1"
+                  max="100"
+                  value={selectedContent?.scaleY || 1}
+                    onChange={(e) => handleScaleChange(e, 'y')}
+                  style={{ width: '100px' }}
+                />
+                <input
+                  type="number"
+                  value={selectedContent?.scaleY || 1}
+           onChange={(e) => handleScaleChange(e, 'y')}
+                  style={{ width: '50px', marginLeft: '10px' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                <label htmlFor="size-range" style={{ marginRight: '10px' }}>
+                  Content Size:
+                </label>
+                <input
+                  id="size-range"
+                  type="range"
+                  min="1"
+                  max="100"
+                  value={selectedContent?.fontSize || selectedContent?.radius || selectedContent?.height || 12}
+                  onChange={handleSizeChange}
+                  style={{ width: '100px' }}
+                />
+                <input
+                  type="number"
+                  value={selectedContent?.fontSize || selectedContent?.radius || selectedContent?.height || 12}
+                  onChange={handleSizeChange}
+                  style={{ width: '50px', marginLeft: '10px' }}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <Icon
+                icon="humbleicons:text"
+                width="24"
+                height="24"
+                onClick={() => setToggleMode('text')}
+                style={{
+                  cursor: 'pointer',
+                  backgroundColor: toggleMode === 'text' ? '#e0e0e0' : '#fff',
+                  padding: '5px',
+                  borderRadius: '50%',
+                  marginLeft: '10px',
+                }}
+              />
+              <Icon
+                icon="material-symbols:circle"
+                width="24"
+                height="24"
+                onClick={() => setToggleMode('circle')}
+                style={{
+                  cursor: 'pointer',
+                  backgroundColor: toggleMode === 'circle' ? '#e0e0e0' : '#fff',
+                  padding: '5px',
+                  borderRadius: '50%',
+                  marginLeft: '10px',
+                }}
+              />
+              <Icon
+                icon="material-symbols:square"
+                width="24"
+                height="24"
+                onClick={() => setToggleMode('square')}
+                style={{
+                  cursor: 'pointer',
+                  backgroundColor: toggleMode === 'square' ? '#e0e0e0' : '#fff',
+                  padding: '5px',
+                  borderRadius: '50%',
+                  marginLeft: '10px',
+                }}
+              />
+              <Icon
+                icon="mdi:triangle"
+                width="24"
+                height="24"
+                onClick={() => setToggleMode('triangle')}
+                style={{
+                  cursor: 'pointer',
+                  backgroundColor: toggleMode === 'triangle' ? '#e0e0e0' : '#fff',
+                  padding: '5px',
+                  borderRadius: '50%',
+                  marginLeft: '10px',
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+);
+
 }
 
 export default SlideManager;
