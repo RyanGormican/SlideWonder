@@ -8,9 +8,9 @@ const calculateRelativeProps = (width, height, xPercent, yPercent, size = {}) =>
   };
 
   const relativeSize = {
-    width: size.width ? (width * size.width) / 100 : undefined,
-    height: size.height ? (height * size.height) / 100 : undefined,
-    radius: size.radius ? (Math.min(width, height) * size.radius) / 100 : undefined,  // For radius, use the smaller dimension
+    width: size.width ? (width * size.width) / 100 : 12,
+    height: size.height ? (height * size.height) / 100 : 12,
+    radius: size.radius ? (Math.min(width, height) * size.radius) / 100 : 12,  // For radius, use the smaller dimension
   };
 
   return {
@@ -28,10 +28,15 @@ export const renderCanvasContent = (canvas, content, width, height) => {
 
   if (content) {
     content.forEach((item) => {
-      const { x, y, angle, fill, scaleX, scaleY, id, size = {} } = item;
+      const { x, y, angle, fill, scaleX, scaleY, id } = item;
+
+      // Directly access width, height, and radius from item
+      const { width: itemWidth, height: itemHeight, radius: itemRadius } = item;
 
       // Calculate relative position and size for each item
-      const { left, top, width: relWidth, height: relHeight, radius: relRadius } = calculateRelativeProps(width, height, x, y, size);
+      const { left, top, width: relWidth, height: relHeight, radius: relRadius } = calculateRelativeProps(
+        width, height, x, y, { width: itemWidth, height: itemHeight, radius: itemRadius }
+      );
 
       // Common object properties to be used for all types
       const commonProps = {
