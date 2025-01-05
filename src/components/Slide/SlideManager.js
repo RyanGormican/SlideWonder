@@ -253,17 +253,16 @@ const updateSlideData = (updatedSlide) => {
   
   // Handle color change
   const handleColorChange = (event) => {
-
     const newColor = event.target.value;
 
     if (selectedContent && selectedContent?.id) {
       const updatedSlide = {
         ...currentSlide,
-        deck: currentSlide.deck.map((canvas) => {
+        deck: currentSlide?.deck?.map((canvas) => {
           if (canvas.id === currentCanvas) {
             return {
               ...canvas,
-              content: canvas.content.map((item) =>
+              content: canvas?.content?.map((item) =>
                 item.id === selectedContent.id ? { ...item, fill: newColor } : item
               ),
             };
