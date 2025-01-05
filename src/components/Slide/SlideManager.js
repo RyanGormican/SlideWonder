@@ -106,7 +106,7 @@ const updateSlideData = (updatedSlide) => {
   height: object.height ? (object.height / 600) * 100 : 1,
   angle: object.angle,
   text: object.textLines ? object.textLines[0] : item.text,
-  fontSize: object.fontSize,
+  fontSize: object.fontSize ? (object.fontSize / Math.min(800, 600)) * 100 : 12,
   color: object.fill || 'black',
   scaleX: object.scaleX || 1,
   scaleY: object.scaleY || 1,
@@ -218,7 +218,7 @@ const updateSlideData = (updatedSlide) => {
       renderCanvasContent(canvasInstance.current, updatedSlide.deck[0].content,800,600); 
 
       canvasInstance.current.on('object:modified', handleObjectModified);
-      canvasInstance.current.on('selection:updated', (e) => {
+      canvasInstance.current.on('selection:created', (e) => {
       const selectedObjects =  canvasInstance.current.getActiveObjects();
       if (selectedObjects) {
         setSelectedContent(selectedObjects[0]);
@@ -506,21 +506,38 @@ return (
                 <label htmlFor="size-range" style={{ marginRight: '10px' }}>
                   Content Size:
                 </label>
-                <input
-                  id="size-range"
-                  type="range"
-                  min="1"
-                  max="100"
-                  value={selectedContent?.fontSize || selectedContent?.radius || selectedContent?.height || 12}
-                  onChange={handleSizeChange}
-                  style={{ width: '100px' }}
-                />
-                <input
-                  type="number"
-                  value={selectedContent?.fontSize || selectedContent?.radius || selectedContent?.height || 12}
-                  onChange={handleSizeChange}
-                  style={{ width: '50px', marginLeft: '10px' }}
-                />
+             <input
+  id="size-range"
+  type="range"
+  min="1"
+  max="100"
+  value={
+    selectedContent?.type === 'text'
+      ? selectedContent?.fontSize || 12
+      : selectedContent?.type === 'circle'
+      ? selectedContent?.radius || 12
+      : selectedContent?.type === 'triangle' || selectedContent?.type === 'square'
+      ? selectedContent?.height || 12
+      : 12
+  }
+  onChange={handleSizeChange}
+  style={{ width: '100px' }}
+/>
+<input
+  type="number"
+  value={
+    selectedContent?.type === 'text'
+      ? selectedContent?.fontSize || 12
+      : selectedContent?.type === 'circle'
+      ? selectedContent?.radius || 12
+      : selectedContent?.type === 'triangle' || selectedContent?.type === 'square'
+      ? selectedContent?.height || 12
+      : 12
+  }
+  onChange={handleSizeChange}
+  style={{ width: '50px', marginLeft: '10px' }}
+/>
+
               </div>
             </div>
 
