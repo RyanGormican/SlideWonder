@@ -222,6 +222,7 @@ const updateSlideData = (updatedSlide) => {
       const selectedObjects =  canvasInstance.current.getActiveObjects();
       if (selectedObjects) {
         setSelectedContent(selectedObjects[0]);
+        console.log(selectedObjects[0]);
       }
     });
       return () => {
@@ -257,7 +258,7 @@ const updateSlideData = (updatedSlide) => {
     setSelectedContent((prevContent) => ({ ...prevContent, fill: newColor }));
   };
 
- const handleSizeChange = (event) => {
+const handleSizeChange = (event) => {
   const newSize = event.target.value;
 
   if (!selectedContent || !selectedContent.id) return;
@@ -292,18 +293,18 @@ const updateSlideData = (updatedSlide) => {
 };
 
 const getUpdatedProperties = (item, newSize) => {
-  switch (item.type) {
-    case 'text':
-      return { fontSize: newSize };
-    case 'circle':
-      return { radius: newSize };
-    case 'square':
-    case 'triangle':
-      return { height: newSize, width: newSize };
-    default:
-      return {};
-  }
+  const updatedProps = {};
+
+  // Iterate over all keys of the item and apply newSize where relevant
+  Object.keys(item).forEach((key) => {
+    if (key === 'fontSize' || key === 'radius' || key === 'height' || key === 'width') {
+      updatedProps[key] = newSize;
+    }
+  });
+
+  return updatedProps;
 };
+
 
   useEffect(() => {
   const handleKeyDown = (event) => {
@@ -387,6 +388,41 @@ const handleScaleChange = (event, axis) => {
     [axis === 'x' ? 'scaleX' : 'scaleY']: newValue,
   }));
 };
+const getSelectedContentType = (selectedContentId) => {
+  if (!selectedContentId) return null;  // Ensure selectedContentId is valid
+
+  const currentCanvasData = currentSlide?.deck.find((canvas) => canvas.id === currentCanvas);
+  console.log("CANVAS")
+  console.log(currentCanvasData);
+  if (!currentCanvasData || !currentCanvasData.content) return null;  // Return null if canvas or content is not found
+
+  // Find the selected content item in the content array
+  const selectedContentItem = currentCanvasData.content.find((item) => item.id === selectedContentId);
+  console.log(selectedContentItem);
+  console.log("ITEM");
+  // Return the .type of the selected content item (if found)
+  return selectedContentItem ? selectedContentItem.type : null;
+};
+
+
+
+const getSizeValue = (selectedContent) => {
+console.log(selectedContent);
+  const contentType = getSelectedContentType(selectedContent.id);
+  console.log(contentType);
+  switch(contentType) {
+    case 'text':
+      return selectedContent?.fontSize || 12;
+    case 'circle':
+      return selectedContent?.radius || 12;
+    case 'triangle':
+    case 'rect':
+      return selectedContent?.height || 12;
+    default:
+      return 12;
+  }
+};
+
 
 return (
   <div className="main-container">
@@ -506,37 +542,22 @@ return (
                 <label htmlFor="size-range" style={{ marginRight: '10px' }}>
                   Content Size:
                 </label>
-             <input
+<input
   id="size-range"
   type="range"
   min="1"
   max="100"
-  value={
-    selectedContent?.type === 'text'
-      ? selectedContent?.fontSize || 12
-      : selectedContent?.type === 'circle'
-      ? selectedContent?.radius || 12
-      : selectedContent?.type === 'triangle' || selectedContent?.type === 'square'
-      ? selectedContent?.height || 12
-      : 12
-  }
+  value={getSizeValue(selectedContent)}
   onChange={handleSizeChange}
   style={{ width: '100px' }}
 />
 <input
   type="number"
-  value={
-    selectedContent?.type === 'text'
-      ? selectedContent?.fontSize || 12
-      : selectedContent?.type === 'circle'
-      ? selectedContent?.radius || 12
-      : selectedContent?.type === 'triangle' || selectedContent?.type === 'square'
-      ? selectedContent?.height || 12
-      : 12
-  }
+  value={getSizeValue(selectedContent)}
   onChange={handleSizeChange}
   style={{ width: '50px', marginLeft: '10px' }}
 />
+
 
               </div>
             </div>
