@@ -187,3 +187,37 @@ canvas {
 .App.present::-webkit-scrollbar {
   display: none;
 }
+/* Transition panel that bumps out to the left */
+.transition-panel {
+  width: 220px; /* Adjust the width as needed */
+  top: 0;
+  left: -240px; /* Bumps it out 240px to the left (width + some spacing) */
+  background-color: #f1f1f1;
+  padding: 15px;
+  border-right: 2px solid #ccc;
+  z-index: 2;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional shadow for effect */
+}
+
+/* Title for the transitions panel */
+.transition-panel h3 {
+  margin-top: 0;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* Style for each transition type button or label */
+.transition-type {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #e0e0e0;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+}
+.transition-list{
+    height: 50vh;
+    overflow-y:auto;
+}

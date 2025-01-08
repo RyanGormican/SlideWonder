@@ -2,7 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Canvas } from 'fabric';
 import { renderCanvasContent } from '../Slide/CanvasRender';
 import { Icon } from '@iconify/react';
-
+import { applyDissolveTransition , applyFadeInTransition, applySlideInLeftTransition } from './Transitions';
+import { Keybinds } from './Keybinds';
 function Present({ currentSlide, setView }) {
   const [currentCanvasIndex, setCurrentCanvasIndex] = useState(0);
   const [hovering, setHovering] = useState(false);
@@ -21,6 +22,9 @@ function Present({ currentSlide, setView }) {
 
   const initializeCanvas = () => {
     if (!currentCanvasData || !canvasRef.current) return;
+
+    // Reset opacity before rendering
+    canvasRef.current.style.opacity = 1;
 
     canvasInstance.current = new Canvas(canvasRef.current, {
       width: window.innerWidth,
@@ -49,66 +53,33 @@ function Present({ currentSlide, setView }) {
     };
   }, [currentCanvasIndex, currentCanvasData]);
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      switch (e.key) {
-        case 'Escape':
-          setView('slide');
-          break;
-        case 'ArrowRight':
-        case 'Enter':
-        case ' ':
-          goToNextCanvas();
-          break;
-        case 'ArrowLeft':
-        case 'Shift+ ':
-          goToPreviousCanvas();
-          break;
-        case 'f':
-          toggleFullscreen();
-          break;
-        case 'Home':
-          // Jump to the first canvas
-          setCurrentCanvasIndex(0);
-          break;
-        case 'End':
-          // Jump to the last canvas
-          setCurrentCanvasIndex(currentSlide.deck.length - 1);
-          break;
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-          // Jump to a specific slide (1-9)
-          const slideIndex = parseInt(e.key) - 1;
-          if (slideIndex < currentSlide.deck.length) {
-            setCurrentCanvasIndex(slideIndex);
-          }
-          break;
-        default:
-          break;
-      }
-    };
+  
 
-    window.addEventListener('keydown', handleKeyDown);
+ const goToNextCanvas = () => {
+  if (currentCanvasIndex < currentSlide.deck.length - 1) {
+    const currentCanvas = currentSlide.deck[currentCanvasIndex];
+    const nextCanvas = currentSlide.deck[currentCanvasIndex + 1];
 
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [currentCanvasIndex, currentSlide, setView]);
-
-  const goToNextCanvas = () => {
-    if (currentCanvasIndex < currentSlide.deck.length - 1) {
-      setCurrentCanvasIndex(currentCanvasIndex + 1);
-    } else if (loop) {
-      setCurrentCanvasIndex(0); // Go back to the beginning if loop is enabled
+    // Add more transition cases here
+    switch (currentCanvas.transition) {
+      case 'dissolve':
+        applyDissolveTransition(currentCanvas, nextCanvas, canvasRef, currentCanvasIndex, setCurrentCanvasIndex);
+        break;
+      case 'slideInLeft':
+        applySlideInLeftTransition(currentCanvas, nextCanvas, canvasRef, currentCanvasIndex, setCurrentCanvasIndex);
+        break;
+      case 'fadeIn':
+        applyFadeInTransition(currentCanvas, nextCanvas, canvasRef, currentCanvasIndex, setCurrentCanvasIndex);
+        break;
+      default:
+        setCurrentCanvasIndex(currentCanvasIndex + 1); 
+        break;
     }
-  };
+  } else if (loop) {
+    setCurrentCanvasIndex(0); 
+  }
+};
+
 
   const goToPreviousCanvas = () => {
     if (currentCanvasIndex > 0) {
@@ -123,6 +94,7 @@ function Present({ currentSlide, setView }) {
       document.exitFullscreen();
     }
   };
+
 
   const startHoverTimer = () => {
     if (hoverTimeoutRef.current) {
@@ -146,13 +118,29 @@ function Present({ currentSlide, setView }) {
       window.removeEventListener('mousemove', handleMouseMove);
     };
   }, []);
+   useEffect(() => {
+    const keydownHandler = Keybinds({
+      currentSlide,
+      currentCanvasIndex,
+      setCurrentCanvasIndex,
+      setView,
+      loop,
+      goToNextCanvas,
+      goToPreviousCanvas,
+      toggleFullscreen
+    });
+    window.addEventListener('keydown', keydownHandler);
 
+    return () => {
+      window.removeEventListener('keydown', keydownHandler);
+    };
+  }, [currentCanvasIndex, currentSlide, setView, loop, goToNextCanvas, goToPreviousCanvas, toggleFullscreen]);
   // Autoplay functionality
   useEffect(() => {
     if (autoPlay) {
       autoPlayTimerRef.current = setInterval(() => {
         goToNextCanvas();
-      }, autoPlayDelay * 1000); // Delay in seconds (with decimal support)
+      }, autoPlayDelay * 1000); // Delay in seconds 
     } else if (autoPlayTimerRef.current) {
       clearInterval(autoPlayTimerRef.current);
     }

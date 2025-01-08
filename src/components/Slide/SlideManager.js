@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { renderCanvasContent } from './CanvasRender';  // Import the shared function
+import { renderCanvasContent } from './CanvasRender'; 
 import DraggableCanvas from './DraggableCanvas';
 import { Icon } from '@iconify/react';
 import { Canvas, IText } from 'fabric';
-
+import { transitions } from './TransitionsList';
 function SlideManager({ slides, setSlides, currentSlide, setCurrentSlide }) {
   const [currentCanvas, setCurrentCanvas] = useState(null);
   const [backgroundColor, setBackgroundColor] = useState('#ffffff');
@@ -434,35 +434,123 @@ const getSizeValue = (selectedContent) => {
       return 12;
   }
 };
+// Handle drag start on transition items
+const handleDragStart = (event, contentType) => {
+  event.dataTransfer.setData("text", contentType); // Store content type
+};
 
+// Handle drag over on canvas
+const handleDragOver = (event) => {
+  event.preventDefault(); // Allow the drop by preventing the default behavior
+};
 
+// Handle drop on canvas
+const handleDrop = (event, canvasId) => {
+  event.preventDefault();
+  const contentType = event.dataTransfer.getData("text"); // Get the dropped content type
+  if (contentType){
+  addTransitionToCanvas(contentType, canvasId); // Pass canvasId to addTransitionToCanvas
+  };
+};
+
+// Add transition to the specific canvas
+const addTransitionToCanvas = (contentType, canvasId) => {
+      const updatedDeck = currentSlide.deck.map((canvas) =>
+        canvas.id === canvasId ? { ...canvas, transition: contentType } : canvas
+      );
+      const updatedSlide = { ...currentSlide, deck: updatedDeck };
+      setCurrentSlide(updatedSlide);
+      updateSlideData(updatedSlide);
+};
+// Function to delete the transition
+const deleteTransition = (canvasId) => {
+  const updatedSlide = { ...currentSlide };
+
+  // Find the canvas by its ID
+  const currentCanvasData = updatedSlide.deck.find((canvas) => canvas.id === canvasId);
+
+  if (!currentCanvasData) return;
+
+  // Set the transition to null
+  currentCanvasData.transition = null;
+
+  setCurrentSlide(updatedSlide);
+  updateSlideData(updatedSlide);
+};
+function formatTransition(transition) {
+  return transition
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/\b\w/g, char => char.toUpperCase());
+}
+ const sortedTransitions = [...transitions].sort((a, b) => a.title.localeCompare(b.title));
 return (
   <div className="main-container">
+    <div className="transition-panel">
+      <h3>Transitions</h3>
+      <div className="transition-list">
+   {sortedTransitions.map((transition) => (
+        <div
+          key={transition.id}
+          className="transition-type"
+          draggable
+          onDragStart={(e) => handleDragStart(e, transition.id)}
+        >
+          {transition.title}
+        </div>
+      ))}
+      </div>
+    </div>
     <div className="scrollable-column">
       <div className="canvas-list" key={JSON.stringify(slides)}>
         {currentSlide?.deck.map((canvas, index) => (
-          <DraggableCanvas
-            key={canvas.id}
-            index={index}
-            canvas={canvas}
-            moveCanvas={moveCanvas}
-            setCurrentCanvas={setCurrentCanvas}
-            deleteCanvas={deleteCanvas}
-            copyCanvas={copyCanvas}
-          />
+          <React.Fragment key={canvas.id}>
+            <div  onDragOver={handleDragOver}
+              onDrop={(e) => handleDrop(e, canvas.id)}>
+            <DraggableCanvas
+              index={index}
+              canvas={canvas}
+              moveCanvas={moveCanvas}
+              setCurrentCanvas={setCurrentCanvas}
+              deleteCanvas={deleteCanvas}
+              copyCanvas={copyCanvas}
+            />
+            </div>
+            {/* Check for transition and render overlap */}
+            {canvas.transition && index < currentSlide.deck.length - 1 && (
+           <div className="canvas-transition-overlay" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+  <span style={{ flexGrow: 1, textAlign: 'center' }}>  {formatTransition(canvas.transition)}</span>
+  <Icon
+    icon="mdi:trash"
+    width="16"
+    height="16"
+    className="delete-icon"
+    onClick={() => deleteTransition(canvas.id)}
+    style={{
+      color: 'red',
+      cursor: 'pointer',
+      background: '#fff',
+      borderRadius: '50%',
+      padding: '4px',
+      border: '1px solid #ccc',
+    }}
+  />
+</div>
+
+
+            )}
+          </React.Fragment>
         ))}
       </div>
+
       <button onClick={addCanvasToDeck}>Add Slide</button>
     </div>
+
 
     <div className="canvas-container">
       {currentCanvas && (
         <div>
           <div onClick={handleCanvasClick}>
-            <canvas
-              id="canvas"
-              ref={canvasRef}
-            ></canvas>
+            <canvas id="canvas" ref={canvasRef}></canvas>
           </div>
           <div
             className="canvas-controls"
@@ -518,13 +606,13 @@ return (
                   min="1"
                   max="100"
                   value={selectedContent?.scaleX || 1}
-                   onChange={(e) => handleScaleChange(e, 'x')}
+                  onChange={(e) => handleScaleChange(e, 'x')}
                   style={{ width: '100px' }}
                 />
                 <input
                   type="number"
                   value={selectedContent?.scaleX || 1}
-                 onChange={(e) => handleScaleChange(e, 'x')}
+                  onChange={(e) => handleScaleChange(e, 'x')}
                   style={{ width: '50px', marginLeft: '10px' }}
                 />
               </div>
@@ -539,13 +627,13 @@ return (
                   min="1"
                   max="100"
                   value={selectedContent?.scaleY || 1}
-                    onChange={(e) => handleScaleChange(e, 'y')}
+                  onChange={(e) => handleScaleChange(e, 'y')}
                   style={{ width: '100px' }}
                 />
                 <input
                   type="number"
                   value={selectedContent?.scaleY || 1}
-           onChange={(e) => handleScaleChange(e, 'y')}
+                  onChange={(e) => handleScaleChange(e, 'y')}
                   style={{ width: '50px', marginLeft: '10px' }}
                 />
               </div>
@@ -554,23 +642,21 @@ return (
                 <label htmlFor="size-range" style={{ marginRight: '10px' }}>
                   Content Size:
                 </label>
-<input
-  id="size-range"
-  type="range"
-  min="1"
-  max="100"
-  value={getSizeValue(selectedContent)}
-  onChange={handleSizeChange}
-  style={{ width: '100px' }}
-/>
-<input
-  type="number"
-  value={getSizeValue(selectedContent)}
-  onChange={handleSizeChange}
-  style={{ width: '50px', marginLeft: '10px' }}
-/>
-
-
+                <input
+                  id="size-range"
+                  type="range"
+                  min="1"
+                  max="100"
+                  value={getSizeValue(selectedContent)}
+                  onChange={handleSizeChange}
+                  style={{ width: '100px' }}
+                />
+                <input
+                  type="number"
+                  value={getSizeValue(selectedContent)}
+                  onChange={handleSizeChange}
+                  style={{ width: '50px', marginLeft: '10px' }}
+                />
               </div>
             </div>
 
@@ -634,6 +720,7 @@ return (
     </div>
   </div>
 );
+
 
 }
 

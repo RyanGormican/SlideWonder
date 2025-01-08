@@ -15,7 +15,8 @@
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^19.0.0",
-    "react-scripts": "^5.0.1"
+    "react-scripts": "^5.0.1",
+    "webpack": "^5.97.1"
   },
   "scripts": {
     "start": "react-scripts start",
