@@ -4,6 +4,9 @@ import DraggableCanvas from './DraggableCanvas';
 import { Icon } from '@iconify/react';
 import { Canvas, IText } from 'fabric';
 import { transitions } from './TransitionsList';
+import CanvasControls from './CanvasControls'; 
+import {handleDragStart, handleDragOver, handleDrop, formatTransition, deleteTransition} from './TransitionsManagement'; 
+import {copyCanvas} from './CanvasManagement'; 
 function SlideManager({ slides, setSlides, currentSlide, setCurrentSlide }) {
   const [currentCanvas, setCurrentCanvas] = useState(null);
   const [backgroundColor, setBackgroundColor] = useState('#ffffff');
@@ -354,27 +357,6 @@ const getUpdatedProperties = (item, newSize) => {
   };
 }, [selectedContent, currentCanvas, currentSlide]);
 
-const copyCanvas = (canvasId) => {
-  const canvasToCopy = currentSlide.deck.find((canvas) => canvas.id === canvasId);
-
-  if (!canvasToCopy) {
-    console.error('Canvas not found');
-    return;
-  }
-
-  const copiedCanvas = {
-    ...canvasToCopy,
-    id: Date.now(), // Assign a new unique ID
-  };
-
-  const updatedSlide = {
-    ...currentSlide,
-    deck: [...currentSlide.deck, copiedCanvas],
-  };
-
-  setCurrentSlide(updatedSlide);
-  updateSlideData(updatedSlide);
-};
 
 const handleScaleChange = (event, axis) => {
   const newValue = parseFloat(event.target.value);
@@ -434,294 +416,84 @@ const getSizeValue = (selectedContent) => {
       return 12;
   }
 };
-// Handle drag start on transition items
-const handleDragStart = (event, contentType) => {
-  event.dataTransfer.setData("text", contentType); // Store content type
-};
 
-// Handle drag over on canvas
-const handleDragOver = (event) => {
-  event.preventDefault(); // Allow the drop by preventing the default behavior
-};
-
-// Handle drop on canvas
-const handleDrop = (event, canvasId) => {
-  event.preventDefault();
-  const contentType = event.dataTransfer.getData("text"); // Get the dropped content type
-  if (contentType){
-  addTransitionToCanvas(contentType, canvasId); // Pass canvasId to addTransitionToCanvas
-  };
-};
-
-// Add transition to the specific canvas
-const addTransitionToCanvas = (contentType, canvasId) => {
-      const updatedDeck = currentSlide.deck.map((canvas) =>
-        canvas.id === canvasId ? { ...canvas, transition: contentType } : canvas
-      );
-      const updatedSlide = { ...currentSlide, deck: updatedDeck };
-      setCurrentSlide(updatedSlide);
-      updateSlideData(updatedSlide);
-};
-// Function to delete the transition
-const deleteTransition = (canvasId) => {
-  const updatedSlide = { ...currentSlide };
-
-  // Find the canvas by its ID
-  const currentCanvasData = updatedSlide.deck.find((canvas) => canvas.id === canvasId);
-
-  if (!currentCanvasData) return;
-
-  // Set the transition to null
-  currentCanvasData.transition = null;
-
-  setCurrentSlide(updatedSlide);
-  updateSlideData(updatedSlide);
-};
-function formatTransition(transition) {
-  return transition
-    .replace(/([a-z])([A-Z])/g, '$1 $2')
-    .replace(/\b\w/g, char => char.toUpperCase());
-}
  const sortedTransitions = [...transitions].sort((a, b) => a.title.localeCompare(b.title));
 return (
-  <div className="main-container">
-    <div className="transition-panel">
-      <h3>Transitions</h3>
-      <div className="transition-list">
-   {sortedTransitions.map((transition) => (
-        <div
-          key={transition.id}
-          className="transition-type"
-          draggable
-          onDragStart={(e) => handleDragStart(e, transition.id)}
-        >
-          {transition.title}
+    <div className="main-container">
+      <div className="transition-panel">
+        <h3>Transitions</h3>
+        <div className="transition-list">
+          {sortedTransitions.map((transition) => (
+            <div
+              key={transition.id}
+              className="transition-type"
+              draggable
+              onDragStart={(e) => handleDragStart(e, transition.id)}
+            >
+              {transition.title}
+            </div>
+          ))}
         </div>
-      ))}
       </div>
-    </div>
-    <div className="scrollable-column">
-      <div className="canvas-list" key={JSON.stringify(slides)}>
-        {currentSlide?.deck.map((canvas, index) => (
-          <React.Fragment key={canvas.id}>
-            <div  onDragOver={handleDragOver}
-              onDrop={(e) => handleDrop(e, canvas.id)}>
-            <DraggableCanvas
-              index={index}
-              canvas={canvas}
-              moveCanvas={moveCanvas}
-              setCurrentCanvas={setCurrentCanvas}
-              deleteCanvas={deleteCanvas}
-              copyCanvas={copyCanvas}
+      
+      <div className="scrollable-column">
+        <div className="canvas-list" key={JSON.stringify(currentSlide?.deck)}>
+          {currentSlide?.deck.map((canvas, index) => (
+            <React.Fragment key={canvas.id}>
+              <div>
+                <DraggableCanvas
+                  index={index}
+                  canvas={canvas}
+                  moveCanvas={moveCanvas}
+                  setCurrentCanvas={setCurrentCanvas}
+                  deleteCanvas={deleteCanvas}
+                  copyCanvas={copyCanvas(canvas,currentSlide,setCurrentSlide,updateSlideData)}
+                />
+              </div>
+              {index < currentSlide.deck.length - 1 && (
+                <div className="canvas-transition-overlay"  onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, canvas.id,currentSlide,setCurrentSlide,updateSlideData)}  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ flexGrow: 1, textAlign: 'center' }}>
+                    {formatTransition(canvas.transition)}
+                  </span>
+                  <Icon
+                    icon="mdi:trash"
+                    width="16"
+                    height="16"
+                    className="delete-icon"
+                    onClick={() => deleteTransition(canvas.id,currentSlide,setCurrentSlide,updateSlideData)}
+                    style={{ color: 'red', cursor: 'pointer', background: '#fff', borderRadius: '50%', padding: '4px', border: '1px solid #ccc' }}
+                  />
+                </div>
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+        <button onClick={addCanvasToDeck}>Add Slide</button>
+      </div>
+
+      <div className="canvas-container">
+        {currentCanvas && (
+          <div>
+            <div onClick={handleCanvasClick}>
+              <canvas id="canvas" ref={canvasRef}></canvas>
+            </div>
+            <CanvasControls
+              backgroundColor={backgroundColor}
+              selectedContent={selectedContent}
+              handleBackgroundColorChange={handleBackgroundColorChange}
+              handleColorChange={handleColorChange}
+              handleScaleChange={handleScaleChange}
+              handleSizeChange={handleSizeChange}
+              getSizeValue={getSizeValue}
+              setToggleMode={setToggleMode}
+              toggleMode={toggleMode}
             />
-            </div>
-            {/* Check for transition and render overlap */}
-            {canvas.transition && index < currentSlide.deck.length - 1 && (
-           <div className="canvas-transition-overlay" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-  <span style={{ flexGrow: 1, textAlign: 'center' }}>  {formatTransition(canvas.transition)}</span>
-  <Icon
-    icon="mdi:trash"
-    width="16"
-    height="16"
-    className="delete-icon"
-    onClick={() => deleteTransition(canvas.id)}
-    style={{
-      color: 'red',
-      cursor: 'pointer',
-      background: '#fff',
-      borderRadius: '50%',
-      padding: '4px',
-      border: '1px solid #ccc',
-    }}
-  />
-</div>
-
-
-            )}
-          </React.Fragment>
-        ))}
+          </div>
+        )}
       </div>
-
-      <button onClick={addCanvasToDeck}>Add Slide</button>
     </div>
+  );
+};
 
-
-    <div className="canvas-container">
-      {currentCanvas && (
-        <div>
-          <div onClick={handleCanvasClick}>
-            <canvas id="canvas" ref={canvasRef}></canvas>
-          </div>
-          <div
-            className="canvas-controls"
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              marginTop: '10px',
-              alignItems: 'center',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <Icon
-                icon="material-symbols-light:background-grid-small-sharp"
-                width="24"
-                height="24"
-                style={{ marginRight: '5px' }}
-              />
-              <label htmlFor="background-color" style={{ marginRight: '10px' }}>
-                Background Color:
-              </label>
-              <input
-                id="background-color"
-                type="color"
-                value={backgroundColor}
-                onChange={handleBackgroundColorChange}
-                style={{ cursor: 'pointer' }}
-              />
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <Icon icon="mdi:shape" width="24" height="24" style={{ marginRight: '5px' }} />
-              <label htmlFor="content-color" style={{ marginRight: '10px' }}>
-                Content Color:
-              </label>
-              <input
-                id="content-color"
-                type="color"
-                key={selectedContent?.fill || '000000'}
-                value={selectedContent?.fill || '000000'}
-                onChange={handleColorChange}
-                style={{ cursor: 'pointer' }}
-              />
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                <label htmlFor="x-scale-range" style={{ marginRight: '10px' }}>
-                  X Scale:
-                </label>
-                <input
-                  id="x-scale-range"
-                  type="range"
-                  min="1"
-                  max="100"
-                  value={selectedContent?.scaleX || 1}
-                  onChange={(e) => handleScaleChange(e, 'x')}
-                  style={{ width: '100px' }}
-                />
-                <input
-                  type="number"
-                  value={selectedContent?.scaleX || 1}
-                  onChange={(e) => handleScaleChange(e, 'x')}
-                  style={{ width: '50px', marginLeft: '10px' }}
-                />
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                <label htmlFor="y-scale-range" style={{ marginRight: '10px' }}>
-                  Y Scale:
-                </label>
-                <input
-                  id="y-scale-range"
-                  type="range"
-                  min="1"
-                  max="100"
-                  value={selectedContent?.scaleY || 1}
-                  onChange={(e) => handleScaleChange(e, 'y')}
-                  style={{ width: '100px' }}
-                />
-                <input
-                  type="number"
-                  value={selectedContent?.scaleY || 1}
-                  onChange={(e) => handleScaleChange(e, 'y')}
-                  style={{ width: '50px', marginLeft: '10px' }}
-                />
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                <label htmlFor="size-range" style={{ marginRight: '10px' }}>
-                  Content Size:
-                </label>
-                <input
-                  id="size-range"
-                  type="range"
-                  min="1"
-                  max="100"
-                  value={getSizeValue(selectedContent)}
-                  onChange={handleSizeChange}
-                  style={{ width: '100px' }}
-                />
-                <input
-                  type="number"
-                  value={getSizeValue(selectedContent)}
-                  onChange={handleSizeChange}
-                  style={{ width: '50px', marginLeft: '10px' }}
-                />
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <Icon
-                icon="humbleicons:text"
-                width="24"
-                height="24"
-                onClick={() => setToggleMode('text')}
-                style={{
-                  cursor: 'pointer',
-                  backgroundColor: toggleMode === 'text' ? '#e0e0e0' : '#fff',
-                  padding: '5px',
-                  borderRadius: '50%',
-                  marginLeft: '10px',
-                }}
-              />
-              <Icon
-                icon="material-symbols:circle"
-                width="24"
-                height="24"
-                onClick={() => setToggleMode('circle')}
-                style={{
-                  cursor: 'pointer',
-                  backgroundColor: toggleMode === 'circle' ? '#e0e0e0' : '#fff',
-                  padding: '5px',
-                  borderRadius: '50%',
-                  marginLeft: '10px',
-                }}
-              />
-              <Icon
-                icon="material-symbols:square"
-                width="24"
-                height="24"
-                onClick={() => setToggleMode('square')}
-                style={{
-                  cursor: 'pointer',
-                  backgroundColor: toggleMode === 'square' ? '#e0e0e0' : '#fff',
-                  padding: '5px',
-                  borderRadius: '50%',
-                  marginLeft: '10px',
-                }}
-              />
-              <Icon
-                icon="mdi:triangle"
-                width="24"
-                height="24"
-                onClick={() => setToggleMode('triangle')}
-                style={{
-                  cursor: 'pointer',
-                  backgroundColor: toggleMode === 'triangle' ? '#e0e0e0' : '#fff',
-                  padding: '5px',
-                  borderRadius: '50%',
-                  marginLeft: '10px',
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  </div>
-);
-
-
-}
 
 export default SlideManager;

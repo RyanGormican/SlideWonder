@@ -2,84 +2,85 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Canvas } from 'fabric';
 import { renderCanvasContent } from '../Slide/CanvasRender';
 import { Icon } from '@iconify/react';
-import { applyDissolveTransition , applyFadeInTransition, applySlideInLeftTransition } from './Transitions';
+import { applyDissolveTransition, applyFadeInTransition, applySlideInLeftTransition } from './Transitions';
 import { Keybinds } from './Keybinds';
+
 function Present({ currentSlide, setView }) {
   const [currentCanvasIndex, setCurrentCanvasIndex] = useState(0);
   const [hovering, setHovering] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   const [autoPlay, setAutoPlay] = useState(false);
-  const [autoPlayDelay, setAutoPlayDelay] = useState(5); // Initial value in seconds
+  const [autoPlayDelay, setAutoPlayDelay] = useState(5);
   const [loop, setLoop] = useState(false);
 
   const canvasRef = useRef(null);
+  const nextCanvasRef = useRef(null);  // New ref for the next canvas
   const canvasInstance = useRef(null);
+  const nextCanvasInstance = useRef(null);  // New instance for the next canvas
   const controlsRef = useRef(null);
   const hoverTimeoutRef = useRef(null);
   const autoPlayTimerRef = useRef(null);
 
   const currentCanvasData = currentSlide?.deck[currentCanvasIndex];
+  const nextCanvasIndex = currentCanvasIndex < currentSlide.deck.length - 1 ? currentCanvasIndex + 1 : 0; // Next index with looping
 
-  const initializeCanvas = () => {
-    if (!currentCanvasData || !canvasRef.current) return;
+  const initializeCanvas = (canvasInstance, canvasRef, canvasData) => {
+    if (!canvasData || !canvasRef.current) return;
 
-    // Reset opacity before rendering
     canvasRef.current.style.opacity = 1;
 
     canvasInstance.current = new Canvas(canvasRef.current, {
       width: window.innerWidth,
       height: window.innerHeight,
       preserveObjectStacking: true,
-      backgroundColor: currentCanvasData.backgroundColor || '#ffffff',
+      backgroundColor: canvasData.backgroundColor || '#ffffff',
     });
 
-    renderCanvasContent(canvasInstance.current, currentCanvasData.content, window.innerWidth, window.innerHeight);
+    renderCanvasContent(canvasInstance.current, canvasData.content, window.innerWidth, window.innerHeight);
   };
 
   useEffect(() => {
     const handleFullscreenChange = () => {
       setFullscreen(document.fullscreenElement !== null);
-      initializeCanvas();
+      initializeCanvas(canvasInstance, canvasRef, currentCanvasData);
+      initializeCanvas(nextCanvasInstance, nextCanvasRef, currentSlide.deck[nextCanvasIndex]);
     };
 
     document.addEventListener('fullscreenchange', handleFullscreenChange);
-    initializeCanvas();
+    initializeCanvas(canvasInstance, canvasRef, currentCanvasData);
+    initializeCanvas(nextCanvasInstance, nextCanvasRef, currentSlide.deck[nextCanvasIndex]);
 
     return () => {
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
-      if (canvasInstance.current) {
-        canvasInstance.current.dispose();
-      }
+      if (canvasInstance.current) canvasInstance.current.dispose();
+      if (nextCanvasInstance.current) nextCanvasInstance.current.dispose();
     };
-  }, [currentCanvasIndex, currentCanvasData]);
+  }, [currentCanvasIndex, currentCanvasData, currentSlide]);
 
-  
+  const goToNextCanvas = () => {
+    if (currentCanvasIndex < currentSlide.deck.length - 1) {
+      const currentCanvas = currentSlide.deck[currentCanvasIndex];
+      const nextCanvas = currentSlide.deck[currentCanvasIndex + 1];
 
- const goToNextCanvas = () => {
-  if (currentCanvasIndex < currentSlide.deck.length - 1) {
-    const currentCanvas = currentSlide.deck[currentCanvasIndex];
-    const nextCanvas = currentSlide.deck[currentCanvasIndex + 1];
-
-    // Add more transition cases here
-    switch (currentCanvas.transition) {
-      case 'dissolve':
-        applyDissolveTransition(currentCanvas, nextCanvas, canvasRef, currentCanvasIndex, setCurrentCanvasIndex);
-        break;
-      case 'slideInLeft':
-        applySlideInLeftTransition(currentCanvas, nextCanvas, canvasRef, currentCanvasIndex, setCurrentCanvasIndex);
-        break;
-      case 'fadeIn':
-        applyFadeInTransition(currentCanvas, nextCanvas, canvasRef, currentCanvasIndex, setCurrentCanvasIndex);
-        break;
-      default:
-        setCurrentCanvasIndex(currentCanvasIndex + 1); 
-        break;
+      // Add more transition cases
+      switch (currentCanvas.transition) {
+        case 'dissolve':
+          applyDissolveTransition(currentCanvas, nextCanvas, canvasRef, currentCanvasIndex, setCurrentCanvasIndex);
+          break;
+        case 'slideInLeft':
+          applySlideInLeftTransition(currentCanvas, nextCanvas, canvasRef, currentCanvasIndex, setCurrentCanvasIndex);
+          break;
+        case 'fadeIn':
+          applyFadeInTransition(currentCanvas, nextCanvas, canvasRef, currentCanvasIndex, setCurrentCanvasIndex);
+          break;
+        default:
+          setCurrentCanvasIndex(currentCanvasIndex + 1);
+          break;
+      }
+    } else if (loop) {
+      setCurrentCanvasIndex(0);
     }
-  } else if (loop) {
-    setCurrentCanvasIndex(0); 
-  }
-};
-
+  };
 
   const goToPreviousCanvas = () => {
     if (currentCanvasIndex > 0) {
@@ -94,7 +95,6 @@ function Present({ currentSlide, setView }) {
       document.exitFullscreen();
     }
   };
-
 
   const startHoverTimer = () => {
     if (hoverTimeoutRef.current) {
@@ -118,7 +118,8 @@ function Present({ currentSlide, setView }) {
       window.removeEventListener('mousemove', handleMouseMove);
     };
   }, []);
-   useEffect(() => {
+
+  useEffect(() => {
     const keydownHandler = Keybinds({
       currentSlide,
       currentCanvasIndex,
@@ -135,6 +136,7 @@ function Present({ currentSlide, setView }) {
       window.removeEventListener('keydown', keydownHandler);
     };
   }, [currentCanvasIndex, currentSlide, setView, loop, goToNextCanvas, goToPreviousCanvas, toggleFullscreen]);
+
   // Autoplay functionality
   useEffect(() => {
     if (autoPlay) {
@@ -161,10 +163,26 @@ function Present({ currentSlide, setView }) {
 
   return (
     <div className="present-container" style={{ textAlign: 'center', position: 'relative', cursor: hovering ? 'auto' : 'none' }}>
-      {/* Canvas */}
+      {/* Main Canvas */}
       <div
         style={{
           top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          zIndex: 1,
+          margin: 0,
+          padding: 0,
+          position: 'relative',
+        }}
+      >
+        <canvas ref={canvasRef} id="presentation-canvas" />
+      </div>
+
+      {/* Next Slide Canvas */}
+      <div
+        style={{
+         top: 0,
           left: 0,
           width: '100vw',
           height: '100vh',
@@ -174,7 +192,7 @@ function Present({ currentSlide, setView }) {
           position: 'relative',
         }}
       >
-        <canvas ref={canvasRef} id="presentation-canvas" />
+        <canvas ref={nextCanvasRef} id="next-presentation-canvas" />
       </div>
 
       {/* Navigation and Autoplay Controls */}
