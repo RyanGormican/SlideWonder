@@ -453,7 +453,7 @@ return (
               {index < currentSlide.deck.length - 1 && (
                 <div className="canvas-transition-overlay"  onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, canvas.id,currentSlide,setCurrentSlide,updateSlideData)}  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ flexGrow: 1, textAlign: 'center' }}>
-                    {{canvas.transition ? formatTransition(canvas.transition) : null}
+                    {canvas.transition ? formatTransition(canvas.transition) : null}
 
                   </span>
                   <Icon
