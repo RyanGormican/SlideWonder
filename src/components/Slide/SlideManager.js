@@ -453,7 +453,8 @@ return (
               {index < currentSlide.deck.length - 1 && (
                 <div className="canvas-transition-overlay"  onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, canvas.id,currentSlide,setCurrentSlide,updateSlideData)}  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ flexGrow: 1, textAlign: 'center' }}>
-                    {formatTransition(canvas.transition)}
+                    {{canvas.transition ? formatTransition(canvas.transition) : null}
+
                   </span>
                   <Icon
                     icon="mdi:trash"
@@ -461,7 +462,7 @@ return (
                     height="16"
                     className="delete-icon"
                     onClick={() => deleteTransition(canvas.id,currentSlide,setCurrentSlide,updateSlideData)}
-                    style={{ color: 'red', cursor: 'pointer', background: '#fff', borderRadius: '50%', padding: '4px', border: '1px solid #ccc' }}
+                    style={{ color: 'red', cursor: 'pointer', background: '#fff', borderRadius: '50%', padding: '4px', border: '1px solid #ccc', display: canvas.transition ? 'inline-block' : 'none'    }}
                   />
                 </div>
               )}
