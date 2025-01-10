@@ -1,6 +1,6 @@
 
 export const copyCanvas = (canvas,currentSlide,setCurrentSlide,updateSlideData) => {
-const canvasId = canvas.id
+const canvasId = canvas
   const canvasToCopy = currentSlide.deck.find((canvas) => canvas.id === canvasId);
 
   if (!canvasToCopy) {

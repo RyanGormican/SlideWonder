@@ -108,8 +108,8 @@ const updateSlideData = (updatedSlide) => {
         // Modify the canvas content if it matches the current canvas
         return {
           ...canvas,
-          content: canvas.content
-            ? canvas.content.map((item) =>
+          content: canvas?.content
+            ? canvas?.content.map((item) =>
                 item.id === object.id
                   ? {
                       ...item,
@@ -232,7 +232,7 @@ const updateSlideData = (updatedSlide) => {
         deck: currentSlide.deck.filter((canvas) => canvas.id === currentCanvas),
       };
 
-      renderCanvasContent(canvasInstance.current, updatedSlide.deck[0].content,800,600); 
+      renderCanvasContent(canvasInstance.current, updatedSlide.deck[0]?.content,800,600); 
 
       canvasInstance.current.on('object:modified', handleObjectModified);
       canvasInstance.current.on('selection:created', (e) => {
@@ -447,13 +447,16 @@ return (
                   moveCanvas={moveCanvas}
                   setCurrentCanvas={setCurrentCanvas}
                   deleteCanvas={deleteCanvas}
-                  copyCanvas={copyCanvas(canvas,currentSlide,setCurrentSlide,updateSlideData)}
+                  currentSlide={currentSlide}
+                  setCurrentSlide={setCurrentSlide}
+                  copyCanvas={copyCanvas}
+                  updateSlideData={updateSlideData}
                 />
               </div>
               {index < currentSlide.deck.length - 1 && (
-                <div className="canvas-transition-overlay"  onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, canvas.id,currentSlide,setCurrentSlide,updateSlideData)}  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div className="canvas-transition-overlay"  onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, canvas.id,currentSlide,setCurrentSlide,updateSlideData)}  style={{ display: 'flex', justifyContent: 'space-between', minHeight: '3vh', backgroundColor:'darkgrey', borderRadius: '8px',alignItems: 'center' }}>
                   <span style={{ flexGrow: 1, textAlign: 'center' }}>
-                    {canvas.transition ? formatTransition(canvas.transition) : null}
+                    {canvas.transition ? formatTransition(canvas.transition,transitions) : null}
 
                   </span>
                   <Icon
@@ -471,9 +474,8 @@ return (
         </div>
         <button onClick={addCanvasToDeck}>Add Slide</button>
       </div>
-
-      <div className="canvas-container">
         {currentCanvas && (
+      <div className="canvas-container">
           <div>
             <div onClick={handleCanvasClick}>
               <canvas id="canvas" ref={canvasRef}></canvas>
@@ -490,8 +492,9 @@ return (
               toggleMode={toggleMode}
             />
           </div>
+       </div>
         )}
-      </div>
+
     </div>
   );
 };

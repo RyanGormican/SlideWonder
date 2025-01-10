@@ -41,8 +41,7 @@ export const deleteTransition = (canvasId,currentSlide,setCurrentSlide,updateSli
   setCurrentSlide(updatedSlide);
   updateSlideData(updatedSlide);
 };
-export function formatTransition(transition) {
-  return transition
-    .replace(/([a-z])([A-Z])/g, '$1 $2')
-    .replace(/\b\w/g, char => char.toUpperCase());
+export function formatTransition(transition,transitions) {
+   const title = transitions.find(t => t.id === transition);
+  return title ? title.title : null;
 }

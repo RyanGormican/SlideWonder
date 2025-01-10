@@ -6,7 +6,7 @@ import { Canvas } from 'fabric';
 
 const ITEM_TYPE = 'CANVAS_ITEM';
 
-function DraggableCanvas({ canvas, index, moveCanvas, setCurrentCanvas, deleteCanvas, copyCanvas }) {
+function DraggableCanvas({ canvas, index, moveCanvas, setCurrentCanvas, deleteCanvas, currentSlide, setCurrentSlide, copyCanvas,updateSlideData }) {
   const dragCanvasRef = useRef(null); // Reference to the <canvas> DOM element
   const dragInstance = useRef(null); // Reference to the fabric.Canvas instance
 
@@ -122,8 +122,8 @@ function DraggableCanvas({ canvas, index, moveCanvas, setCurrentCanvas, deleteCa
           height="24"
           className="copy-icon"
           onClick={(e) => {
-            e.stopPropagation();
-            copyCanvas(canvas.id);
+            e.stopPropagation(); 
+            copyCanvas(canvas.id,currentSlide,setCurrentSlide,updateSlideData);
           }}
           style={{
             color: '#4caf50',
