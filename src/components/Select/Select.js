@@ -12,6 +12,8 @@ const Select = ({ slides, setSlides, handleGridClick }) => {
   const [sortOrder, setSortOrder] = useState({ field: 'lastUpdated', direction: 'desc' });
   const [viewType, setViewType] = useState('grid'); // State to toggle between grid and list view
  const [hoveredDate, setHoveredDate] = useState({});
+ const [currentPageGrid, setCurrentPageGrid] = useState(1);
+const [currentPageList, setCurrentPageList] = useState(1);
   // Filter slides based on search query
   const filteredSlides = slides.filter(slide =>
     slide.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -155,56 +157,72 @@ const timeAgo = (date) => {
   const formatDate = (date) => {
     return new Date(date).toLocaleString(); 
   };
-  return (
-    <div>
-      {/* Search bar and view toggle buttons */}
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px', gap: '16px' }}>
-        <TextField
-          label="Search Slides"
-          variant="outlined"
-          value={searchQuery}
-          onChange={handleSearchChange}
-          style={{ flexGrow: 1 }}
-        />
-        <IconButton onClick={() => setViewType('grid')}>
-          <Icon icon="mdi:grid" width="24" height="24" />
-        </IconButton>
-        <IconButton onClick={() => setViewType('list')}>
-          <Icon icon="material-symbols:list" width="24" height="24" />
-        </IconButton>
 
-        <IconButton onClick={toggleSortOrder}>
-          <Icon icon={`mdi:arrow-${sortOrder.direction === 'asc' ? 'up' : 'down'}`} width="24" height="24" />
-        </IconButton>
-        <IconButton onClick={() => changeSortField('name')}>
-          <Typography style={{ fontWeight: sortOrder.field === 'name' ? 'bold' : 'normal' }}>
-            Sort by Name
-          </Typography>
-        </IconButton>
-        <IconButton onClick={() => changeSortField('lastUpdated')}>
-          <Typography style={{ fontWeight: sortOrder.field === 'lastUpdated' ? 'bold' : 'normal' }}>
-            Sort by Last Updated
-          </Typography>
-        </IconButton>
-        <IconButton onClick={() => changeSortField('dateCreated')}>
-          <Typography style={{ fontWeight: sortOrder.field === 'dateCreated' ? 'bold' : 'normal' }}>
-            Sort by Creation Date
-          </Typography>
-        </IconButton>
-      </div>
+  // Pagination logic for grid view 
+const slidesPerPageGrid = 9;
+const startIndexGrid = (currentPageGrid - 1) * slidesPerPageGrid;
+const paginatedSlidesGrid = sortedSlides.slice(startIndexGrid, startIndexGrid + slidesPerPageGrid);
 
-      {/* Conditional rendering of grid or list view */}
-      {viewType === 'grid' ? (
+// Pagination logic for list view
+const slidesPerPageList = 15;
+const startIndexList = (currentPageList - 1) * slidesPerPageList;
+const paginatedSlidesList = sortedSlides.slice(startIndexList, startIndexList + slidesPerPageList);
+const handlePageChangeGrid = (newPage) => {
+  setCurrentPageGrid(newPage);
+};
+
+const handlePageChangeList = (newPage) => {
+  setCurrentPageList(newPage);
+};
+
+return (
+  <div>
+    {/* Search bar and view toggle buttons */}
+    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px', gap: '16px' }}>
+      <TextField
+        label="Search Slides"
+        variant="outlined"
+        value={searchQuery}
+        onChange={handleSearchChange}
+        style={{ flexGrow: 1 }}
+      />
+      <IconButton onClick={() => setViewType('grid')}>
+        <Icon icon="mdi:grid" width="24" height="24" />
+      </IconButton>
+      <IconButton onClick={() => setViewType('list')}>
+        <Icon icon="material-symbols:list" width="24" height="24" />
+      </IconButton>
+
+      <IconButton onClick={toggleSortOrder}>
+        <Icon icon={`mdi:arrow-${sortOrder.direction === 'asc' ? 'up' : 'down'}`} width="24" height="24" />
+      </IconButton>
+      <IconButton onClick={() => changeSortField('name')}>
+        <Typography style={{ fontWeight: sortOrder.field === 'name' ? 'bold' : 'normal' }}>
+          Sort by Name
+        </Typography>
+      </IconButton>
+      <IconButton onClick={() => changeSortField('lastUpdated')}>
+        <Typography style={{ fontWeight: sortOrder.field === 'lastUpdated' ? 'bold' : 'normal' }}>
+          Sort by Last Updated
+        </Typography>
+      </IconButton>
+      <IconButton onClick={() => changeSortField('dateCreated')}>
+        <Typography style={{ fontWeight: sortOrder.field === 'dateCreated' ? 'bold' : 'normal' }}>
+          Sort by Creation Date
+        </Typography>
+      </IconButton>
+    </div>
+
+    {/* Conditional rendering of grid or list view */}
+    {viewType === 'grid' ? (
+      <>
         <Grid container spacing={2}>
-          {sortedSlides.map((slide, index) => (
+          {paginatedSlidesGrid.map((slide, index) => (
             <Grid item xs={12} sm={6} md={4} key={index}>
               <Card onClick={() => handleGridClick(slide.id)}>
                 <CardContent>
                   <Typography variant="h6"></Typography>
-                  <div style={{ minHeight:150, maxHeight: 150, overflowY: 'auto' }}>
-                   
-                     
-                  </div>
+                  <div style={{ minHeight: 150, maxHeight: 150, overflowY: 'auto' }}></div>
                 </CardContent>
               </Card>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -236,62 +254,108 @@ const timeAgo = (date) => {
               </div>
             </Grid>
           ))}
-
-          <Grid item xs={12} sm={6} md={4} key="add-slide">
-            <Card onClick={handleAddSlide} style={{ cursor: 'pointer' }}>
-              <CardContent style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 95, maxHeight: 95 }}>
-                <Typography variant="h4"><Icon icon="mdi:plus" width="24" height="24" /></Typography>
-              </CardContent>
-            </Card>
-          </Grid>
         </Grid>
-      ) : (
-       <List>
-  {sortedSlides.map((slide, index) => (
-    <ListItem button key={index} onClick={() => handleGridClick(slide.id)}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-        {/* Title Section */}
-        <ListItemText 
-          primary={slide.title}
-          style={{ fontWeight: 'bold' }}
-        />
 
-        {/* Creation Date Section */}
-        <div
-          style={{ fontSize: '14px', color: '#555', marginLeft: '16px' }}
-          onMouseEnter={() => setHoveredDate(prev => ({ ...prev, [slide.id]: 'created' }))}
-          onMouseLeave={() => setHoveredDate(prev => ({ ...prev, [slide.id]: null }))}
-        >
-          <strong>Created: </strong>
-          {hoveredDate[slide.id] === 'created'
-            ? formatDate(slide.dateCreated)
-            : timeAgo(slide.dateCreated)}
+        {/* Pagination controls with Add Slide button */}
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '16px' }}>
+          <button
+            onClick={() => handlePageChangeGrid(currentPageGrid - 1)}
+            disabled={currentPageGrid === 1}
+            style={{ marginRight: '16px' }}
+          >
+            Previous
+          </button>
+
+          {/* Add Slide Button */}
+          <IconButton onClick={handleAddSlide} style={{ margin: '0 16px' }}>
+              New Slide
+          </IconButton>
+          
+          <button
+            onClick={() => handlePageChangeGrid(currentPageGrid + 1)}
+            disabled={currentPageGrid * slidesPerPageGrid >= sortedSlides.length}
+            style={{ marginLeft: '16px' }}
+          >
+            Next
+          </button>
+
+         {/* Page indicator */}
+          <Typography variant="body1" style={{ margin: '0 16px' }}>
+            Page {currentPageGrid} of {Math.ceil(sortedSlides.length / slidesPerPageGrid)}
+          </Typography>
         </div>
+      </>
+    ) : (
+      <>
+        <List>
+          {paginatedSlidesList.map((slide, index) => (
+            <ListItem button key={index} onClick={() => handleGridClick(slide.id)}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                <ListItemText primary={slide.title} style={{ fontWeight: 'bold' }} />
+                <div
+                  style={{ fontSize: '14px', color: '#555', marginLeft: '16px' }}
+                  onMouseEnter={() => setHoveredDate(prev => ({ ...prev, [slide.id]: 'created' }))}
+                  onMouseLeave={() => setHoveredDate(prev => ({ ...prev, [slide.id]: null }))}
+                >
+                  <strong>Created: </strong>
+                  {hoveredDate[slide.id] === 'created'
+                    ? formatDate(slide.dateCreated)
+                    : timeAgo(slide.dateCreated)}
+                </div>
 
-        {/* Last Updated Date Section */}
-        <div
-          style={{ fontSize: '14px', color: '#555', marginLeft: '16px' }}
-          onMouseEnter={() => setHoveredDate(prev => ({ ...prev, [slide.id]: 'updated' }))}
-          onMouseLeave={() => setHoveredDate(prev => ({ ...prev, [slide.id]: null }))}
-        >
-          <strong>Last Updated: </strong>
-          {hoveredDate[slide.id] === 'updated'
-            ? formatDate(slide.lastUpdated)
-            : timeAgo(slide.lastUpdated)}
+                <div
+                  style={{ fontSize: '14px', color: '#555', marginLeft: '16px' }}
+                  onMouseEnter={() => setHoveredDate(prev => ({ ...prev, [slide.id]: 'updated' }))}
+                  onMouseLeave={() => setHoveredDate(prev => ({ ...prev, [slide.id]: null }))}
+                >
+                  <strong>Last Updated: </strong>
+                  {hoveredDate[slide.id] === 'updated'
+                    ? formatDate(slide.lastUpdated)
+                    : timeAgo(slide.lastUpdated)}
+                </div>
+              </div>
+            </ListItem>
+          ))}
+        </List>
+
+        {/* Pagination controls with Add Slide button */}
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '16px' }}>
+          <button
+            onClick={() => handlePageChangeList(currentPageList - 1)}
+            disabled={currentPageList === 1}
+            style={{ marginRight: '16px' }}
+          >
+            Previous
+          </button>
+
+          {/* Add Slide Button in the center */}
+          <IconButton onClick={handleAddSlide} style={{ margin: '0 16px' }}>
+            New Slide
+          </IconButton>
+
+        
+
+          <button
+            onClick={() => handlePageChangeList(currentPageList + 1)}
+            disabled={currentPageList * slidesPerPageList >= sortedSlides.length}
+            style={{ marginLeft: '16px' }}
+          >
+            Next
+          </button>
+
+          {/* Page indicator */}
+          <Typography variant="body1" style={{ margin: '0 16px' }}>
+            Page {currentPageList} of {Math.ceil(sortedSlides.length / slidesPerPageList)}
+          </Typography>
         </div>
-      </div>
-    </ListItem>
-  ))}
-</List>
-      )}
+      </>
+    )}
 
-      <InfoModal
-        open={Boolean(selectedSlide)}
-        slide={selectedSlide}
-        onClose={() => setSelectedSlide(null)}
-      />
-    </div>
-  );
+    <InfoModal open={Boolean(selectedSlide)} slide={selectedSlide} onClose={() => setSelectedSlide(null)} />
+  </div>
+);
+
+
 };
 
 export default Select;

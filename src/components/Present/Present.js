@@ -39,6 +39,7 @@ function Present({ currentSlide, setView }) {
     height: window.innerHeight,
     preserveObjectStacking: true,
     backgroundColor: currentCanvasData.backgroundColor || '#ffffff',
+    zIndex:2,
   });
 
   const nextCanvasIndex = currentCanvasIndex + 1 < currentSlide.deck.length ? currentCanvasIndex + 1 : 0;
@@ -54,6 +55,7 @@ function Present({ currentSlide, setView }) {
     height: window.innerHeight,
     preserveObjectStacking: true,
     backgroundColor: currentSlide.deck[nextCanvasIndex].backgroundColor || '#ffffff',
+    zIndex:1,
   });
 
   // Render canvas content
