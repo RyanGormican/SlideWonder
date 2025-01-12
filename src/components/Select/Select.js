@@ -133,6 +133,12 @@ const convertToCSV = (slide) => {
     const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
     saveAs(blob, `${slide.title}.csv`);
   };
+  const handleDownloadAll = () => {
+  const allSlidesCSV = slides.map(slide => convertToCSV(slide)).join('\n');
+  const blob = new Blob([allSlidesCSV], { type: 'text/csv;charset=utf-8;' });
+  saveAs(blob, 'slides.csv');
+};
+
 const timeAgo = (date) => {
   const now = new Date();
   const diff = now - new Date(date); // Difference in milliseconds
@@ -192,7 +198,9 @@ return (
       <IconButton onClick={() => setViewType('list')}>
         <Icon icon="material-symbols:list" width="24" height="24" />
       </IconButton>
-
+      <IconButton onClick={handleDownloadAll}>
+  <Icon icon="mdi:download" width="24" height="24" />
+      </IconButton>
       <IconButton onClick={toggleSortOrder}>
         <Icon icon={`mdi:arrow-${sortOrder.direction === 'asc' ? 'up' : 'down'}`} width="24" height="24" />
       </IconButton>
