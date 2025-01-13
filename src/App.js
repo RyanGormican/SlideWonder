@@ -55,12 +55,14 @@ function App() {
       height="24"
       onClick={() => setView('select')}
     />
+         {currentSlide && currentSlide.deck.length > 0 && (
     <Icon
       icon="gg:play-button"
       width="24"
       height="24"
       onClick={() => setView('present')}
     />
+    )}
     <SlideManager
       slides={slides}
       setSlides={setSlides}
