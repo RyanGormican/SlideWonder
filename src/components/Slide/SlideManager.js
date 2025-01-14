@@ -140,76 +140,76 @@ const updateSlideData = (updatedSlide) => {
 };
 
 
-
-
-  const handleCanvasClick = (event) => {
+const handleCanvasClick = (event) => {
   if (toggleMode === null) return;
 
   const canvasElement = event.target;
   const canvasWidth = canvasElement.width;
   const canvasHeight = canvasElement.height;
 
-  // Get mouse position relative to canvas
   const xPercentage = (event.nativeEvent.offsetX / canvasWidth) * 100;
   const yPercentage = (event.nativeEvent.offsetY / canvasHeight) * 100;
 
-  const updatedSlide = { ...currentSlide };
-  const currentCanvasData = updatedSlide.deck.find((canvas) => canvas.id === currentCanvas);
+  const updatedSlide = {
+    ...currentSlide,
+    deck: currentSlide.deck.map((canvas) => {
+      if (canvas.id === currentCanvas) {
+        const currentCanvasData = { ...canvas }; // Copy canvas data
 
-  if (!currentCanvasData) {
-    console.error("Canvas with id", currentCanvas, "not found.");
-    return;
-  }
+        // Initialize content if it is null
+        currentCanvasData.content = currentCanvasData.content || [];
 
-  // Initialize content if it is null
-  currentCanvasData.content = currentCanvasData.content || [];
+        const createNewObject = (type, additionalProperties) => ({
+          type,
+          id: Date.now(),
+          x: xPercentage,
+          y: yPercentage,
+          fill: selectedContent?.fill || '#000000',
+          fontSize: selectedContent?.fontSize || 12,
+          radius: selectedContent?.radius || 12,
+          width: selectedContent?.width || 12,
+          height: selectedContent?.height || 12,
+          ...additionalProperties,
+        });
 
-  const createNewObject = (type, additionalProperties) => ({
-    type,
-    id: Date.now(),
-    x: xPercentage,
-    y: yPercentage,
-    fill: selectedContent?.fill || '#000000',
-    ...additionalProperties,
-  });
+        if (toggleMode === 'text') {
+          const newTextObject = createNewObject('text', { text: 'New Text' });
+          currentCanvasData.content = [...currentCanvasData.content, newTextObject];
+        }
 
-  if (toggleMode === 'text') {
-    const newTextObject = createNewObject('text', {
-      text: 'New Text',
-      fontSize: selectedContent?.fontSize || 12,
-    });
-    currentCanvasData.content.push(newTextObject);
-  } 
+        if (toggleMode === 'circle') {
+          const newCircle = createNewObject('circle', { radius: selectedContent?.radius || 12 });
+          currentCanvasData.content = [...currentCanvasData.content, newCircle];
+        }
 
-  if (toggleMode === 'circle') {
-    const newCircle = createNewObject('circle', {
-      radius: selectedContent?.radius ? (selectedContent?.radius / 700) * 100 : 12,
-    });
-    currentCanvasData.content.push(newCircle);
-  }
+        if (toggleMode === 'square') {
+          const newSquare = createNewObject('square', {
+            width: selectedContent?.width || 12,
+            height: selectedContent?.height || 12,
+          });
+          currentCanvasData.content = [...currentCanvasData.content, newSquare];
+        }
 
-  if (toggleMode === 'square') {
-    const newSquare = createNewObject('square', {
-      width: selectedContent?.width ? (selectedContent?.width / 700) * 100 : 12,
-      height: selectedContent?.height ? (selectedContent?.height / 700) * 100 : 12,
-    });
-    currentCanvasData.content.push(newSquare);
-  }
+        if (toggleMode === 'triangle') {
+          const newTriangle = createNewObject('triangle', {
+            width: selectedContent?.size || 12,
+            height: selectedContent?.size || 12,
+          });
+          currentCanvasData.content = [...currentCanvasData.content, newTriangle];
+        }
 
-  if (toggleMode === 'triangle') {
-    const newTriangle = createNewObject('triangle', {
-      width: selectedContent?.size ? (selectedContent?.size / 700) * 100 : 12,
-      height: selectedContent?.size ? (selectedContent?.size / 700) * 100 : 12,
-    });
-    currentCanvasData.content.push(newTriangle);
-  }
+        return currentCanvasData;
+      }
+      return canvas;
+    }),
+  };
 
-  // Update the current slide with the new content
   setCurrentSlide(updatedSlide);
   updateSlideData(updatedSlide);
 
   setToggleMode(null);
 };
+
 
 
   useEffect(() => {

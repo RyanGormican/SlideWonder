@@ -12,7 +12,7 @@ const canvasId = canvas
     ...canvasToCopy,
     id: Date.now(), // Assign a new unique ID
   };
-
+  console.log(copiedCanvas);
   const updatedSlide = {
     ...currentSlide,
     deck: [...currentSlide.deck, copiedCanvas],
