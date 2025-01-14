@@ -8,7 +8,7 @@ import Select from './components/Select/Select';
 import Present from './components/Present/Present';
 import SlideManager from './components/Slide/SlideManager';
 import { Icon } from '@iconify/react';
-function App() {
+function App({theme,setTheme}) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [view, setView] = useState('select');
   const [slides, setSlides] = useState([]);
@@ -46,6 +46,8 @@ function App() {
       setCurrentSlide(selectedSlide);
       setView('slide');
     }}
+    theme={theme}
+    setTheme={setTheme}
   />
 ) : view === 'slide' ? (
   <div       style={{textAlign: 'center'}}>
