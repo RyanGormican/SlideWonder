@@ -21,7 +21,6 @@
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
 }
 
 .App-link {
@@ -48,7 +47,6 @@
   text-decoration: underline;
   background: linear-gradient(to right, #a1c4fd, #c2e9fb);
   -webkit-background-clip: text;
-  color: transparent;
   font-weight: 400;
   letter-spacing: 0.2px;
   text-transform: none;
@@ -93,7 +91,6 @@ font-family: "Quicksand", sans-serif !important;
 .title {
   font-size: 2rem;
   margin: 1rem 0;
-  color: #333;
   text-align: center;
 }
 
@@ -116,6 +113,7 @@ font-family: "Quicksand", sans-serif !important;
   border-radius: 8px;
   padding: 10px;
   background-color: #f9f9f9;
+    color: black;
 }
 
 .canvas-list {
@@ -177,6 +175,8 @@ font-family: "Quicksand", sans-serif !important;
   background-color: #ffffff;
   padding: 10px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  color: black;
+
 }
 .App.present .canvas-container {
   padding: 0; 
@@ -205,6 +205,7 @@ canvas {
   border-right: 2px solid #ccc;
   z-index: 2;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+  color: black;
 }
 
 .transition-panel h3 {
@@ -226,4 +227,71 @@ canvas {
 .transition-list{
     height: 50vh;
     overflow-y:auto;
+}
+
+body {
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.light-mode {
+  background-color: white;
+  color: black;
+}
+
+.dark-mode {
+  background-color: black;
+  color: white;
+}
+
+.dark-mode .MuiButton-root,
+.dark-mode .MuiIconButton-root {
+  background-color: black;
+  color: white;
+}
+
+.dark-mode .MuiTextField-root {
+  background-color: #333;
+  color: white;
+}
+
+.dark-mode .MuiInputBase-root {
+  background-color: #444;
+}
+
+.dark-mode .MuiInputBase-input {
+  color: white;
+}
+
+.dark-mode .MuiInputLabel-root {
+  color: white;
+}
+
+.light-mode .MuiTextField-root {
+  background-color: #fff;
+  color: black;
+}
+
+.light-mode .MuiInputBase-root {
+  background-color: #fff;
+}
+
+.light-mode .MuiInputBase-input {
+  color: black;
+}
+
+.light-mode .MuiInputLabel-root {
+  color: black;
+}
+
+.light-mode .iconify {
+  color: black;
+}
+
+.dark-mode .iconify {
+  color: white;
+}
+.dark-mode .canvas-container .iconify,
+.dark-mode .transition-panel .iconify,
+.dark-mode .scrollable-column .iconify {
+  color: black;
 }

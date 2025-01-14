@@ -4,16 +4,16 @@ import { Icon } from '@iconify/react';
 import InfoModal from '../InfoModal/InfoModal';
 import * as SelectUtility from './SelectUtility';
 import * as SlideManagement from './SlideManagement';
-import GridView from './GridView'; // Ensure you import your GridView component
-import ListView from './ListView'; // Ensure you import your ListView component
+import GridView from './GridView'; 
+import ListView from './ListView';
 
-const Select = ({ slides, setSlides, handleGridClick }) => {
+const Select = ({ slides, setSlides, handleGridClick,theme, setTheme }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [editingTitle, setEditingTitle] = useState(null);
   const [newTitle, setNewTitle] = useState('');
   const [selectedSlide, setSelectedSlide] = useState(null);
   const [sortOrder, setSortOrder] = useState({ field: 'lastUpdated', direction: 'desc' });
-  const [viewType, setViewType] = useState('grid'); // State to toggle between grid and list view
+  const [viewType, setViewType] = useState('grid');
   const [hoveredDate, setHoveredDate] = useState({});
   const [currentPageGrid, setCurrentPageGrid] = useState(1);
   const [currentPageList, setCurrentPageList] = useState(1);
@@ -73,6 +73,16 @@ const Select = ({ slides, setSlides, handleGridClick }) => {
           onChange={(e) => SelectUtility.handleSearchChange(e, setSearchQuery)}
           style={{ flexGrow: 1 }}
         />
+        <button 
+        onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+        style={{ border: 'none', background: 'none', cursor: 'pointer' }}
+      >
+        {theme === 'light' ? (
+          <Icon icon="tabler:sun-filled" width="24" height="24"/>
+        ) : (
+          <Icon icon="tabler:moon-filled" width="24" height="24"/>
+        )}
+      </button>
         <IconButton onClick={() => setViewType('grid')}>
           <Icon icon="mdi:grid" width="24" height="24" />
         </IconButton>
