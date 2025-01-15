@@ -44,14 +44,15 @@
 }
   .title {
   font-size: 6.5vh;
-  text-decoration: underline;
   background: linear-gradient(to right, #a1c4fd, #c2e9fb);
   -webkit-background-clip: text;
-  font-weight: 400;
+ font-weight: 400;
   letter-spacing: 0.2px;
   text-transform: none;
   padding: 2px 4px;
+  font-family: "Goblin One", serif;
 }
+
 *{
   font-family: "Quicksand", serif;
   font-optical-sizing: auto;

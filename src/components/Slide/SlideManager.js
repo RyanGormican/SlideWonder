@@ -329,9 +329,8 @@ const getUpdatedProperties = (item, newSize) => {
 
   useEffect(() => {
   const handleKeyDown = (event) => {
-    if (event.key === 'Backspace' && selectedContent?.id) {
+    if (event.key === 'Backspace' && selectedContent?.id && selectedContent?.type != 'i-text') {
       event.preventDefault();
-
       const updatedSlide = {
         ...currentSlide,
         deck: currentSlide.deck.map((canvas) => {
