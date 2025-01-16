@@ -1,5 +1,5 @@
 
 
-export const saveSlideToLocalStorage = (updatedSlides) => {
-  localStorage.setItem('SlideWonderdata', JSON.stringify({ slides: updatedSlides, settings: {} }));
+export const saveSlideToLocalStorage = (updatedSlides, pins) => {
+  localStorage.setItem('SlideWonderdata', JSON.stringify({ slides: updatedSlides, settings: {}, pins: pins }));
 };

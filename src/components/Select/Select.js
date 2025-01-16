@@ -7,7 +7,7 @@ import * as SlideManagement from './SlideManagement';
 import GridView from './GridView'; 
 import ListView from './ListView';
 
-const Select = ({ slides, setSlides, handleGridClick,theme, setTheme }) => {
+const Select = ({ slides, setSlides, pins,setPins, handleGridClick,theme, setTheme }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [editingTitle, setEditingTitle] = useState(null);
   const [newTitle, setNewTitle] = useState('');
@@ -23,26 +23,37 @@ const Select = ({ slides, setSlides, handleGridClick,theme, setTheme }) => {
     slide.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Sort slides based on selected field and direction
-  const sortedSlides = [...filteredSlides].sort((a, b) => {
-    const { field, direction } = sortOrder;
-    if (field === 'name') {
-      return direction === 'asc'
-        ? a.title.localeCompare(b.title)
-        : b.title.localeCompare(a.title);
-    }
-    if (field === 'lastUpdated') {
-      return direction === 'asc'
-        ? new Date(a.lastUpdated) - new Date(b.lastUpdated)
-        : new Date(b.lastUpdated) - new Date(a.lastUpdated);
-    }
-    if (field === 'dateCreated') {
-      return direction === 'asc'
-        ? new Date(a.dateCreated) - new Date(b.dateCreated)
-        : new Date(b.dateCreated) - new Date(a.dateCreated);
-    }
-    return 0;
-  });
+ // Sort slides based on selected field and direction
+const sortedSlides = [...filteredSlides].sort((a, b) => {
+  const { field, direction } = sortOrder;
+
+  // First, prioritize pinned slides
+  const aIsPinned = pins.includes(a.id);
+  const bIsPinned = pins.includes(b.id);
+  
+  if (aIsPinned && !bIsPinned) return -1; // a is pinned, b is not
+  if (!aIsPinned && bIsPinned) return 1;  // b is pinned, a is not
+  
+  // If both are pinned or neither is pinned, continue sorting by the selected field
+  if (field === 'name') {
+    return direction === 'asc'
+      ? a.title.localeCompare(b.title)
+      : b.title.localeCompare(a.title);
+  }
+  if (field === 'lastUpdated') {
+    return direction === 'asc'
+      ? new Date(a.lastUpdated) - new Date(b.lastUpdated)
+      : new Date(b.lastUpdated) - new Date(a.lastUpdated);
+  }
+  if (field === 'dateCreated') {
+    return direction === 'asc'
+      ? new Date(a.dateCreated) - new Date(b.dateCreated)
+      : new Date(b.dateCreated) - new Date(a.dateCreated);
+  }
+
+  return 0; // Default sorting if no matching criteria
+});
+
 
   // Pagination logic for grid view 
   const slidesPerPageGrid = 9;
@@ -121,12 +132,14 @@ const Select = ({ slides, setSlides, handleGridClick,theme, setTheme }) => {
   slidesPerPageGrid={slidesPerPageGrid}
   handleGridClick={handleGridClick}
   editingTitle={editingTitle}
+  setEditingTitle={setEditingTitle}
   newTitle={newTitle}
   setNewTitle={setNewTitle}
   slides={slides}
-  setEditingTitle={setEditingTitle}
   setSlides={setSlides}
   setSelectedSlide={setSelectedSlide}
+  pins={pins}
+  setPins={setPins}
 />
 
 

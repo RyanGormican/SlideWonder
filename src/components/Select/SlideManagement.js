@@ -20,7 +20,7 @@ export  const handleDeleteSlide = (slideId,slides,setSlides) => {
     saveSlideToLocalStorage(updatedSlides);
   };
 
- export const handleSaveTitle = (slide,slides,setSlides,newTitle,setEditingTitle) => {
+ export const handleSaveTitle = (slide,slides,setSlides,setEditingTitle,newTitle) => {
     const updatedSlides = slides.map(slideItem =>
       slideItem.title === slide.title ? { ...slideItem, title: newTitle } : slideItem
     );
@@ -28,4 +28,40 @@ export  const handleDeleteSlide = (slideId,slides,setSlides) => {
     setEditingTitle(null);
     saveSlideToLocalStorage(updatedSlides);
   };
+
+export const handleDuplicateSlide = (slide, slides, setSlides) => {
+  const currentDate = new Date().toISOString();
+  const currentTimestamp = Date.now();
+
+
+  const duplicatedSlide = {
+    ...slide,
+    id: currentTimestamp, 
+    title: `Copy of ${slide.title}`, 
+    dateCreated: currentDate,
+    lastUpdated: currentDate,
+  };
+
+
+  const updatedSlides = [...slides, duplicatedSlide];
+
+  setSlides(updatedSlides);
+  saveSlideToLocalStorage(updatedSlides);
+};
+export const togglePin = (slideId, pins, setPins, slides, setSlides) => {
+
+  const currentPins = pins || [];
+
+  const isPinned = currentPins.includes(slideId);
   
+  let updatedPins;
+  
+  if (isPinned) {
+    updatedPins = currentPins.filter(id => id !== slideId);
+  } else {
+    updatedPins = [...currentPins, slideId];
+  }
+  
+  setPins(updatedPins);  
+  saveSlideToLocalStorage(slides, updatedPins);  
+};
