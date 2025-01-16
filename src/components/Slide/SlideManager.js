@@ -7,7 +7,8 @@ import { transitions } from './TransitionsList';
 import CanvasControls from './CanvasControls'; 
 import {handleDragStart, handleDragOver, handleDrop, formatTransition, deleteTransition} from './TransitionsManagement'; 
 import {copyCanvas} from './CanvasManagement'; 
-function SlideManager({ slides, setSlides, currentSlide, setCurrentSlide }) {
+import {saveSlideToLocalStorage} from '../Helper'
+function SlideManager({ slides, setSlides, currentSlide, setCurrentSlide,pins }) {
   const [currentCanvas, setCurrentCanvas] = useState(null);
   const [backgroundColor, setBackgroundColor] = useState('#ffffff');
   const [toggleMode, setToggleMode] = useState(null);
@@ -26,10 +27,7 @@ const updateSlideData = (updatedSlide) => {
   );
 
   setSlides(updatedSlides);
-  localStorage.setItem(
-    'SlideWonderdata',
-    JSON.stringify({ slides: updatedSlides })
-  );
+  saveSlideToLocalStorage(updatedSlides);
 };
 
 

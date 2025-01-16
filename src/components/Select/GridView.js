@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Grid, Card, CardContent, Typography, IconButton, TextField, Menu, MenuItem } from '@mui/material';
 import { Icon } from '@iconify/react';
 import * as SelectUtility from './SelectUtility';
 import * as SlideManagement from './SlideManagement';
-
+import { renderCanvasContent } from '../Slide/CanvasRender'; 
+import { Canvas } from 'fabric';
 const GridView = ({ 
   slides, 
   sortedSlides, 
@@ -21,6 +22,64 @@ const GridView = ({
 }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedSlide, setSelectedSlideState] = useState(null);
+  const canvasRefs = useRef({});
+  const HEIGHT = 0.134407174;
+  const WIDTH = 0.3880;
+
+
+useEffect(() => {
+  // Render content on canvas for each slide when the sortedSlides change
+  sortedSlides.forEach((slide) => {
+    const canvasElement = canvasRefs.current[slide.id];
+    
+    // Find the corresponding slide in the 'slides' array
+    const slideData = slides.find(s => s.id === slide.id);
+    const deckItem = slideData?.deck && slideData.deck[0]; // Check if deck[0] exists
+    
+    if (canvasElement) {
+      const fabricCanvas = canvasElement.fabricCanvas; // Access fabric canvas instance if it exists
+      
+      // If a canvas instance already exists, dispose of it first before creating a new one
+      if (fabricCanvas) {
+        fabricCanvas.dispose(); // Dispose the previous fabric canvas instance
+      }
+
+      if (deckItem) {
+        // If deck[0] exists, render the content for that item
+        const newFabricCanvas = new Canvas(canvasElement, {
+          width: window.innerWidth * WIDTH,
+          height: window.innerHeight * HEIGHT,
+          preserveObjectStacking: true,
+          backgroundColor: deckItem.backgroundColor,
+        });
+
+        // Save the fabricCanvas instance to the canvas element for later disposal
+        canvasElement.fabricCanvas = newFabricCanvas;
+
+        renderCanvasContent(newFabricCanvas, deckItem.content, window.innerWidth * WIDTH,  window.innerHeight * HEIGHT);
+      } else {
+        // If deck[0] does not exist, clear the canvas (render blank)
+        const context = canvasElement.getContext('2d');
+        context.clearRect(0, 0, canvasElement.width, canvasElement.height); // Clear the canvas
+      }
+    }
+  });
+  
+  // Cleanup function to dispose of the previous canvas instances
+  return () => {
+    // Dispose of each fabric canvas when the component unmounts or when slides change
+    sortedSlides.forEach((slide) => {
+      const canvasElement = canvasRefs.current[slide.id];
+      if (canvasElement) {
+        const fabricCanvas = canvasElement.fabricCanvas; // Access fabric canvas instance
+        if (fabricCanvas) {
+          fabricCanvas.dispose(); // Dispose the fabric canvas instance
+        }
+      }
+    });
+  };
+}, [sortedSlides, slides]); 
+
 
   const handleClickDots = (event, slide) => {
     setAnchorEl(event.currentTarget);
@@ -51,12 +110,15 @@ const GridView = ({
   return (
     <>
       <Grid container spacing={2}>
-        {paginatedSlidesGrid?.map((slide, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index}>
+        {paginatedSlidesGrid?.map((slide) => (
+          <Grid item xs={12} sm={6} md={4} key={slide.id}>
             <Card onClick={() => handleGridClick(slide.id)}>
               <CardContent>
-                <Typography variant="h6"></Typography>
-                <div style={{ minHeight: 120, maxHeight: 120, overflowY: 'auto' }}></div>
+              <div className="locked">
+                <canvas
+                  ref={(el) => (canvasRefs.current[slide.id] = el)} 
+                />
+                </div>
               </CardContent>
             </Card>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0' }}>
@@ -80,7 +142,7 @@ const GridView = ({
 
               {/* Pin icon */}
               <IconButton sx={{ boxShadow: 'none' }}>
-                <Icon  onClick={() => SlideManagement.togglePin(slide.id, pins, setPins, slides, setSlides)} icon={pins.includes(slide.id) ? "mdi:pin" : "mdi:pin-outline"}  width="24" height="24" />
+                <Icon  onClick={() => SlideManagement.togglePin(slide.id, pins, setPins, slides, setSlides)} icon={pins?.includes(slide.id) ? "mdi:pin" : "mdi:pin-outline"}  width="24" height="24" />
               </IconButton>
               {/* Info icon */}
               <IconButton onClick={() => SelectUtility.handleInfoClick(slide, setSelectedSlide)} sx={{ boxShadow: 'none' }}>
@@ -90,7 +152,6 @@ const GridView = ({
               <IconButton onClick={(e) => handleClickDots(e, slide)} sx={{ boxShadow: 'none' }}>
                 <Icon icon="tabler:dots" width="24" height="24" />
               </IconButton>
-
 
               <Menu
                 anchorEl={anchorEl}

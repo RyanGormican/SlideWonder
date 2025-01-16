@@ -28,8 +28,8 @@ const sortedSlides = [...filteredSlides].sort((a, b) => {
   const { field, direction } = sortOrder;
 
   // First, prioritize pinned slides
-  const aIsPinned = pins.includes(a.id);
-  const bIsPinned = pins.includes(b.id);
+  const aIsPinned = pins?.includes(a.id);
+  const bIsPinned = pins?.includes(b.id);
   
   if (aIsPinned && !bIsPinned) return -1; // a is pinned, b is not
   if (!aIsPinned && bIsPinned) return 1;  // b is pinned, a is not

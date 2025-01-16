@@ -26,7 +26,6 @@ export const renderCanvasContent = (canvas, content, width, height) => {
     console.error("Canvas instance is not properly initialized.");
     return;
   }
-
   if (content) {
     content.forEach((item) => {
       const { x, y, angle, fill, scaleX, scaleY, id } = item;

@@ -21,8 +21,11 @@ function App({theme,setTheme}) {
           title: 'New Slide',
           deck: [],
           id: Date.now(),
+         dateCreated:  Date.now(),
+      lastUpdated:  Date.now(),
         },
       ],
+      pins:[],
     };
     setSlides(savedData.slides);
     setPins(savedData.pins);
