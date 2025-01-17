@@ -7,7 +7,7 @@ import * as SlideManagement from './SlideManagement';
 import GridView from './GridView'; 
 import ListView from './ListView';
 
-const Select = ({ slides, setSlides, pins,setPins, handleGridClick,theme, setTheme }) => {
+const Select = ({ slides, setSlides, pins,setPins,tags,setTags, handleGridClick,theme, setTheme}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [editingTitle, setEditingTitle] = useState(null);
   const [newTitle, setNewTitle] = useState('');
@@ -19,12 +19,27 @@ const Select = ({ slides, setSlides, pins,setPins, handleGridClick,theme, setThe
   const [currentPageList, setCurrentPageList] = useState(1);
 
   // Filter slides based on search query
-  const filteredSlides = slides.filter(slide =>
-    slide.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+const filteredSlides = slides.filter(slide => 
+  slide.title.toLowerCase().includes(searchQuery.toLowerCase())
+);
+
+const filteredTagIds = tags
+  ?.filter(tag => 
+    tag.titles.some(title => title.toLowerCase().includes(searchQuery.toLowerCase()))
+  )
+  .map(tag => tag.id);
+  
+const mergedFilteredSlides = [
+  ...filteredSlides,
+  ...slides.filter(slide => filteredTagIds?.includes(slide.id))
+];
+
+const uniqueFilteredSlides = Array.from(new Set(mergedFilteredSlides.map(slide => slide.id)))
+  .map(id => mergedFilteredSlides.find(slide => slide.id === id));
+
 
  // Sort slides based on selected field and direction
-const sortedSlides = [...filteredSlides].sort((a, b) => {
+const sortedSlides = [...uniqueFilteredSlides].sort((a, b) => {
   const { field, direction } = sortOrder;
 
   // First, prioritize pinned slides
@@ -140,6 +155,8 @@ const sortedSlides = [...filteredSlides].sort((a, b) => {
   setSelectedSlide={setSelectedSlide}
   pins={pins}
   setPins={setPins}
+  tags={tags}
+  setTags={setTags}
 />
 
 

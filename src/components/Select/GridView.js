@@ -18,10 +18,15 @@ const GridView = ({
   setSlides,
   setSelectedSlide,
   pins,
-  setPins
+  setPins,
+  tags,
+  setTags,
 }) => {
   const [anchorEl, setAnchorEl] = useState(null);
+  const [tagsAnchorEl, setTagsAnchorEl] = useState(null);
+  const [newTag, setNewTag] = useState('');
   const [selectedSlide, setSelectedSlideState] = useState(null);
+  const [tagId, setTagId] = useState(0);
   const canvasRefs = useRef({});
   const HEIGHT = 0.134407174;
   const WIDTH = 0.3880;
@@ -81,10 +86,15 @@ useEffect(() => {
 }, [sortedSlides, slides]); 
 
 
-  const handleClickDots = (event, slide) => {
+  const handleClickDots = (event, slide,slideId) => {
     setAnchorEl(event.currentTarget);
     setSelectedSlideState(slide);  
+    setTagId(slideId);
   };
+  const handleClickTags = (event, slide) => {
+  setTagsAnchorEl(event.currentTarget);
+  setSelectedSlideState(slide);  
+};
 
   const handleCloseMenu = () => {
     setAnchorEl(null);
@@ -149,7 +159,7 @@ useEffect(() => {
                 <Icon icon="material-symbols:info" width="24" height="24" />
               </IconButton>
               {/* Dots icon - opens the menu */}
-              <IconButton onClick={(e) => handleClickDots(e, slide)} sx={{ boxShadow: 'none' }}>
+              <IconButton onClick={(e) => handleClickDots(e, slide,slide.id)} sx={{ boxShadow: 'none' }}>
                 <Icon icon="tabler:dots" width="24" height="24" />
               </IconButton>
 
@@ -179,7 +189,62 @@ useEffect(() => {
                   <Icon icon="mdi:trash" width="24" height="24" style={{ marginRight: '8px' }} />
                   Delete
                 </MenuItem>
+                  <MenuItem onClick={handleClickTags}>
+                  <Icon icon="mynaui:tag-solid" width="24" height="24" style={{ marginRight: '8px' }} />
+                  Tags
+                </MenuItem>
               </Menu>
+           <Menu
+  anchorEl={tagsAnchorEl}
+  open={Boolean(tagsAnchorEl)}
+  onClose={() => setTagsAnchorEl(null)}
+  anchorOrigin={{
+    vertical: 'bottom',
+    horizontal: 'right',
+  }}
+  transformOrigin={{
+    vertical: 'top',
+    horizontal: 'left',
+  }}
+  className="tags-dropdown"
+>
+  <MenuItem onKeyDown={(e) => e.stopPropagation()}> 
+    <TextField
+      label="Add Tag"
+      variant="outlined"
+      value={newTag}
+      onChange={(e) => setNewTag(e.target.value)}
+      fullWidth
+      autoFocus 
+      onClick={(e) => e.stopPropagation()} 
+      onFocus={(e) => e.stopPropagation()} 
+    />
+    <IconButton onClick={() => {
+              SlideManagement.addTag(tagId, newTag, tags, setTags, slides, setSlides); 
+          setNewTag('');
+          }} sx={{ boxShadow: 'none' }}>
+          Add Tag
+          </IconButton>
+  </MenuItem>
+
+  {/* Map over each tag and display each title as a separate MenuItem */}
+  {tags?.filter(tag => tag.id === tagId).map(tag => (
+    tag.titles.map((title, index) => (
+      <MenuItem key={index}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+          <Typography variant="body2">{title} </Typography>
+          <IconButton onClick={() => {
+            SlideManagement.deleteTag(tagId, title, tags, setTags);
+          }} sx={{ boxShadow: 'none' }}>
+            <Icon icon="mdi:trash" width="20" height="20" />
+          </IconButton>
+        </div>
+      </MenuItem>
+    ))
+  ))}
+</Menu>
+
+
             </div>
           </Grid>
         ))}

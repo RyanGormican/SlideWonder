@@ -27,7 +27,7 @@ const updateSlideData = (updatedSlide) => {
   );
 
   setSlides(updatedSlides);
-  saveSlideToLocalStorage(updatedSlides);
+  saveSlideToLocalStorage(updatedSlides,1,1);
 };
 
 

@@ -56,7 +56,7 @@ The following scripts are available for managing the application:
 - test: Runs the test suite.
 - eject: Ejects the configuration files for customization.
 ## Contributing
-Contributions are welcome! If you have suggestions for improvements or new features, please open an issue or submit a pull request.
+Contributions are welcome! If you have suggestions for improvements or new features, please use the feeedback modal.
 
 ## License
 This project is licensed under the MIT License. See the LICENSE file for more details.

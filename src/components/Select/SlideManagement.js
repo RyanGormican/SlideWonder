@@ -11,13 +11,13 @@ export const handleAddSlide = (slides,setSlides) => {
     };
     const updatedSlides = [...slides, newSlide];
     setSlides(updatedSlides);
-    saveSlideToLocalStorage(updatedSlides);
+    saveSlideToLocalStorage(updatedSlides,1,1);
   };
 
 export  const handleDeleteSlide = (slideId,slides,setSlides) => {
     const updatedSlides = slides.filter(slide => slide.id !== slideId);
     setSlides(updatedSlides);
-    saveSlideToLocalStorage(updatedSlides);
+    saveSlideToLocalStorage(updatedSlides,1,1);
   };
 
  export const handleSaveTitle = (slide,slides,setSlides,setEditingTitle,newTitle) => {
@@ -26,7 +26,7 @@ export  const handleDeleteSlide = (slideId,slides,setSlides) => {
     );
     setSlides(updatedSlides);
     setEditingTitle(null);
-    saveSlideToLocalStorage(updatedSlides);
+    saveSlideToLocalStorage(updatedSlides,1,1);
   };
 
 export const handleDuplicateSlide = (slide, slides, setSlides) => {
@@ -46,7 +46,7 @@ export const handleDuplicateSlide = (slide, slides, setSlides) => {
   const updatedSlides = [...slides, duplicatedSlide];
 
   setSlides(updatedSlides);
-  saveSlideToLocalStorage(updatedSlides);
+  saveSlideToLocalStorage(updatedSlides,1,1);
 };
 export const togglePin = (slideId, pins, setPins, slides, setSlides) => {
 
@@ -63,5 +63,43 @@ export const togglePin = (slideId, pins, setPins, slides, setSlides) => {
   }
   
   setPins(updatedPins);  
-  saveSlideToLocalStorage(slides, updatedPins);  
+  saveSlideToLocalStorage(slides, updatedPins,1);  
+};
+export const addTag = (slideId, newTag, tags, setTags, slides, setSlides) => {
+  if (newTag.length === 0) {
+    return;
+  }
+  
+  const currentTags = tags || [];
+
+
+  const tagIndex = currentTags.findIndex(tag => tag.id === slideId);
+
+  if (tagIndex === -1) {
+    currentTags.push({
+      id: slideId,
+      titles: [newTag],
+    });
+  } else {
+    const titles = currentTags[tagIndex].titles;
+    if (!titles.includes(newTag)) {
+      titles.push(newTag);
+    }
+  }
+
+  setTags(currentTags);
+  saveSlideToLocalStorage(1, 1, currentTags);
+};
+
+export const deleteTag = (slideId, tagTitle, tags, setTags) => {
+  const updatedTags = tags.map(tag => {
+    if (tag.id === slideId) {
+      const updatedTitles = tag.titles.filter(title => title !== tagTitle);
+      return { ...tag, titles: updatedTitles };
+    }
+    return tag;
+  }).filter(tag => tag.titles.length > 0);  
+
+  setTags(updatedTags);
+  saveSlideToLocalStorage(1, 1, updatedTags);  
 };

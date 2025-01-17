@@ -14,6 +14,7 @@ function App({theme,setTheme}) {
   const [slides, setSlides] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(null);
   const [pins,setPins] = useState([]);
+  const [tags,setTags]= useState([]);
   useEffect(() => {
     const savedData = JSON.parse(localStorage.getItem('SlideWonderdata')) || {
       slides: [
@@ -26,9 +27,11 @@ function App({theme,setTheme}) {
         },
       ],
       pins:[],
+      tags:[],
     };
     setSlides(savedData.slides);
     setPins(savedData.pins);
+    setTags(savedData.tags);
   }, []);
 
   return (
@@ -47,6 +50,8 @@ function App({theme,setTheme}) {
     setSlides={setSlides}
     pins={pins}
     setPins={setPins}
+    tags={tags}
+    setTags={setTags}
     handleGridClick={(id) => {
       const selectedSlide = slides.find((slide) => slide.id === id);
       setCurrentSlide(selectedSlide);
