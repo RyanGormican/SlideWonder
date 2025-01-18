@@ -195,7 +195,7 @@ useEffect(() => {
                 </MenuItem>
               </Menu>
            <Menu
-  anchorEl={tagsAnchorEl}
+  anchorEl={anchorEl}
   open={Boolean(tagsAnchorEl)}
   onClose={() => setTagsAnchorEl(null)}
   anchorOrigin={{

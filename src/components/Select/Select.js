@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { Grid, Card, CardContent, Typography, IconButton, TextField, List, ListItem, ListItemText } from '@mui/material';
+import React, { useState,useEffect } from 'react';
+import { Grid, Card, CardContent, Typography, IconButton, Menu, MenuItem, InputAdornment, TextField, List, ListItem, ListItemText } from '@mui/material';
 import { Icon } from '@iconify/react';
 import InfoModal from '../InfoModal/InfoModal';
 import * as SelectUtility from './SelectUtility';
 import * as SlideManagement from './SlideManagement';
 import GridView from './GridView'; 
 import ListView from './ListView';
-
+import Buttons from './Buttons';
 const Select = ({ slides, setSlides, pins,setPins,tags,setTags, handleGridClick,theme, setTheme}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [editingTitle, setEditingTitle] = useState(null);
@@ -17,11 +17,44 @@ const Select = ({ slides, setSlides, pins,setPins,tags,setTags, handleGridClick,
   const [hoveredDate, setHoveredDate] = useState({});
   const [currentPageGrid, setCurrentPageGrid] = useState(1);
   const [currentPageList, setCurrentPageList] = useState(1);
-
+  const [sortedSlides, setSortedSlides] = useState([]);
   // Filter slides based on search query
 const filteredSlides = slides.filter(slide => 
   slide.title.toLowerCase().includes(searchQuery.toLowerCase())
 );
+  const [tagStates, setTagStates] = useState({});
+
+
+ 
+  useEffect(() => {
+    const newTagStates = tags.reduce((acc, tag) => {
+      tag.titles.forEach(title => {
+        if (!acc[title]) {
+          acc[title] = true; 
+        }
+      });
+      return acc;
+    }, {});
+    setTagStates(newTagStates); 
+  }, [tags]); 
+
+
+const toggleTag = (title) => {
+  setTagStates((prevStates) => ({
+    ...prevStates,
+    [title]: !prevStates[title], 
+  }));
+};
+
+const toggleAllTags = (isOn) => {
+  setTagStates((prevStates) =>
+    Object.keys(prevStates).reduce((acc, title) => {
+      acc[title] = isOn;
+      return acc;
+    }, {})
+  );
+};
+
 
 const filteredTagIds = tags
   ?.filter(tag => 
@@ -34,14 +67,32 @@ const mergedFilteredSlides = [
   ...slides.filter(slide => filteredTagIds?.includes(slide.id))
 ];
 
-const uniqueFilteredSlides = Array.from(new Set(mergedFilteredSlides.map(slide => slide.id)))
-  .map(id => mergedFilteredSlides.find(slide => slide.id === id));
+const allTagsOn = Object.values(tagStates).every(state => state === true);
 
 
+const uniqueFilteredSlides = allTagsOn
+  ? Array.from(new Set(mergedFilteredSlides.map(slide => slide.id)))
+      .map(id => mergedFilteredSlides.find(slide => slide.id === id))
+  : [];
+
+
+const filteredSlidesByTags = mergedFilteredSlides.filter(slide => {
+  return tags?.some(tag => 
+    tag.titles.some(title => tagStates[title] === true) && 
+    tag.id === slide.id // Ensure the slide's id matches the tag's id
+  );
+});
+
+const filteredSlidesConditional = allTagsOn ? uniqueFilteredSlides : filteredSlidesByTags;
+
+const uniqueSlides = Array.from(new Set(filteredSlidesConditional.map(slide => slide.id)))
+  .map(id => filteredSlidesConditional.find(slide => slide.id === id));
+
+
+  useEffect(() => {
  // Sort slides based on selected field and direction
-const sortedSlides = [...uniqueFilteredSlides].sort((a, b) => {
+const slideList = [...uniqueSlides].sort((a, b) => {
   const { field, direction } = sortOrder;
-
   // First, prioritize pinned slides
   const aIsPinned = pins?.includes(a.id);
   const bIsPinned = pins?.includes(b.id);
@@ -68,7 +119,14 @@ const sortedSlides = [...uniqueFilteredSlides].sort((a, b) => {
 
   return 0; // Default sorting if no matching criteria
 });
+  setSortedSlides((prevSortedSlides) => {
 
+    if (JSON.stringify(prevSortedSlides) !== JSON.stringify(slideList)) {
+      return slideList;
+    }
+    return prevSortedSlides; 
+  });
+  }, [uniqueSlides, sortOrder, pins]);
 
   // Pagination logic for grid view 
   const slidesPerPageGrid = 9;
@@ -87,56 +145,36 @@ const sortedSlides = [...uniqueFilteredSlides].sort((a, b) => {
   const handlePageChangeList = (newPage) => {
     setCurrentPageList(newPage);
   };
+const uniqueTags = [];
+const seenTitles = new Set();
 
+tags.forEach(tag => {
+  tag.titles.forEach(title => {
+    if (!seenTitles.has(title)) {
+      seenTitles.add(title);
+      uniqueTags.push({ title, id: tag.id });
+    }
+  });
+});
   return (
     <div>
-      {/* Search bar and view toggle buttons */}
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px', gap: '16px' }}>
-        <TextField
-          label="Search Slides"
-          variant="outlined"
-          value={searchQuery}
-          onChange={(e) => SelectUtility.handleSearchChange(e, setSearchQuery)}
-          style={{ flexGrow: 1 }}
-        />
-        <button 
-        onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-        style={{ border: 'none', background: 'none', cursor: 'pointer' }}
-      >
-        {theme === 'light' ? (
-          <Icon icon="tabler:sun-filled" width="24" height="24"/>
-        ) : (
-          <Icon icon="tabler:moon-filled" width="24" height="24"/>
-        )}
-      </button>
-        <IconButton onClick={() => setViewType('grid')}>
-          <Icon icon="mdi:grid" width="24" height="24" />
-        </IconButton>
-        <IconButton onClick={() => setViewType('list')}>
-          <Icon icon="material-symbols:list" width="24" height="24" />
-        </IconButton>
-        <IconButton onClick={() => SelectUtility.handleDownloadAll(slides)}>
-          <Icon icon="mdi:download" width="24" height="24" />
-        </IconButton>
-        <IconButton onClick={() => SelectUtility.toggleSortOrder(setSortOrder)}>
-          <Icon icon={`mdi:arrow-${sortOrder.direction === 'asc' ? 'up' : 'down'}`} width="24" height="24" />
-        </IconButton>
-        <IconButton onClick={() => SelectUtility.changeSortField('name', setSortOrder)}>
-          <Typography style={{ fontWeight: sortOrder.field === 'name' ? 'bold' : 'normal' }}>
-            Sort by Name
-          </Typography>
-        </IconButton>
-        <IconButton onClick={() => SelectUtility.changeSortField('lastUpdated', setSortOrder)}>
-          <Typography style={{ fontWeight: sortOrder.field === 'lastUpdated' ? 'bold' : 'normal' }}>
-            Sort by Last Updated
-          </Typography>
-        </IconButton>
-        <IconButton onClick={() => SelectUtility.changeSortField('dateCreated', setSortOrder)}>
-          <Typography style={{ fontWeight: sortOrder.field === 'dateCreated' ? 'bold' : 'normal' }}>
-            Sort by Creation Date
-          </Typography>
-        </IconButton>
-      </div>
+      {/* Buttons  */}
+      <Buttons 
+      
+      theme={theme}
+      setTheme={setTheme}
+      sortOrder={sortOrder}
+      setSortOrder={setSortOrder}
+      searchQuery={searchQuery}
+      setSearchQuery={setSearchQuery}
+      slides={slides}
+      tags={tags}
+      toggleTag={toggleTag}
+      tagStates={tagStates}
+      toggleAllTags={toggleAllTags}
+      uniqueTags={uniqueTags}
+      setViewType={setViewType}
+      />
 
       {/* Conditional rendering of grid or list view */}
       {viewType === 'grid' ? (
@@ -238,7 +276,7 @@ const sortedSlides = [...uniqueFilteredSlides].sort((a, b) => {
           </div>
         </div>
       )}
-
+        
       <InfoModal open={Boolean(selectedSlide)} slide={selectedSlide} onClose={() => setSelectedSlide(null)} />
     </div>
   );
