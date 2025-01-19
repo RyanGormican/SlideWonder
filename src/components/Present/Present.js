@@ -16,13 +16,11 @@ function Present({ currentSlide, setView }) {
   const nextCanvasRef = useRef(null);
   const canvasInstance = useRef(null);
   const nextCanvasInstance = useRef(null);
-  const controlsRef = useRef(null);
   const hoverTimeoutRef = useRef(null);
   const autoPlayTimerRef = useRef(null);
-
+  const [opacity,setOpacity] = useState(1);
   const currentCanvasData = currentSlide?.deck[currentCanvasIndex];
-
-  const initializeCanvas = () => {
+const initializeCanvas = () => {
   if (!currentCanvasData || !canvasRef.current) return;
 
   // Dispose of the previous canvas instance if it exists
@@ -39,10 +37,11 @@ function Present({ currentSlide, setView }) {
     height: window.innerHeight,
     preserveObjectStacking: true,
     backgroundColor: currentCanvasData.backgroundColor || '#ffffff',
-    zIndex:2,
+    zIndex: 2,
   });
 
-  const nextCanvasIndex = currentCanvasIndex + 1 < currentSlide.deck.length ? currentCanvasIndex + 1 : 0;
+  // Determine the next canvas index (wraps around if at the end)
+  const nextCanvasIndex = (currentCanvasIndex + 1) % currentSlide.deck.length;
 
   // Dispose of the previous nextCanvasInstance if it exists
   if (nextCanvasInstance.current) {
@@ -55,13 +54,14 @@ function Present({ currentSlide, setView }) {
     height: window.innerHeight,
     preserveObjectStacking: true,
     backgroundColor: currentSlide.deck[nextCanvasIndex].backgroundColor || '#ffffff',
-    zIndex:1,
+    zIndex: 1,
   });
 
   // Render canvas content
-  renderCanvasContent(canvasInstance.current, currentCanvasData.content, window.innerWidth, window.innerHeight);
-  renderCanvasContent(nextCanvasInstance.current, currentCanvasData.content, window.innerWidth, window.innerHeight);
+  renderCanvasContent(canvasInstance.current, currentCanvasData.content, window.innerWidth, window.innerHeight, opacity);
+  renderCanvasContent(nextCanvasInstance.current, currentSlide.deck[nextCanvasIndex].content, window.innerWidth, window.innerHeight, opacity);
 };
+
 
 
   useEffect(() => {
@@ -87,11 +87,10 @@ function Present({ currentSlide, setView }) {
   if (currentCanvasIndex < currentSlide.deck.length - 1) {
     const currentCanvas = currentSlide.deck[currentCanvasIndex];
     const nextCanvas = currentSlide.deck[currentCanvasIndex + 1];
-
     // Add more transition cases here
     switch (currentCanvas.transition) {
       case 'dissolve':
-        applyDissolveTransition(currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex);
+        applyDissolveTransition(currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex,opacity,setOpacity);
         break;
       case 'slideleft':
         applySlideTransition(currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex, 'left'); 
@@ -114,7 +113,14 @@ function Present({ currentSlide, setView }) {
   }
 };
 
+  useEffect(() => {
 
+
+  if (canvasRef.current){
+  canvasRef.current.style.opacity = opacity;
+  }
+
+}, [opacity]);
   const goToPreviousCanvas = () => {
     if (currentCanvasIndex > 0) {
       setCurrentCanvasIndex(currentCanvasIndex - 1);
@@ -195,11 +201,14 @@ function Present({ currentSlide, setView }) {
   // Calculate progress percentage
   const progress = ((currentCanvasIndex + 1) / currentSlide.deck.length) * 100;
 
+
+
+
   return (
-    <div className="present-container locked" style={{ textAlign: 'center', position: 'absolute', cursor: hovering ? 'auto' : 'none' }}>
+    <div className="present-container locked" style={{ textAlign: 'center', position: 'absolute', cursor: hovering ? 'auto' : 'none',  overflow: 'hidden' }}>
       {/* Canvas */}
-      <div
-        style={{
+  
+        <canvas style={{
           top: 0,
           left: 0,
           width: '100vw',
@@ -209,10 +218,8 @@ function Present({ currentSlide, setView }) {
           padding: 0,
           position: 'absolute',
           overflow: 'hidden',
-        }}
-      >
-        <canvas ref={canvasRef} id="presentation-canvas" />
-      </div>
+        }} ref={canvasRef} id="presentation-canvas" />
+    
             <div
         style={{
           top: 0,
@@ -226,12 +233,21 @@ function Present({ currentSlide, setView }) {
           overflow: 'hidden',
         }}
       >
-        <canvas ref={nextCanvasRef} id="next-canvas" />
+        <canvas style={{
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          zIndex: 1,
+          margin: 0,
+          padding: 0,
+          position: 'absolute',
+          overflow: 'hidden',
+        }} ref={nextCanvasRef} id="next-canvas" />
       </div>
 
       {/* Navigation and Autoplay Controls */}
       <div
-        ref={controlsRef}
         className="present-controls"
         style={{
           position: 'fixed',
@@ -354,7 +370,8 @@ function Present({ currentSlide, setView }) {
           left: 0,
           width: '100vw',
           height: '100vh',
-          zIndex: '1',
+          zIndex: '0',
+           pointerEvents: 'none', 
         }}
         onMouseEnter={() => {
           setHovering(true);

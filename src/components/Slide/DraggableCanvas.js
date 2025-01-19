@@ -39,7 +39,7 @@ function DraggableCanvas({ canvas, index, moveCanvas, setCurrentCanvas, deleteCa
       });
 
       // Render content on the canvas
-      renderCanvasContent(dragInstance.current, canvas.content, 300, 200, false);
+      renderCanvasContent(dragInstance.current, canvas.content, 300, 200, 1);
 
       return () => {
         dragInstance.current.dispose(); // Clean up the canvas instance

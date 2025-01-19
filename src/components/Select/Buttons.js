@@ -8,7 +8,7 @@ import * as SlideManagement from './SlideManagement';
 import GridView from './GridView'; 
 import ListView from './ListView';
 
-const Buttons = ({ theme,setTheme,sortOrder,setSortOrder,searchQuery,setSearchQuery,slides,tags,toggleTag,tagStates,toggleAllTags,uniqueTags,setViewType}) => {
+const Buttons = ({ theme,setTheme,sortOrder,setSortOrder,searchQuery,setSearchQuery,slides,tags,toggleTag,tagStates,toggleAllTags,uniqueTags,setViewType,setSlides,setPins,setTags}) => {
  const [menuAnchor, setMenuAnchor] = useState(null);
   const handleTagMenuOpen = (event) => {
     setMenuAnchor(event.currentTarget);
@@ -16,6 +16,13 @@ const Buttons = ({ theme,setTheme,sortOrder,setSortOrder,searchQuery,setSearchQu
 
   const handleTagMenuClose = () => {
     setMenuAnchor(null);
+  };
+    const handleImportFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+
+      SelectUtility.handleImportJSON(file, setSlides, setPins, setTags);
+    }
   };
   return (
     <div>
@@ -29,7 +36,7 @@ const Buttons = ({ theme,setTheme,sortOrder,setSortOrder,searchQuery,setSearchQu
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
-              {tags.length>0? (
+              {tags?.length>0? (
               <div>
                 <IconButton onClick={handleTagMenuOpen}>
                   <Icon icon="mynaui:tag-solid" width="24" height="24" />
@@ -84,9 +91,21 @@ const Buttons = ({ theme,setTheme,sortOrder,setSortOrder,searchQuery,setSearchQu
         <IconButton onClick={() => setViewType('list')}>
           <Icon icon="material-symbols:list" width="24" height="24" />
         </IconButton>
-        <IconButton onClick={() => SelectUtility.handleDownloadAll(slides)}>
+        <IconButton onClick={() => SelectUtility.handleDownloadAll()}>
           <Icon icon="mdi:download" width="24" height="24" />
         </IconButton>
+      
+       <IconButton component="label" htmlFor="importFileInput">
+  <Icon icon="mdi:import" width="24" height="24" />
+  <input
+    type="file"
+    accept="application/json"
+    id="importFileInput"
+    style={{ display: 'none' }}
+    onChange={handleImportFileChange}
+  />
+</IconButton>
+    
         <IconButton onClick={() => SelectUtility.toggleSortOrder(setSortOrder)}>
           <Icon icon={`mdi:arrow-${sortOrder.direction === 'asc' ? 'up' : 'down'}`} width="24" height="24" />
         </IconButton>

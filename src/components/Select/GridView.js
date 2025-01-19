@@ -61,7 +61,7 @@ useEffect(() => {
         // Save the fabricCanvas instance to the canvas element for later disposal
         canvasElement.fabricCanvas = newFabricCanvas;
 
-        renderCanvasContent(newFabricCanvas, deckItem.content, window.innerWidth * WIDTH,  window.innerHeight * HEIGHT);
+        renderCanvasContent(newFabricCanvas, deckItem.content, window.innerWidth * WIDTH,  window.innerHeight * HEIGHT,1);
       } else {
         // If deck[0] does not exist, clear the canvas (render blank)
         const context = canvasElement.getContext('2d');

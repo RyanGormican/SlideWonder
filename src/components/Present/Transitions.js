@@ -1,25 +1,23 @@
-export const applyDissolveTransition = (currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex) => {
-  const canvasDiv = canvasRef.current;
+export const applyDissolveTransition = (currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex,opacity,setOpacity) => {
 
+let grabCapacity = opacity;
   // Set the initial opacity of the current canvas to 1
-  canvasDiv.style.opacity = 1;
-  console.log(nextCanvasRef.current.style);
   // Transition duration and fade speed
   const duration = 1000; // Duration of the transition in milliseconds
   const fadeStep = 20; // Step interval for the fade (in ms)
   const fadeDuration = duration / fadeStep;
-    nextCanvasRef.current.style.zIndex = 2;
   let fadeOutInterval = setInterval(() => {
     // Fade out the current canvas (reduce opacity)
-    if (parseFloat(canvasDiv.style.opacity) > 0) {
-      canvasDiv.style.opacity = parseFloat(canvasDiv.style.opacity) - (1 / fadeDuration);
+    if ( grabCapacity > 0) {
+     grabCapacity = (parseFloat( grabCapacity) - (1 / fadeDuration));
+      setOpacity(parseFloat( grabCapacity) - (1 / fadeDuration));
     }
 
     // When transition is complete, stop the interval and update the canvas index
-    if (parseFloat(canvasDiv.style.opacity) <= 0) {
+    if ( grabCapacity <= 0) {
       clearInterval(fadeOutInterval);
+      setOpacity(1);
       setCurrentCanvasIndex(currentCanvasIndex + 1); // Move to the next canvas
-        nextCanvasRef.current.style.zIndex = 1;
     }
   }, fadeStep);
 };
@@ -43,6 +41,6 @@ export const applySlideTransition = (currentCanvas, nextCanvasRef, canvasRef, cu
   setTimeout(() => {
     // After the slide-out is done, move to the next canvas
     setCurrentCanvasIndex(currentCanvasIndex + 1); // Move to the next canvas
-  nextCanvasRef.current.style.zIndex = 1;
+
   }, duration);
 };

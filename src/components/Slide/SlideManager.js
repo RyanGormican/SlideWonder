@@ -84,20 +84,21 @@ const updateSlideData = (updatedSlide) => {
     }
   };
 
- const handleObjectModified = (e) => {
+const handleObjectModified = (e) => {
+
   const object = e.target;
   const contentType = getSelectedContentType(object.id); // Get the content type
-
+  
   // Declare width and height with let so they can be reassigned
-  let width = object.width ? (object.width / 800) * 100 : 1;
-  let height = object.height ? (object.height / 600) * 100 : 1;
+  let width = object.width ? (object.width ) * 1 : 1;
+  let height = object.height ? (object.height) * 1 : 1;
 
   // If the content type is square, set width and height to the minimum of the two
   if (contentType === 'square') {
     const minDimension = Math.min(width, height);
     width = height = minDimension; // Make height and width equal
   }
-
+  
   // Create a shallow copy of the current slide
   const updatedSlide = {
     ...currentSlide,
@@ -111,15 +112,15 @@ const updateSlideData = (updatedSlide) => {
                 item.id === object.id
                   ? {
                       ...item,
-                      x: (object.left / 800) * 100,
-                      y: (object.top / 600) * 100,
-                      width:  object.width ? (object.width / 800) * 100 : 1,
-                      radius: object.radius ? (object.radius / 700) * 100 : 1,
-                      height:  object.height ? (object.height / 600) * 100 : 1,
+                      x: object.left,
+                      y: object.top,
+                      width:  object.width ? (object.width ) * 1 : 1,
+                      radius: object.radius ? (object.radius ) * 1 : 1,
+                      height:  object.height ? (object.height ) * 1 : 1,
                       angle: object.angle,
                       text: object.textLines ? object.textLines[0] : item.text,
-                      fontSize: object.fontSize ? (object.fontSize / 700) * 100 : 12,
-                      color: object.fill || 'black',
+                      fontSize: object.fontSize ? (object.fontSize) * 1 : 12,
+                      color: object.fill || '#FFFFFF',
                       scaleX: object.scaleX || 1,
                       scaleY: object.scaleY || 1,
                     }
@@ -131,11 +132,13 @@ const updateSlideData = (updatedSlide) => {
       return canvas;
     }),
   };
-
   // Update state and persist changes
   setCurrentSlide(updatedSlide);
   updateSlideData(updatedSlide);
 };
+
+
+
 
 
 const handleCanvasClick = (event) => {
@@ -144,9 +147,6 @@ const handleCanvasClick = (event) => {
   const canvasElement = event.target;
   const canvasWidth = canvasElement.width;
   const canvasHeight = canvasElement.height;
-
-  const xPercentage = (event.nativeEvent.offsetX / canvasWidth) * 100;
-  const yPercentage = (event.nativeEvent.offsetY / canvasHeight) * 100;
 
   const updatedSlide = {
     ...currentSlide,
@@ -157,21 +157,29 @@ const handleCanvasClick = (event) => {
         // Initialize content if it is null
         currentCanvasData.content = currentCanvasData.content || [];
 
+
+        const contentSize = Math.max(
+    selectedContent?.fontSize || 12,
+    selectedContent?.radius || 12,
+    selectedContent?.width ||12,
+    selectedContent?.height || 12
+  );
         const createNewObject = (type, additionalProperties) => ({
           type,
           id: Date.now(),
-          x: xPercentage,
-          y: yPercentage,
+          x: event.nativeEvent.offsetX,
+          y: event.nativeEvent.offsetY,
           fill: selectedContent?.fill || '#000000',
-          fontSize: selectedContent?.fontSize || 12,
-          radius: selectedContent?.radius || 12,
-          width: selectedContent?.width || 12,
-          height: selectedContent?.height || 12,
+          fontSize: contentSize,
+    radius: contentSize,
+    width: contentSize,
+    height: contentSize,
           ...additionalProperties,
         });
 
         if (toggleMode === 'text') {
           const newTextObject = createNewObject('text', { text: 'New Text' });
+          console.log(newTextObject);
           currentCanvasData.content = [...currentCanvasData.content, newTextObject];
         }
 
@@ -230,7 +238,7 @@ const handleCanvasClick = (event) => {
         deck: currentSlide.deck.filter((canvas) => canvas.id === currentCanvas),
       };
 
-      renderCanvasContent(canvasInstance.current, updatedSlide.deck[0]?.content,800,600); 
+      renderCanvasContent(canvasInstance.current, updatedSlide.deck[0]?.content,800,600,1); 
 
       canvasInstance.current.on('object:modified', handleObjectModified);
       canvasInstance.current.on('selection:created', (e) => {
@@ -403,12 +411,12 @@ const getSizeValue = (selectedContent) => {
   const contentType = getSelectedContentType(selectedContent?.id);
   switch(contentType) {
     case 'text':
-      return (selectedContent?.fontSize / 700) * 100 || 12;
+      return (selectedContent?.fontSize) * 1 || 12;
     case 'circle':
-      return (selectedContent?.radius / 700) * 100 || 12;
+      return (selectedContent?.radius ) * 1 || 12;
     case 'triangle':
     case 'square':
-      return (selectedContent?.height / 700) * 100 || 12;
+      return (selectedContent?.height) * 1|| 12;
     default:
       return 12;
   }

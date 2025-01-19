@@ -27,7 +27,7 @@ const filteredSlides = slides.filter(slide =>
 
  
   useEffect(() => {
-    const newTagStates = tags.reduce((acc, tag) => {
+    const newTagStates = tags?.reduce((acc, tag) => {
       tag.titles.forEach(title => {
         if (!acc[title]) {
           acc[title] = true; 
@@ -67,7 +67,7 @@ const mergedFilteredSlides = [
   ...slides.filter(slide => filteredTagIds?.includes(slide.id))
 ];
 
-const allTagsOn = Object.values(tagStates).every(state => state === true);
+const allTagsOn = Object.values(tagStates || {}).every((state) => state === true);
 
 
 const uniqueFilteredSlides = allTagsOn
@@ -148,7 +148,7 @@ const slideList = [...uniqueSlides].sort((a, b) => {
 const uniqueTags = [];
 const seenTitles = new Set();
 
-tags.forEach(tag => {
+tags?.forEach(tag => {
   tag.titles.forEach(title => {
     if (!seenTitles.has(title)) {
       seenTitles.add(title);
@@ -156,6 +156,7 @@ tags.forEach(tag => {
     }
   });
 });
+
   return (
     <div>
       {/* Buttons  */}
@@ -174,6 +175,9 @@ tags.forEach(tag => {
       toggleAllTags={toggleAllTags}
       uniqueTags={uniqueTags}
       setViewType={setViewType}
+      setSlides={setSlides}
+      setPins={setPins}
+      setTags={setTags}
       />
 
       {/* Conditional rendering of grid or list view */}
@@ -213,7 +217,6 @@ tags.forEach(tag => {
               <IconButton onClick={() => SlideManagement.handleAddSlide(slides, setSlides)} style={{ margin: '0 16px' }}>
                 New Slide
               </IconButton>
-
               <button
                 onClick={() => handlePageChangeGrid(currentPageGrid + 1)}
                 disabled={currentPageGrid * slidesPerPageGrid >= sortedSlides.length}

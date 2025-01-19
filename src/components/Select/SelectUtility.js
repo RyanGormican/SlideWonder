@@ -1,4 +1,5 @@
 import { saveAs } from 'file-saver'; 
+import { saveSlideToLocalStorage } from '../Helper';
 export const timeAgo = (date) => {
   const now = new Date();
   const diff = now - new Date(date); // Difference in milliseconds
@@ -52,11 +53,17 @@ export const convertToCSV = (slide) => {
     const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
     saveAs(blob, `${slide.title}.csv`);
   };
-export  const handleDownloadAll = (slides) => {
-  const allSlidesCSV = slides.map(slide => convertToCSV(slide)).join('\n');
-  const blob = new Blob([allSlidesCSV], { type: 'text/csv;charset=utf-8;' });
-  saveAs(blob, 'slides.csv');
+
+export const handleDownloadAll = () => {
+  const slideWonderData = JSON.parse(localStorage.getItem('SlideWonderdata'));
+
+  if (slideWonderData) {
+    const blob = new Blob([JSON.stringify(slideWonderData, null, 2)], { type: 'application/json;charset=utf-8;' });
+    saveAs(blob, 'SlideWonderdata.json');
+  } else {
+  }
 };
+
 
 
 export  const handleTitleClick = (slide,setEditingTitle,setNewTitle) => {
@@ -70,7 +77,24 @@ export  const handleInfoClick = (slide,setSelectedSlide) => {
     setSelectedSlide(slide);
   };
 
-
+export const handleImportJSON = (file, setSlides, setPins, setTags) => {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const importedData = JSON.parse(e.target.result);
+      const slidesFromLocalStorage = JSON.parse(localStorage.getItem('SlideWonderdata') || '{}');
+      
+      setSlides(importedData.slides || slidesFromLocalStorage.slides || []);
+      setTags(importedData.tags || slidesFromLocalStorage.tags || []);
+      setPins(importedData.pins || slidesFromLocalStorage.pins || []);
+      saveSlideToLocalStorage(importedData.slides || slidesFromLocalStorage.slides || [], importedData.pins || slidesFromLocalStorage.pins || [],  importedData.tags || slidesFromLocalStorage.tags || [])
+    } catch (error) {
+      console.error("Error importing JSON", error);
+    }
+  };
+  reader.readAsText(file);
+ 
+};
 
 export  const handleSearchChange = (e,setSearchQuery) => {
     setSearchQuery(e.target.value);
