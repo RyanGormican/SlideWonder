@@ -29,7 +29,7 @@ const GridView = ({
   const [tagId, setTagId] = useState(0);
   const canvasRefs = useRef({});
   const HEIGHT = 0.134407174;
-  const WIDTH = 0.3880;
+  const WIDTH = 0.22374999432;
 
 
 useEffect(() => {
@@ -57,7 +57,7 @@ useEffect(() => {
           preserveObjectStacking: true,
           backgroundColor: deckItem.backgroundColor,
         });
-
+   
         // Save the fabricCanvas instance to the canvas element for later disposal
         canvasElement.fabricCanvas = newFabricCanvas;
 

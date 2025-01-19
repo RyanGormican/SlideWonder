@@ -8,8 +8,8 @@ const calculateScaledProps = (width, height, x, y, size = {}) => {
   const xPercentage = x / 800;
   const yPercentage = y /600;
   const scaledPosition = {
-    left: (width * xPercentage), // Scale x using the xScale factor
-    top: (height * yPercentage), // Scale y using the yScale factor
+    left: (x * xScale), // Scale x using the xScale factor
+    top: (y * yScale), // Scale y using the yScale factor
   };
   const scaledSize = {
     width: size.width ? size.width * xScale : 12, // Scale width using xScale
