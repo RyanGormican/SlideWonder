@@ -194,7 +194,6 @@ html, body {
 .canvas-container {
   flex-grow: 1;
   display: flex;
-  padding:10px;
   justify-content: center;
   align-items: center;
   border: 1px solid #ddd;

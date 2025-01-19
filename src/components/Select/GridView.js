@@ -29,7 +29,7 @@ const GridView = ({
   const [tagId, setTagId] = useState(0);
   const canvasRefs = useRef({});
   const HEIGHT = 0.134407174;
-  const WIDTH = 0.22374999432;
+  const WIDTH = 0.315;
 
 
 useEffect(() => {
@@ -48,12 +48,14 @@ useEffect(() => {
       if (fabricCanvas) {
         fabricCanvas.dispose(); // Dispose the previous fabric canvas instance
       }
-
+        const parentGridItem = canvasElement.closest(".MuiGrid-item");
+      const parentWidth = parentGridItem?.getBoundingClientRect().width || 0;
+     
       if (deckItem) {
         // If deck[0] exists, render the content for that item
         const newFabricCanvas = new Canvas(canvasElement, {
-          width: window.innerWidth * WIDTH,
-          height: window.innerHeight * HEIGHT,
+          width: parentWidth,
+          height: canvasElement.height,
           preserveObjectStacking: true,
           backgroundColor: deckItem.backgroundColor,
         });
@@ -61,11 +63,11 @@ useEffect(() => {
         // Save the fabricCanvas instance to the canvas element for later disposal
         canvasElement.fabricCanvas = newFabricCanvas;
 
-        renderCanvasContent(newFabricCanvas, deckItem.content, window.innerWidth * WIDTH,  window.innerHeight * HEIGHT,1);
+        renderCanvasContent(newFabricCanvas, deckItem.content,parentWidth,  window.innerHeight * HEIGHT,1);
       } else {
         // If deck[0] does not exist, clear the canvas (render blank)
         const context = canvasElement.getContext('2d');
-        context.clearRect(0, 0, canvasElement.width, canvasElement.height); // Clear the canvas
+        context.clearRect(0, 0, parentWidth,  canvasElement.height); // Clear the canvas
       }
     }
   });
