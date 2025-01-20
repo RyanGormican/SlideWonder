@@ -20,11 +20,11 @@ export const handleDrop = (event, canvasId,currentSlide,setCurrentSlide,updateSl
 // Add transition to the specific canvas
 export const addTransitionToCanvas = (contentType, canvasId,currentSlide,setCurrentSlide,updateSlideData) => {
       const updatedDeck = currentSlide.deck.map((canvas) =>
-        canvas.id === canvasId ? { ...canvas, transition: contentType } : canvas
+        canvas.id === canvasId ? { ...canvas, transition: contentType, duration:1 } : canvas
       );
       const updatedSlide = { ...currentSlide, deck: updatedDeck };
       setCurrentSlide(updatedSlide);
-      updateSlideData(updatedSlide);
+      updateSlideData(updatedSlide,1,1);
 };
 // Function to delete the transition
 export const deleteTransition = (canvasId,currentSlide,setCurrentSlide,updateSlideData) => {
@@ -37,11 +37,36 @@ export const deleteTransition = (canvasId,currentSlide,setCurrentSlide,updateSli
 
   // Set the transition to null
   currentCanvasData.transition = null;
-
+  currentCanvasData.duration = null;
   setCurrentSlide(updatedSlide);
-  updateSlideData(updatedSlide);
+  updateSlideData(updatedSlide,1,1);
 };
 export function formatTransition(transition,transitions) {
    const title = transitions.find(t => t.id === transition);
   return title ? title.title : null;
 }
+
+// Update canvas duration
+export const updateCanvasDuration = (e, canvasId, currentSlide, setCurrentSlide, updateSlideData) => {
+  let newDuration = e.target.value; 
+  if (newDuration < 0.1) {
+    newDuration = 0.1;
+  }
+  if (newDuration > 12) {
+    newDuration = 12;
+  }
+
+  // Update the duration in the specific canvas
+  const updatedDeck = currentSlide.deck.map((canvas) => {
+    if (canvas.id === canvasId) {
+      return { ...canvas, duration: newDuration };
+    }
+    return canvas;
+  });
+
+  // Update the slide with the new deck
+  const updatedSlide = { ...currentSlide, deck: updatedDeck };
+  
+  setCurrentSlide(updatedSlide);
+  updateSlideData(updatedSlide, 1, 1);
+};

@@ -10,6 +10,6 @@
     "\\src\\components\\Select",
     "\\src\\components\\Slide"
   ],
-  "SelectedNode": "\\public\\index.html",
+  "SelectedNode": "\\src\\components\\Select\\GridView.js",
   "PreviewInSolutionExplorer": false
 }

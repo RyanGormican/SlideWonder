@@ -5,7 +5,7 @@ import { Icon } from '@iconify/react';
 import { Canvas, IText } from 'fabric';
 import { transitions } from './TransitionsList';
 import CanvasControls from './CanvasControls'; 
-import {handleDragStart, handleDragOver, handleDrop, formatTransition, deleteTransition} from './TransitionsManagement'; 
+import {handleDragStart, handleDragOver, handleDrop, formatTransition, deleteTransition, updateCanvasDuration} from './TransitionsManagement'; 
 import {copyCanvas} from './CanvasManagement'; 
 import {saveSlideToLocalStorage} from '../Helper'
 function SlideManager({ slides, setSlides, currentSlide, setCurrentSlide,pins }) {
@@ -15,6 +15,8 @@ function SlideManager({ slides, setSlides, currentSlide, setCurrentSlide,pins })
   const canvasRef = useRef(null);
   const canvasInstance = useRef(null);
   const [selectedContent, setSelectedContent] = useState([]);
+  const [copiedContent, setCopiedContent] = useState(null);
+
 const updateSlideData = (updatedSlide) => {
 
   const updatedSlideWithDate = {
@@ -83,6 +85,49 @@ const updateSlideData = (updatedSlide) => {
       updateSlideData(updatedSlide);
     }
   };
+const copyCanvasElement = () => {
+  if (!selectedContent) return; // If nothing is selected, do nothing
+  setCopiedContent(selectedContent); // Copy the selected content
+};
+
+const pasteCanvas = () => {
+  if (!copiedContent) return; // If no content to paste, do nothing
+
+  // Clone the copied content and place it at a new position 
+  const newContent = {
+    type: getSelectedContentType(selectedContent.id),
+    id: Date.now(), 
+    x: copiedContent.left + 5, 
+    y: copiedContent.top + 5,
+    width:  copiedContent.width, 
+    radius: copiedContent.radius,
+    height:  copiedContent.height, 
+    angle: copiedContent.angle,
+    text: copiedContent.textLines, 
+    fontSize: copiedContent.fontSize, 
+    fill: selectedContent.fill,
+    scaleX: copiedContent.scaleX,
+    scaleY: copiedContent.scaleY,
+  };
+ 
+  // Add the new content to the current canvas
+  const updatedSlide = {
+    ...currentSlide,
+    deck: currentSlide.deck.map((canvas) => {
+      if (canvas.id === currentCanvas) {
+        return {
+          ...canvas,
+          content: [...canvas.content, newContent], // Add new content to the canvas
+        };
+      }
+      return canvas;
+    }),
+  };
+
+  setCurrentSlide(updatedSlide);
+  updateSlideData(updatedSlide); // Update the slide data
+};
+
 
 const handleObjectModified = (e) => {
 
@@ -120,7 +165,7 @@ const handleObjectModified = (e) => {
                       angle: object.angle,
                       text: object.textLines ? object.textLines[0] : item.text,
                       fontSize: object.fontSize ? (object.fontSize) * 1 : 12,
-                      color: object.fill || '#FFFFFF',
+                      fill: object.fill || '#FFFFFF',
                       scaleX: object.scaleX || 1,
                       scaleY: object.scaleY || 1,
                     }
@@ -179,7 +224,6 @@ const handleCanvasClick = (event) => {
 
         if (toggleMode === 'text') {
           const newTextObject = createNewObject('text', { text: 'New Text' });
-          console.log(newTextObject);
           currentCanvasData.content = [...currentCanvasData.content, newTextObject];
         }
 
@@ -203,7 +247,10 @@ const handleCanvasClick = (event) => {
           });
           currentCanvasData.content = [...currentCanvasData.content, newTriangle];
         }
-
+         if (toggleMode === 'image') {
+          const newImage = createNewObject('image', { src: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvk-ecPeKuRvec5czcoK2H7axiY9XZtcqopQ&s' });
+          currentCanvasData.content = [...currentCanvasData.content, newImage];
+        }
         return currentCanvasData;
       }
       return canvas;
@@ -335,6 +382,15 @@ const getUpdatedProperties = (item, newSize) => {
 
   useEffect(() => {
   const handleKeyDown = (event) => {
+    if (event.ctrlKey || event.metaKey) {
+      if (event.key === 'c') {
+        event.preventDefault(); 
+        copyCanvasElement();
+      } else if (event.key === 'v') {
+        event.preventDefault(); 
+        pasteCanvas();
+      }
+    }
     if (event.key === 'Backspace' && selectedContent?.id && selectedContent?.type != 'i-text') {
       event.preventDefault();
       const updatedSlide = {
@@ -360,7 +416,7 @@ const getUpdatedProperties = (item, newSize) => {
   return () => {
     window.removeEventListener('keydown', handleKeyDown);
   };
-}, [selectedContent, currentCanvas, currentSlide]);
+}, [selectedContent, copiedContent, currentCanvas, currentSlide]);
 
 
 const handleScaleChange = (event, axis) => {
@@ -458,22 +514,83 @@ return (
                   updateSlideData={updateSlideData}
                 />
               </div>
-              {index < currentSlide.deck.length - 1 && (
-                <div className="canvas-transition-overlay"  onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, canvas.id,currentSlide,setCurrentSlide,updateSlideData)}  style={{ display: 'flex', justifyContent: 'space-between', minHeight: '3vh', backgroundColor:'darkgrey', borderRadius: '8px',alignItems: 'center' }}>
-                  <span style={{ flexGrow: 1, textAlign: 'center' }}>
-                    {canvas.transition ? formatTransition(canvas.transition,transitions) : null}
+          {index < currentSlide.deck.length - 1 && (
+  <div
+    className="canvas-transition-overlay"
+    onDragOver={handleDragOver}
+    onDrop={(e) => handleDrop(e, canvas.id, currentSlide, setCurrentSlide, updateSlideData)}
+    style={{
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      minHeight: '3vh',
+      backgroundColor: 'darkgrey',
+      borderRadius: '8px',
+    }}
+  >
+    {/* Transition Label */}
+    <span style={{ flexGrow: 0, textAlign: 'left', paddingLeft: '10px' }}>
+      {canvas.transition ? formatTransition(canvas.transition, transitions) : null}
+    </span>
 
-                  </span>
-                  <Icon
-                    icon="mdi:trash"
-                    width="16"
-                    height="16"
-                    className="delete-icon"
-                    onClick={() => deleteTransition(canvas.id,currentSlide,setCurrentSlide,updateSlideData)}
-                    style={{ color: 'red', cursor: 'pointer', background: '#fff', borderRadius: '50%', padding: '4px', border: '1px solid #ccc', display: canvas.transition ? 'inline-block' : 'none'    }}
-                  />
-                </div>
-              )}
+    {/* Duration Section with Input and Range */}
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+      <span style={{ display: canvas.transition ? 'inline-block' : 'none' }}>
+      <input
+        type="number"
+        min="0.1"
+        max="12"
+        step="0.1"
+        value={canvas.duration}
+        onChange={(e) => updateCanvasDuration(e, canvas.id, currentSlide, setCurrentSlide, updateSlideData)}
+        style={{
+          width: '60px',
+          display: canvas.transition ? 'inline-block' : 'none',
+          textAlign: 'center',
+          backgroundColor: 'darkgrey',
+          border: 'none',
+          outline: 'none',
+        }}
+      />s
+      </span>
+    
+      
+      {/* Range Input for Duration */}
+      <input
+        type="range"
+        min="0.1"
+        max="12"
+        step="0.1"
+        value={canvas.duration}
+        onChange={(e) => updateCanvasDuration(e, canvas.id, currentSlide, setCurrentSlide, updateSlideData)}
+        style={{
+          width: '100px',
+          display: canvas.transition ? 'inline-block' : 'none',
+        }}
+      />
+    </div>
+
+    {/* Trash Icon */}
+    <Icon
+      icon="mdi:trash"
+      width="16"
+      height="16"
+      className="delete-icon"
+      onClick={() => deleteTransition(canvas.id, currentSlide, setCurrentSlide, updateSlideData)}
+      style={{
+        color: 'red',
+        cursor: 'pointer',
+        background: '#fff',
+        borderRadius: '50%',
+        padding: '4px',
+        border: '1px solid #ccc',
+        display: canvas.transition ? 'inline-block' : 'none',
+      }}
+    />
+  </div>
+)}
+
+
             </React.Fragment>
           ))}
         </div>

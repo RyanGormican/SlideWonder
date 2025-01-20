@@ -1,14 +1,14 @@
 import React, { useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { renderCanvasContent } from './CanvasRender'; // Import the shared function
+import { renderCanvasContent } from './CanvasRender';
 import { Icon } from '@iconify/react';
 import { Canvas } from 'fabric';
 
 const ITEM_TYPE = 'CANVAS_ITEM';
 
 function DraggableCanvas({ canvas, index, moveCanvas, setCurrentCanvas, deleteCanvas, currentSlide, setCurrentSlide, copyCanvas,updateSlideData }) {
-  const dragCanvasRef = useRef(null); // Reference to the <canvas> DOM element
-  const dragInstance = useRef(null); // Reference to the fabric.Canvas instance
+  const dragCanvasRef = useRef(null);
+  const dragInstance = useRef(null);
 
   // Drag functionality
   const [, dragRef] = useDrag({

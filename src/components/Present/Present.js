@@ -9,7 +9,7 @@ function Present({ currentSlide, setView }) {
   const [hovering, setHovering] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   const [autoPlay, setAutoPlay] = useState(false);
-  const [autoPlayDelay, setAutoPlayDelay] = useState(5); // Initial value in seconds
+  const [autoPlayDelay, setAutoPlayDelay] = useState(5); 
   const [loop, setLoop] = useState(false);
 
   const canvasRef = useRef(null);
@@ -63,30 +63,47 @@ const initializeCanvas = () => {
 };
 
 
+useEffect(() => {
+  // Initialize canvas when the component mounts
+  initializeCanvas();
 
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setFullscreen(document.fullscreenElement !== null);
-      initializeCanvas();
-    };
+  // Add resize event listener to re-render canvases on window resize
+  const handleResize = () => {
+    if (canvasInstance.current) {
+      canvasInstance.current.clear();
+      canvasInstance.current.setWidth(window.innerWidth);
+      canvasInstance.current.setHeight(window.innerHeight);
+      canvasInstance.current.backgroundColor = currentCanvasData.backgroundColor
+    }
+    if (nextCanvasInstance.current) {
+      // Clear the next canvas before resizing
+      nextCanvasInstance.current.clear();
+      nextCanvasInstance.current.setWidth(window.innerWidth);
+      nextCanvasInstance.current.setHeight(window.innerHeight);
+    }
+  
+    renderCanvasContent(canvasInstance.current, currentCanvasData.content, window.innerWidth, window.innerHeight, opacity);
+  };
 
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    initializeCanvas();
+  window.addEventListener('resize', handleResize);
 
-    return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-      if (canvasInstance.current) {
-        canvasInstance.current.dispose();
-      }
-    };
-  }, [currentCanvasIndex, currentCanvasData]);
-
+  return () => {
+    window.removeEventListener('resize', handleResize);
+    if (canvasInstance.current) {
+      canvasInstance.current.dispose();
+    }
+    if (nextCanvasInstance.current) {
+      nextCanvasInstance.current.dispose();
+    }
+  };
+}, [currentCanvasIndex, currentCanvasData, currentSlide.deck]);
   
 
  const goToNextCanvas = () => {
   if (currentCanvasIndex < currentSlide.deck.length - 1) {
     const currentCanvas = currentSlide.deck[currentCanvasIndex];
     const nextCanvas = currentSlide.deck[currentCanvasIndex + 1];
+      renderCanvasContent(nextCanvasInstance.current, currentSlide.deck[(currentCanvasIndex + 1) % currentSlide.deck.length].content, window.innerWidth, window.innerHeight, opacity);
     // Add more transition cases here
     switch (currentCanvas.transition) {
       case 'dissolve':
