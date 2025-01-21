@@ -179,6 +179,7 @@ font-family: "Quicksand", sans-serif !important;
   cursor: pointer;
   color: #ff4d4d;
   transition: color 0.2s ease;
+
 }
 html, body {
   height: 100%;

@@ -1,14 +1,16 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { renderCanvasContent } from './CanvasRender';
 import { Icon } from '@iconify/react';
 import { Canvas } from 'fabric';
+import NotesModal from './NotesModal';  // Import the NotesModal component
 
 const ITEM_TYPE = 'CANVAS_ITEM';
 
-function DraggableCanvas({ canvas, index, moveCanvas, setCurrentCanvas, deleteCanvas, currentSlide, setCurrentSlide, copyCanvas,updateSlideData }) {
+function DraggableCanvas({ canvas, index, moveCanvas, setCurrentCanvas, deleteCanvas, currentSlide, setCurrentSlide, copyCanvas, updateSlideData }) {
   const dragCanvasRef = useRef(null);
   const dragInstance = useRef(null);
+  const [openNotesModal, setOpenNotesModal] = useState(false); // Modal state
 
   // Drag functionality
   const [, dragRef] = useDrag({
@@ -30,7 +32,6 @@ function DraggableCanvas({ canvas, index, moveCanvas, setCurrentCanvas, deleteCa
   // Initialize and render the canvas
   useEffect(() => {
     if (dragCanvasRef.current) {
-      // Initialize fabric.Canvas
       dragInstance.current = new Canvas(dragCanvasRef.current, {
         width: 300,
         height: 200,
@@ -38,7 +39,6 @@ function DraggableCanvas({ canvas, index, moveCanvas, setCurrentCanvas, deleteCa
         backgroundColor: canvas.backgroundColor,
       });
 
-      // Render content on the canvas
       renderCanvasContent(dragInstance.current, canvas.content, 300, 200, 1);
 
       return () => {
@@ -79,7 +79,7 @@ function DraggableCanvas({ canvas, index, moveCanvas, setCurrentCanvas, deleteCa
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'space-between',
-          gap: '2vh', 
+          gap: '2vh',
         }}
       >
         {/* Index */}
@@ -122,7 +122,7 @@ function DraggableCanvas({ canvas, index, moveCanvas, setCurrentCanvas, deleteCa
           height="24"
           className="copy-icon"
           onClick={(e) => {
-            e.stopPropagation(); 
+            e.stopPropagation();
             copyCanvas(canvas.id,currentSlide,setCurrentSlide,updateSlideData);
           }}
           style={{
@@ -134,7 +134,36 @@ function DraggableCanvas({ canvas, index, moveCanvas, setCurrentCanvas, deleteCa
             border: '1px solid #ccc',
           }}
         />
+        {/* Notes icon */}
+        <Icon
+          icon="fluent:notepad-20-regular"
+          width="24"
+          height="24"
+          className="note-icon"
+          onClick={(e) => {
+            e.stopPropagation();
+            setOpenNotesModal(true); 
+     
+          }}
+          style={{
+            color: '#3b9ab8',
+            cursor: 'pointer',
+            background: '#fff',
+            borderRadius: '50%',
+            padding: '4px',
+            border: '1px solid #ccc',
+          }}
+        />
       </div>
+
+      {/* Notes Modal */}
+      <NotesModal
+        open={openNotesModal}
+        onClose={() => setOpenNotesModal(false)}
+        canvasId={canvas.id}
+        currentSlide={currentSlide}
+        updateSlideData={updateSlideData}
+      />
     </div>
   );
 }

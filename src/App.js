@@ -34,6 +34,7 @@ function App({theme,setTheme}) {
     setTags(savedData.tags);
   }, []);
 
+
   return (
     <DndProvider backend={HTML5Backend}>
 <div className={`App ${view !== 'present' ? 'not-present' : 'present'}`}>
@@ -85,7 +86,11 @@ function App({theme,setTheme}) {
   </div>
 ) : view === 'present' && (
   <div>
-    <Present currentSlide={currentSlide} setView={setView}/>
+<Present
+  currentSlide={slides.find((slide) => slide.id === currentSlide?.id) || null} 
+  setView={setView}
+/>
+
   </div>
 )}
         {isModalOpen && <Feedback isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />}

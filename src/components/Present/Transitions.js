@@ -22,9 +22,7 @@ export const applyDissolveTransition = (currentCanvas, nextCanvasRef, canvasRef,
   }, fadeStep);
 };
 
-
 export const applySlideTransition = (currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex, direction) => {
-
   const canvasDiv = document.getElementById('presentation-canvas');
 
   // Use the dynamic duration from currentCanvas
@@ -36,6 +34,10 @@ export const applySlideTransition = (currentCanvas, nextCanvasRef, canvasRef, cu
     right: 'translateX(+100%)',   // Slide in from the left
     up: 'translateY(-100%)',      // Slide in from the bottom
     down: 'translateY(100%)',     // Slide in from the top
+    topleft: 'translateX(-100%) translateY(-100%)',   // Slide in from top-left corner
+    topright: 'translateX(100%) translateY(-100%)',   // Slide in from top-right corner
+    bottomleft: 'translateX(-100%) translateY(100%)', // Slide in from bottom-left corner
+    bottomright: 'translateX(100%) translateY(100%)', // Slide in from bottom-right corner
   }[direction] || 'translateX(100%)'; // Default to 'left'
 
   nextCanvasRef.current.style.zIndex = 2;

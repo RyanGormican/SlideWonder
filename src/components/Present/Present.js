@@ -11,7 +11,7 @@ function Present({ currentSlide, setView }) {
   const [autoPlay, setAutoPlay] = useState(false);
   const [autoPlayDelay, setAutoPlayDelay] = useState(5); 
   const [loop, setLoop] = useState(false);
-
+  const [showNotes, setShowNotes]=useState(false);
   const canvasRef = useRef(null);
   const nextCanvasRef = useRef(null);
   const canvasInstance = useRef(null);
@@ -61,7 +61,7 @@ const initializeCanvas = () => {
   renderCanvasContent(canvasInstance.current, currentCanvasData.content, window.innerWidth, window.innerHeight, opacity);
   renderCanvasContent(nextCanvasInstance.current, currentSlide.deck[nextCanvasIndex].content, window.innerWidth, window.innerHeight, opacity);
 };
-
+console.log(currentCanvasData);
 
 useEffect(() => {
   // Initialize canvas when the component mounts
@@ -98,29 +98,22 @@ useEffect(() => {
   };
 }, [currentCanvasIndex, currentCanvasData, currentSlide.deck]);
   
-
+const slideDirections = [
+  'slideleft', 'slideright', 'slideup', 'slidedown', 
+  'slidetopleft', 'slidetopright', 'slidebottomleft', 'slidebottomright'
+];
  const goToNextCanvas = () => {
   if (currentCanvasIndex < currentSlide.deck.length - 1) {
     const currentCanvas = currentSlide.deck[currentCanvasIndex];
     const nextCanvas = currentSlide.deck[currentCanvasIndex + 1];
       renderCanvasContent(nextCanvasInstance.current, currentSlide.deck[(currentCanvasIndex + 1) % currentSlide.deck.length].content, window.innerWidth, window.innerHeight, opacity);
-    // Add more transition cases here
     switch (currentCanvas.transition) {
       case 'dissolve':
         applyDissolveTransition(currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex,opacity,setOpacity);
         break;
-      case 'slideleft':
-        applySlideTransition(currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex, 'left'); 
-        break;
-          case 'slideright':
-        applySlideTransition(currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex, 'right'); 
-        break;
-              case 'slideup':
-        applySlideTransition(currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex, 'up'); 
-        break;
-              case 'slidedown':
-        applySlideTransition(currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex, 'down'); 
-        break;
+     case slideDirections.includes(currentCanvas.transition) && currentCanvas.transition:
+    applySlideTransition( currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex, currentCanvas.transition.replace('slide', '').toLowerCase());
+    break;
       default:
         setCurrentCanvasIndex(currentCanvasIndex + 1); 
         break;
@@ -219,12 +212,34 @@ useEffect(() => {
   const progress = ((currentCanvasIndex + 1) / currentSlide.deck.length) * 100;
 
 
-
+ 
 
   return (
+  <div>
+      {showNotes && currentCanvasData?.note && currentCanvasData.note.length > 0 && (
+  <div
+    style={{
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      opacity: 0.4,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      color: 'white',
+      padding: '20px',
+      maxWidth: '80%',
+      borderRadius: '8px',
+      zIndex: 10,
+      textAlign: 'center',
+      fontSize: '18px',
+    }}
+  >
+    {currentCanvasData.note.join('\n')}
+  </div>
+)}
     <div className="present-container locked" style={{ textAlign: 'center', position: 'absolute', cursor: hovering ? 'auto' : 'none',  overflow: 'hidden' }}>
       {/* Canvas */}
-  
+   
         <canvas style={{
           top: 0,
           left: 0,
@@ -338,6 +353,7 @@ useEffect(() => {
             />
           </div>
         </div>
+   
 
         {/* Slide Info */}
         <p style={{ color: '#fff', marginLeft: '10px' }}>
@@ -376,6 +392,16 @@ useEffect(() => {
           />
           Loop
         </div>
+         <div style={{ color: '#fff', display: 'flex', alignItems: 'center' }}>
+    <input
+      type="checkbox"
+      checked={showNotes}
+      onChange={() => setShowNotes(!showNotes)} 
+      style={{ marginRight: '10px' }}
+    />
+    <span>Show Notes</span>
+  </div>
+
       </div>
 
       {/* Hover Area */}
@@ -401,6 +427,7 @@ useEffect(() => {
           }
         }}
       />
+    </div>
     </div>
   );
 }
