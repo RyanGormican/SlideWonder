@@ -65,15 +65,15 @@ function App({theme,setTheme}) {
   <div       style={{textAlign: 'center'}}>
     <Icon
       icon="mingcute:back-line"
-      width="24"
-      height="24"
+      width="3vw"
+      height="3vh"
       onClick={() => setView('select')}
     />
          {currentSlide && currentSlide.deck.length > 0 && (
     <Icon
       icon="gg:play-button"
-      width="24"
-      height="24"
+      width="3vw"
+      height="3vh"
       onClick={() => setView('present')}
     />
     )}

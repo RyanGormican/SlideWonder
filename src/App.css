@@ -224,19 +224,18 @@ canvas {
 .present-container::-webkit-scrollbar {
   display: none;
 }
-.transition-panel {
-  width: 220px; 
+.additions-panel {
+  width: 10vw; 
   top: 0;
-  left: -240px;
   background-color: #f1f1f1;
-  padding: 15px;
+  padding: 1vw;
   border-right: 2px solid #ccc;
   z-index: 2;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
   color: black;
 }
 
-.transition-panel h3 {
+.additions-panel h3 {
   margin-top: 0;
   font-size: 18px;
   font-weight: bold;

@@ -4,10 +4,13 @@ import DraggableCanvas from './DraggableCanvas';
 import { Icon } from '@iconify/react';
 import { Canvas, IText } from 'fabric';
 import { transitions } from './TransitionsList';
+import { templates } from './TemplatesList';
 import CanvasControls from './CanvasControls'; 
 import {handleDragStart, handleDragOver, handleDrop, formatTransition, deleteTransition, updateCanvasDuration} from './TransitionsManagement'; 
-import {handleCanvasClick, copyCanvas} from './CanvasManagement'; 
-import {saveSlideToLocalStorage} from '../Helper'
+import {handleObjectModified} from './Modifications';
+import { IconButton } from '@mui/material';
+import {handleCanvasClick, copyCanvasElement, copyCanvas} from './CanvasManagement'; 
+import { saveSlideToLocalStorage} from '../Helper'
 function SlideManager({ slides, setSlides, currentSlide, setCurrentSlide,pins }) {
   const [currentCanvas, setCurrentCanvas] = useState(null);
   const [backgroundColor, setBackgroundColor] = useState('#ffffff');
@@ -16,7 +19,9 @@ function SlideManager({ slides, setSlides, currentSlide, setCurrentSlide,pins })
   const canvasInstance = useRef(null);
   const [selectedContent, setSelectedContent] = useState([]);
   const [copiedContent, setCopiedContent] = useState(null);
-
+  const [additionsMode, setAdditionsMode] = useState('transitions');
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const templatesRef = useRef({}); 
 const updateSlideData = (updatedSlide) => {
 
   const updatedSlideWithDate = {
@@ -32,28 +37,94 @@ const updateSlideData = (updatedSlide) => {
   saveSlideToLocalStorage(updatedSlides,1,1);
 };
 
+ const sortedTemplates = [...templates].sort((a, b) => a.title.localeCompare(b.title));
+    useEffect(() => {
+    const loadTemplates = () => {
+      // Iterate over templates using forEach
+      templates.forEach((template) => {
+        const { id, title } = template; // Destructure id from template
+        const canvasElement = templatesRef.current[id]; // Access the canvas ref by id
+        loadTemplate(`${id}.js`).then((canvasTemplate) => {
+          if (canvasTemplate) {
+            const { content, backgroundColor } = canvasTemplate;
 
-  const addCanvasToDeck = () => {
-    if (!currentSlide) {
-      alert('Please select a slide first!');
-      return;
-    }
+            // Create a new canvas
+            const newCanvas = new Canvas(canvasElement, {
+              width: 150,
+              height: 150,
+              preserveObjectStacking: true,
+              backgroundColor: backgroundColor || '#ffffff', 
+            });
 
-    const newCanvas = {
-      id: Date.now(),
-      content: null, // Initialize content as null
-      backgroundColor: '#ffffff',
-      text: '', // Initialize text property
+            // Render the content on the canvas
+            renderCanvasContent(newCanvas, content, 150, 150, 1);
+          }
+        }).catch((error) => {
+          console.error('Error loading template:', error);
+        });
+      });
     };
 
-    const updatedSlide = {
-      ...currentSlide,
-      deck: [...currentSlide.deck, newCanvas],
-    };
+    loadTemplates(); 
 
-    setCurrentSlide(updatedSlide);
-    updateSlideData(updatedSlide);
+    // Cleanup function to dispose of the fabric canvas instances when component unmounts or data changes
+    return () => {
+      // Loop through each canvas reference by keys in templatesRef.current
+      Object.values(templatesRef.current).forEach((canvasElement) => {
+        if (canvasElement) {
+          const fabricCanvas = canvasElement.fabricCanvas;
+          if (fabricCanvas) {
+            fabricCanvas.dispose(); // Dispose of the canvas when cleaning up
+          }
+        }
+      });
+    };
+  }, [additionsMode]); 
+
+  // Function to dynamically import the template content
+  const loadTemplate = (templateTitle) => {
+    return import(`./Templates/${templateTitle}`)
+      .then((template) => template.default) 
+      .catch((error) => {
+        console.error('Error loading template:', error);
+        return null; // Return null if there is an error
+      });
   };
+
+const addCanvasToDeck = async () => {
+  if (!currentSlide) {
+    alert('Please select a slide first!');
+    return;
+  }
+
+  // Initialize content and backgroundColor with defaults
+  let content = null;
+  let backgroundColor = '#ffffff';
+
+  if (selectedTemplate) {
+    // If there's a selected template, load the content and background color from it
+    const canvasTemplate = await loadTemplate(selectedTemplate.id);
+    if (canvasTemplate) {
+      content = canvasTemplate.content || null;
+      backgroundColor = canvasTemplate.backgroundColor || '#ffffff';
+    }
+  }
+  const newCanvas = {
+    id: Date.now(),
+    content: content,
+    backgroundColor: backgroundColor,
+    text: '', 
+  };
+
+  const updatedSlide = {
+    ...currentSlide,
+    deck: [...currentSlide.deck, newCanvas],
+  };
+
+  setCurrentSlide(updatedSlide);
+  updateSlideData(updatedSlide); 
+};
+
 
   const deleteCanvas = (canvasId) => {
     const updatedDeck = currentSlide.deck.filter((canvas) => canvas.id !== canvasId);
@@ -85,13 +156,10 @@ const updateSlideData = (updatedSlide) => {
       updateSlideData(updatedSlide);
     }
   };
-const copyCanvasElement = () => {
-  if (!selectedContent) return; // If nothing is selected, do nothing
-  setCopiedContent(selectedContent); // Copy the selected content
-};
+
 
 const pasteCanvas = () => {
-  if (!copiedContent || typeof copiedContent === 'string') return; 
+  if (!copiedContent ||  Array.isArray(copiedContent) && copiedContent.length === 0 ||   typeof copiedContent === 'string') return; 
 
   // Clone the copied content and place it at a new position 
   const newContent = {
@@ -129,60 +197,6 @@ const pasteCanvas = () => {
 };
 
 
-const handleObjectModified = (e) => {
-
-  const object = e.target;
-  const contentType = getSelectedContentType(object.id); // Get the content type
-  
-  // Declare width and height with let so they can be reassigned
-  let width = object.width ? (object.width ) * 1 : 1;
-  let height = object.height ? (object.height) * 1 : 1;
-
-  // If the content type is square, set width and height to the minimum of the two
-  if (contentType === 'square') {
-    const minDimension = Math.min(width, height);
-    width = height = minDimension; // Make height and width equal
-  }
-  
-  // Create a shallow copy of the current slide
-  const updatedSlide = {
-    ...currentSlide,
-    deck: currentSlide.deck.map((canvas) => {
-      if (canvas.id === currentCanvas) {
-        // Modify the canvas content if it matches the current canvas
-        return {
-          ...canvas,
-          content: canvas?.content
-            ? canvas?.content.map((item) =>
-                item.id === object.id
-                  ? {
-                      ...item,
-                      x: object.left,
-                      y: object.top,
-                      width:  object.width ? (object.width ) * 1 : 1,
-                      radius: object.radius ? (object.radius ) * 1 : 1,
-                      height:  object.height ? (object.height ) * 1 : 1,
-                      angle: object.angle,
-                      text: object.textLines ? object.textLines[0] : item.text,
-                      fontSize: object.fontSize ? (object.fontSize) * 1 : 12,
-                      fill: object.fill || '#FFFFFF',
-                      scaleX: object.scaleX || 1,
-                      scaleY: object.scaleY || 1,
-                    }
-                  : item
-              )
-            : [],
-        };
-      }
-      return canvas;
-    }),
-  };
-  // Update state and persist changes
-  setCurrentSlide(updatedSlide);
-  updateSlideData(updatedSlide);
-};
-
-
 
 
 
@@ -207,8 +221,8 @@ const handleObjectModified = (e) => {
       };
 
       renderCanvasContent(canvasInstance.current, updatedSlide.deck[0]?.content,800,600,1); 
+canvasInstance.current.on('object:modified', (e) => handleObjectModified(e, getSelectedContentType, currentSlide, currentCanvas, setCurrentSlide, updateSlideData));
 
-      canvasInstance.current.on('object:modified', handleObjectModified);
       canvasInstance.current.on('selection:created', (e) => {
       const selectedObjects =  canvasInstance.current.getActiveObjects();
       if (selectedObjects) {
@@ -306,7 +320,7 @@ const getUpdatedProperties = (item, newSize) => {
     if (event.ctrlKey || event.metaKey) {
       if (event.key === 'c') {
         event.preventDefault(); 
-        copyCanvasElement();
+        copyCanvasElement(selectedContent,setCopiedContent);
       } else if (event.key === 'v') {
         event.preventDefault(); 
         pasteCanvas();
@@ -400,10 +414,17 @@ const getSizeValue = (selectedContent) => {
 };
 
  const sortedTransitions = [...transitions].sort((a, b) => a.title.localeCompare(b.title));
+
 return (
     <div className="main-container">
-      <div className="transition-panel">
-        <h3>Transitions</h3>
+      <div className="additions-panel">
+      <IconButton onClick={() => setAdditionsMode("transitions")}>
+        <h3>Transitions <Icon icon="fluent-mdl2:transition-pop" width="24" height="24" /> </h3>
+    </IconButton>
+         <IconButton  onClick={() => setAdditionsMode("templates")}>
+        <h3>Templates <Icon icon="ion:easel" width="24" height="24" /></h3>
+    </IconButton>
+      {additionsMode === "transitions" ? (
         <div className="transition-list">
           {sortedTransitions.map((transition) => (
             <div
@@ -416,6 +437,24 @@ return (
             </div>
           ))}
         </div>
+        ) : ( <div>   {sortedTemplates.map((template) => (
+           <div
+              key={template.id}
+               onClick={() => setSelectedTemplate(selectedTemplate === template ? null : template)} 
+        style={{
+          backgroundColor: selectedTemplate === template ? '#e0e0e0' : 'transparent', 
+          padding: '10px',
+          margin: '5px',
+          cursor: 'pointer',
+        }}
+            >         <div className="locked">
+                <canvas ref={(el) => (templatesRef.current[template.id] = el)}></canvas>
+                </div>
+              {template.title}
+            </div>
+        
+        ))}
+        </div>)}
       </div>
       
       <div className="scrollable-column">

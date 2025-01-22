@@ -1,12 +1,8 @@
 import React, {useState} from 'react';
 
-import { Grid, Card, CardContent, Typography, IconButton, Menu, MenuItem, InputAdornment, TextField, List, ListItem, ListItemText } from '@mui/material';
+import { Typography, IconButton, Menu, MenuItem, InputAdornment, TextField, ListItemText } from '@mui/material';
 import { Icon } from '@iconify/react';
-import InfoModal from '../InfoModal/InfoModal';
 import * as SelectUtility from './SelectUtility';
-import * as SlideManagement from './SlideManagement';
-import GridView from './GridView'; 
-import ListView from './ListView';
 
 const Buttons = ({ theme,setTheme,sortOrder,setSortOrder,searchQuery,setSearchQuery,slides,tags,toggleTag,tagStates,toggleAllTags,uniqueTags,setViewType,setSlides,setPins,setTags}) => {
  const [menuAnchor, setMenuAnchor] = useState(null);

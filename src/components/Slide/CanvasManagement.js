@@ -21,7 +21,10 @@ const canvasId = canvas
   updateSlideData(updatedSlide);
 };
 
-
+export const copyCanvasElement = (selectedContent,setCopiedContent) => {
+  if (!selectedContent) return; // If nothing is selected, do nothing
+  setCopiedContent(selectedContent); // Copy the selected content
+};
 
 export const handleCanvasClick = (event,toggleMode,setToggleMode, currentSlide,setCurrentSlide, currentCanvas,selectedContent, updateSlideData) => {
   if (toggleMode === null) return;

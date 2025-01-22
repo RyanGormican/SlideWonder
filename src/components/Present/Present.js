@@ -20,6 +20,9 @@ function Present({ currentSlide, setView }) {
   const autoPlayTimerRef = useRef(null);
   const [opacity,setOpacity] = useState(1);
   const currentCanvasData = currentSlide?.deck[currentCanvasIndex];
+  const [showPopoutNotes, setShowPopoutNotes] = useState(false);
+  const [popoutWindow, setPopoutWindow] = useState(null);
+
 const initializeCanvas = () => {
   if (!currentCanvasData || !canvasRef.current) return;
 
@@ -61,7 +64,58 @@ const initializeCanvas = () => {
   renderCanvasContent(canvasInstance.current, currentCanvasData.content, window.innerWidth, window.innerHeight, opacity);
   renderCanvasContent(nextCanvasInstance.current, currentSlide.deck[nextCanvasIndex].content, window.innerWidth, window.innerHeight, opacity);
 };
-console.log(currentCanvasData);
+const handlePopoutNotes = () => {
+  if (showPopoutNotes) {
+    if (!popoutWindow) {
+      // Open a new window if it doesn't exist
+      const newWindow = window.open('', '_blank', 'width=600,height=400');
+      setPopoutWindow(newWindow);
+
+      // Initialize content inside the new window
+      newWindow.document.write(`
+        <html>
+          <head><title>Notes</title></head>
+          <body style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+            <h3>Canvas Notes</h3>
+            <p id="noteContent">Loading...</p>  <!-- Default loading message -->
+          </body>
+        </html>
+      `);
+
+      // Ensure that the content is updated immediately after writing to the window
+      newWindow.document.close(); 
+
+      // Update the content with the actual note right after writing the content
+      const noteContent = currentCanvasData?.note && currentCanvasData?.note.length > 0
+        ? currentCanvasData.note.join('\n')
+        : 'No note here!';
+      const noteElement = newWindow.document.getElementById('noteContent');
+      if (noteElement) {
+        noteElement.innerHTML = noteContent;  // Set the note content
+      }
+    } else {
+      // If the window is already open, update the content immediately
+      const noteContent = currentCanvasData?.note && currentCanvasData?.note.length > 0
+        ? currentCanvasData.note.join('\n')
+        : 'No note here!';
+      const noteElement = popoutWindow.document.getElementById('noteContent');
+      if (noteElement) {
+        noteElement.innerHTML = noteContent;  // Update content
+      }
+    }
+  } else {
+    // Close the popout window if notes are not to be shown
+    if (popoutWindow) {
+      popoutWindow.close();
+      setPopoutWindow(null);  
+    }
+  }
+};
+
+
+
+
+
 
 useEffect(() => {
   // Initialize canvas when the component mounts
@@ -168,6 +222,11 @@ const slideDirections = [
       window.removeEventListener('mousemove', handleMouseMove);
     };
   }, []);
+
+  useEffect(() => {
+  handlePopoutNotes();
+}, [currentCanvasIndex, currentCanvasData, showPopoutNotes]);
+
    useEffect(() => {
     const keydownHandler = Keybinds({
       currentSlide,
@@ -401,6 +460,17 @@ const slideDirections = [
     />
     <span>Show Notes</span>
   </div>
+  <div style={{ color: '#fff', display: 'flex', alignItems: 'center' }}>
+  <input
+    type="checkbox"
+    checked={showPopoutNotes}
+    onChange={() => {
+      setShowPopoutNotes(!showPopoutNotes);
+    }}
+    style={{ marginRight: '10px' }}
+  />
+  <span>Popout Notes</span>
+</div>
 
       </div>
 

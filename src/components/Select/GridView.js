@@ -36,14 +36,13 @@ useEffect(() => {
   // Render content on canvas for each slide when the sortedSlides change
   sortedSlides.forEach((slide) => {
     const canvasElement = canvasRefs.current[slide.id];
-    
+
     // Find the corresponding slide in the 'slides' array
     const slideData = slides.find(s => s.id === slide.id);
     const deckItem = slideData?.deck && slideData.deck[0]; // Check if deck[0] exists
     
     if (canvasElement) {
       const fabricCanvas = canvasElement.fabricCanvas; // Access fabric canvas instance if it exists
-      
       // If a canvas instance already exists, dispose of it first before creating a new one
       if (fabricCanvas) {
         fabricCanvas.dispose(); // Dispose the previous fabric canvas instance
@@ -62,7 +61,6 @@ useEffect(() => {
    
         // Save the fabricCanvas instance to the canvas element for later disposal
         canvasElement.fabricCanvas = newFabricCanvas;
-
         renderCanvasContent(newFabricCanvas, deckItem.content,parentWidth,  window.innerHeight * HEIGHT,1);
       } else {
         // If deck[0] does not exist, clear the canvas (render blank)

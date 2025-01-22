@@ -1,7 +1,7 @@
 import { IText, FabricImage, Image, Circle, Polygon, Point, Triangle, Rect } from 'fabric';
 
 // Helper function to calculate scaled properties
-const calculateScaledProps = (width, height, x, y, size = {}) => {
+const calculateScaledProps = (width, height, x, y, size = {}, scaleX = 1, scaleY = 1) => {
   const xScale = width / 800; // Calculate width scaling factor
   const yScale = height / 600; // Calculate height scaling factor
 
@@ -9,6 +9,7 @@ const calculateScaledProps = (width, height, x, y, size = {}) => {
     left: x * xScale, // Scale x using the xScale factor
     top: y * yScale, // Scale y using the yScale factor
   };
+
   const scaledSize = {
     width: size.width ? size.width * xScale : 12, // Scale width using xScale
     height: size.height ? size.height * yScale : 12, // Scale height using yScale
@@ -16,9 +17,14 @@ const calculateScaledProps = (width, height, x, y, size = {}) => {
     fontSize: size.fontSize ? size.fontSize * Math.min(xScale, yScale) : 12,
   };
 
+  const reverseScaleX = scaleX * 1;
+  const reverseScaleY = scaleY * 1;
+
   return {
     ...scaledPosition,
     ...scaledSize,
+    scaleX: reverseScaleX, 
+    scaleY: reverseScaleY, 
   };
 };
 
@@ -39,9 +45,13 @@ export const renderCanvasContent = (canvas, content, width, height, opacity) => 
       // Directly access width, height, and radius from item
       const { width: itemWidth, height: itemHeight, radius: itemRadius, fontSize: itemFontSize } = item;
 
-      // Calculate scaled position and size for each item
-      const { left, top, width: scaledWidth, height: scaledHeight, radius: scaledRadius, fontSize: scaledFontSize } = calculateScaledProps(
-        width, height, x, y, { width: itemWidth, height: itemHeight, radius: itemRadius, fontSize: itemFontSize }
+      // Calculate scaled position, size, scaleX, and scaleY for each item
+      const { 
+        left, top, width: scaledWidth, height: scaledHeight, radius: scaledRadius, 
+        fontSize: scaledFontSize, scaleX: scaledScaleX, scaleY: scaledScaleY 
+      } = calculateScaledProps(
+        width, height, x, y, { width: itemWidth, height: itemHeight, radius: itemRadius, fontSize: itemFontSize },
+        scaleX, scaleY
       );
 
       // Common object properties to be used for all types
@@ -50,8 +60,8 @@ export const renderCanvasContent = (canvas, content, width, height, opacity) => 
         top,
         angle: angle || 0,
         id: id,
-        scaleX: scaleX || 1,
-        scaleY: scaleY || 1,
+        scaleX: scaledScaleX, 
+        scaleY: scaledScaleY, 
         editable: true,
         fill: fill || 'black',
         opacity: opacity || 1,
