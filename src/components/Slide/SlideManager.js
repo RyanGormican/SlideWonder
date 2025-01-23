@@ -291,7 +291,7 @@ useEffect(() => {
 };
 
 const handleSizeChange = (event) => {
-  const newSize = event.target.value;
+  const newSize = Math.max(1, Number(event.target.value));
 
   setSelectedProperties((prevProperties) => {
     // Update the size property
@@ -394,7 +394,7 @@ if (!contentLock && selectedContent){
 }, [selectedContent, copiedContent, currentCanvas, currentSlide]);
 
 const handleScaleChange = (event, axis) => {
-  const newValue = parseFloat(event.target.value);
+  const newValue = Math.max(1, parseFloat(event.target.value));
 
   setSelectedProperties((prevProperties) => {
     // Update scale for the selected axis

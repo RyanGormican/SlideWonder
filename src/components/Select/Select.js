@@ -86,7 +86,10 @@ const filteredSlidesConditional = allTagsOn ? uniqueFilteredSlides : filteredSli
 const uniqueSlides = Array.from(new Set(filteredSlidesConditional.map(slide => slide.id)))
   .map(id => filteredSlidesConditional.find(slide => slide.id === id));
 
-
+    useEffect(() => {
+    setCurrentPageGrid(1);
+    setCurrentPageList(1)
+    }, [searchQuery]);
   useEffect(() => {
  // Sort slides based on selected field and direction
 const slideList = [...uniqueSlides].sort((a, b) => {
@@ -201,7 +204,7 @@ tags?.forEach(tag => {
 
 
           {/* Pagination controls with Add Slide button */}
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '16px', flexDirection: 'column' }}>
+          <div style={{ width: '100vw', display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '16px', flexDirection: 'column' }}>
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <button
                 onClick={() => handlePageChangeGrid(currentPageGrid - 1)}

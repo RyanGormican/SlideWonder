@@ -35,6 +35,12 @@
     transform: rotate(360deg);
   }
 }
+.portrait{
+   display: flex;
+   position:absolute;
+   top:10px;
+   left:15px;
+}
 .links {
   display: flex;
   position: absolute;
@@ -111,8 +117,8 @@ font-family: "Quicksand", sans-serif !important;
 
 .title {
   font-size: 2rem;
-  margin: 1rem 0;
   text-align: center;
+  padding-top: 1vh;
 }
 
 /* General Layout */
@@ -256,7 +262,7 @@ canvas {
     overflow-y:auto;
 }
 .template-list{
-    height: 60vh;
+    height: 50vh;
     overflow-y:auto;
 }
 body {

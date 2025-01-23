@@ -83,7 +83,7 @@ useEffect(() => {
       }
     });
   };
-}, [sortedSlides, slides]); 
+}, [sortedSlides, slides,currentPageGrid]); 
 
 
   const handleClickDots = (event, slide,slideId) => {

@@ -7,6 +7,8 @@ import Navigate from './components/Navigate';
 import Select from './components/Select/Select';
 import Present from './components/Present/Present';
 import SlideManager from './components/Slide/SlideManager';
+import Sync from './components/Sync/Sync';
+import {saveSettingsToLocalStorage} from './components/Helper';
 import { Icon } from '@iconify/react';
 function App({theme,setTheme}) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -15,6 +17,7 @@ function App({theme,setTheme}) {
   const [currentSlide, setCurrentSlide] = useState(null);
   const [pins,setPins] = useState([]);
   const [tags,setTags]= useState([]);
+  const [user,setUser]=useState(null);
   useEffect(() => {
     const savedData = JSON.parse(localStorage.getItem('SlideWonderdata')) || {
       slides: [
@@ -32,19 +35,49 @@ function App({theme,setTheme}) {
     setSlides(savedData.slides);
     setPins(savedData.pins);
     setTags(savedData.tags);
+    setTheme(savedData.settings.theme);
   }, []);
+  
+  useEffect(() => {
+}, [view]);
 
-
+useEffect(() => {
+    if (theme) {
+      const savedData = JSON.parse(localStorage.getItem('SlideWonderdata')) || {};
+      const updatedSettings = { ...savedData.settings, theme };
+      saveSettingsToLocalStorage(updatedSettings);
+    }
+  }, [theme]);
   return (
     <DndProvider backend={HTML5Backend}>
 <div className={`App ${view !== 'present' ? 'not-present' : 'present'}`}>
+ 
+<div className="portrait">
+<Icon icon="bi:person-fill"   width= "3.13vw" height= "4vh"  onClick={() => setView(view === 'sync' ? 'select' : 'sync')}  />
+</div>
+
+
         {view !== 'present' && (
     <>
         <Navigate toggleFeedbackModal={() => setIsModalOpen(!isModalOpen)} />
         <div className="title">SlideWonder</div>
    </>
   )}
-
+  
+<div style={{ display: view === 'sync' ? 'block' : 'none' }}>
+  <Sync
+    slides={slides}
+    setSlides={setSlides}
+    pins={pins}
+    setPins={setPins}
+    tags={tags}
+    setTags={setTags}
+    user={user}
+    setUser={setUser}
+    theme={theme}
+    setTheme={setTheme}
+  />
+</div>
  {view === 'select' ? (
   <Select
     slides={slides}
