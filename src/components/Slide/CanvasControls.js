@@ -1,171 +1,152 @@
 import React from 'react';
 import { Icon } from '@iconify/react';
+import Tooltip from '@mui/material/Tooltip';
+import { Box } from '@mui/material';
 
 const CanvasControls = ({
   backgroundColor,
   selectedContent,
+  selectedProperties,
   handleBackgroundColorChange,
   handleColorChange,
   handleScaleChange,
   handleSizeChange,
   getSizeValue,
   setToggleMode,
-  toggleMode
+  toggleMode,
+  contentLock,
+  setContentLock
 }) => {
   return (
     <div className="canvas-controls" style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px', alignItems: 'center' }}>
-  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '10px' }}>
-  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%' }}>
-    <Icon icon="material-symbols-light:background-grid-small-sharp" width="24" height="24" />
-    <label htmlFor="background-color" style={{ width: '150px' }}>Background Color</label>
-    <input
-      id="background-color"
-      type="color"
-      value={backgroundColor}
-      onChange={handleBackgroundColorChange}
-      style={{ cursor: 'pointer', flexGrow: '1' }}
-    />
-  </div>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '10px' }}>
+        
+        {/* Background Color */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%' }}>
+          <Tooltip title="Background Color" arrow>
+            <Icon icon="material-symbols-light:background-grid-small-sharp" width="24" height="24" />
+          </Tooltip>
+          <input
+            id="background-color"
+            type="color"
+            value={backgroundColor}
+            onChange={handleBackgroundColorChange}
+            style={{ cursor: 'pointer', flexGrow: '1' }}
+          />
+        </div>
 
-  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%' }}>
-    <Icon icon="mdi:shape" width="24" height="24" />
-    <label htmlFor="content-color" style={{ width: '150px' }}>Content Color</label>
-    <input
-      id="content-color"
-      type="color"
-      key={selectedContent?.fill || '000000'}
-      value={selectedContent?.fill || '000000'}
-      onChange={handleColorChange}
-      style={{ cursor: 'pointer', flexGrow: '1' }}
-    />
-  </div>
-</div>
-
-
-
+        {/* Content Color */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%' }}>
+          <Tooltip title="Content Color" arrow>
+            <Icon icon="mdi:shape" width="24" height="24" />
+          </Tooltip>
+          <input
+            id="content-color"
+            type="color"
+            key={selectedProperties?.fill || '000000'}
+            value={selectedProperties?.fill || '000000'}
+            onChange={handleColorChange}
+            style={{ cursor: 'pointer', flexGrow: '1' }}
+          />
+        </div>
+      </div>
+      <div>
+<Tooltip title="Toggle Properties Copying" arrow>
+<Icon icon={contentLock ? "material-symbols:lock" : "material-symbols:lock-open"}   onClick={() => setContentLock(!contentLock)}  width="24" height="24" />
+</Tooltip>
+      </div>
+      {/* Scale and Size Controls */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+        
+        {/* X Scale */}
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-          <label htmlFor="x-scale-range" style={{ marginRight: '10px' }}>X Scale:</label>
+          <Tooltip title="X Scale" arrow>
+            <Icon icon="tabler:letter-x" width="24" height="24" />
+          </Tooltip>
           <input
             id="x-scale-range"
             type="range"
             min="1"
             max="100"
-            value={selectedContent?.scaleX || 1}
+            value={selectedProperties?.scaleX || 1}
             onChange={(e) => handleScaleChange(e, 'x')}
-            style={{ width: '100px' }}
+            style={{ width: '100px', marginRight: '10px' }}
           />
           <input
             type="number"
-            value={selectedContent?.scaleX || 1}
+            value={selectedProperties?.scaleX || 1}
             onChange={(e) => handleScaleChange(e, 'x')}
-            style={{ width: '50px', marginLeft: '10px' }}
+            style={{ width: '50px' }}
           />
         </div>
 
+        {/* Y Scale */}
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-          <label htmlFor="y-scale-range" style={{ marginRight: '10px' }}>Y Scale:</label>
+          <Tooltip title="Y Scale" arrow>
+            <Icon icon="tabler:letter-y" width="24" height="24" />
+          </Tooltip>
           <input
             id="y-scale-range"
             type="range"
             min="1"
             max="100"
-            value={selectedContent?.scaleY || 1}
+            value={selectedProperties?.scaleY || 1}
             onChange={(e) => handleScaleChange(e, 'y')}
-            style={{ width: '100px' }}
+            style={{ width: '100px', marginRight: '10px' }}
           />
           <input
             type="number"
-            value={selectedContent?.scaleY || 1}
+            value={selectedProperties?.scaleY || 1}
             onChange={(e) => handleScaleChange(e, 'y')}
-            style={{ width: '50px', marginLeft: '10px' }}
+            style={{ width: '50px' }}
           />
         </div>
 
+        {/* Content Size */}
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-          <label htmlFor="size-range" style={{ marginRight: '10px' }}>Content Size:</label>
+          <Tooltip title="Content Size" arrow>
+            <Icon icon="icon-park-outline:scale" width="24" height="24"  />
+          </Tooltip>
           <input
             id="size-range"
             type="range"
             min="1"
             max="100"
-            value={getSizeValue(selectedContent)}
+            value={selectedProperties?.size || 12}
             onChange={handleSizeChange}
-            style={{ width: '100px' }}
+            style={{ width: '100px', marginRight: '10px' }}
           />
           <input
             type="number"
-            value={getSizeValue(selectedContent)}
+            value={selectedProperties?.size || 12}
             onChange={handleSizeChange}
-            style={{ width: '50px', marginLeft: '10px' }}
+            style={{ width: '50px' }}
           />
         </div>
       </div>
 
-    <div style={{ display: 'flex', alignItems: 'center' }}>
-  <Icon
-    icon="humbleicons:text"
-    width="24"
-    height="24"
-    onClick={() => setToggleMode(toggleMode === 'text' ? null : 'text')}
-    style={{
-      cursor: 'pointer',
-      backgroundColor: toggleMode === 'text' ? '#e0e0e0' : '#fff',
-      padding: '5px',
-      borderRadius: '50%',
-    }}
-  />
-  <Icon
-    icon="material-symbols:circle"
-    width="24"
-    height="24"
-    onClick={() => setToggleMode(toggleMode === 'circle' ? null : 'circle')}
-    style={{
-      cursor: 'pointer',
-      backgroundColor: toggleMode === 'circle' ? '#e0e0e0' : '#fff',
-      padding: '5px',
-      borderRadius: '50%',
-    }}
-  />
-  <Icon
-    icon="material-symbols:square"
-    width="24"
-    height="24"
-    onClick={() => setToggleMode(toggleMode === 'square' ? null : 'square')}
-    style={{
-      cursor: 'pointer',
-      backgroundColor: toggleMode === 'square' ? '#e0e0e0' : '#fff',
-      padding: '5px',
-      borderRadius: '50%',
-    }}
-  />
-  <Icon
-    icon="mdi:triangle"
-    width="24"
-    height="24"
-    onClick={() => setToggleMode(toggleMode === 'triangle' ? null : 'triangle')}
-    style={{
-      cursor: 'pointer',
-      backgroundColor: toggleMode === 'triangle' ? '#e0e0e0' : '#fff',
-      padding: '5px',
-      borderRadius: '50%',
-    }}
-  />
-   <Icon
-    icon="icon-park-outline:picture"
-    width="24"
-    height="24"
-    onClick={() => setToggleMode(toggleMode === 'image' ? null : 'image')}
-    style={{
-      cursor: 'pointer',
-      backgroundColor: toggleMode === 'image' ? '#e0e0e0' : '#fff',
-      padding: '5px',
-      borderRadius: '50%',
-      display: 'none',
-    }}
-  />
-</div>
-
+      {/* Toggle Icons */}
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        {['text', 'circle', 'square', 'triangle'].map((mode, idx) => (
+          <Tooltip title={mode.charAt(0).toUpperCase() + mode.slice(1)} arrow key={idx}>
+            <Icon
+              icon={mode === 'text' ? "humbleicons:text" :
+                    mode === 'circle' ? "material-symbols:circle" :
+                    mode === 'square' ? "material-symbols:square" :
+                    mode === 'triangle' ? "mdi:triangle" : ""}
+              width="24"
+              height="24"
+              onClick={() => setToggleMode(toggleMode === mode ? null : mode)}
+              style={{
+                cursor: 'pointer',
+                backgroundColor: toggleMode === mode ? '#e0e0e0' : '#fff',
+                padding: '5px',
+                borderRadius: '50%',
+              }}
+            />
+          </Tooltip>
+        ))}
+      </div>
     </div>
   );
 };

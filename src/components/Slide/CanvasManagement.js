@@ -26,7 +26,7 @@ export const copyCanvasElement = (selectedContent,setCopiedContent) => {
   setCopiedContent(selectedContent); // Copy the selected content
 };
 
-export const handleCanvasClick = (event,toggleMode,setToggleMode, currentSlide,setCurrentSlide, currentCanvas,selectedContent, updateSlideData) => {
+export const handleCanvasClick = (event,toggleMode,setToggleMode, currentSlide,setCurrentSlide, currentCanvas,selectedContent, updateSlideData,selectedProperties) => {
   if (toggleMode === null) return;
 
   const canvasElement = event.target;
@@ -41,25 +41,20 @@ export const handleCanvasClick = (event,toggleMode,setToggleMode, currentSlide,s
 
         // Initialize content if it is null
         currentCanvasData.content = currentCanvasData.content || [];
-
-
-        const contentSize = Math.max(
-    selectedContent?.fontSize || 12,
-    selectedContent?.radius || 12,
-    selectedContent?.width ||12,
-    selectedContent?.height || 12
-  );
+        console.log(selectedProperties);
         const createNewObject = (type, additionalProperties) => ({
           type,
           id: Date.now(),
           x: event.nativeEvent.offsetX,
           y: event.nativeEvent.offsetY,
-          fill: selectedContent?.fill || '#000000',
-          fontSize: contentSize,
-    radius: contentSize,
-    width: contentSize,
-    height: contentSize,
+          fill: selectedProperties?.fill || '#000000',
+          fontSize:  selectedProperties?.size,
+    radius: selectedProperties?.size,
+    width: selectedProperties?.size,
+    height: selectedProperties?.size,
           ...additionalProperties,
+          scaleX:selectedProperties?.scaleX,
+          scaleY:selectedProperties?.scaleY,
         });
 
         if (toggleMode === 'text') {
@@ -68,22 +63,23 @@ export const handleCanvasClick = (event,toggleMode,setToggleMode, currentSlide,s
         }
 
         if (toggleMode === 'circle') {
-          const newCircle = createNewObject('circle', { radius: selectedContent?.radius || 12 });
+          const newCircle = createNewObject('circle', { radius: selectedProperties?.radius || 12 });
           currentCanvasData.content = [...currentCanvasData.content, newCircle];
         }
 
         if (toggleMode === 'square') {
           const newSquare = createNewObject('square', {
-            width: selectedContent?.width || 12,
-            height: selectedContent?.height || 12,
+            width: selectedProperties?.width || 12,
+            height: selectedProperties?.height || 12,
           });
+          console.log(newSquare);
           currentCanvasData.content = [...currentCanvasData.content, newSquare];
         }
 
         if (toggleMode === 'triangle') {
           const newTriangle = createNewObject('triangle', {
-            width: selectedContent?.size || 12,
-            height: selectedContent?.size || 12,
+            width: selectedProperties?.size || 12,
+            height: selectedProperties?.size || 12,
           });
           currentCanvasData.content = [...currentCanvasData.content, newTriangle];
         }

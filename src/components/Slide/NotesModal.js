@@ -29,6 +29,7 @@ const NotesModal = ({ open, onClose, canvasId, currentSlide, updateSlideData }) 
     updateSlideData(updatedSlide);
   };
 
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>Notes</DialogTitle>

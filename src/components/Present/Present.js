@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Canvas } from 'fabric';
 import { renderCanvasContent } from '../Slide/CanvasRender';
 import { Icon } from '@iconify/react';
-import { applyDissolveTransition , applySlideTransition } from './Transitions';
+import { applyDissolveTransition , applySlideTransition ,applyScaleOutTransition, applyFlipTransition, applyRotateTransition } from './Transitions';
 import { Keybinds } from './Keybinds';
 function Present({ currentSlide, setView }) {
   const [currentCanvasIndex, setCurrentCanvasIndex] = useState(0);
@@ -167,6 +167,22 @@ const slideDirections = [
         break;
      case slideDirections.includes(currentCanvas.transition) && currentCanvas.transition:
     applySlideTransition( currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex, currentCanvas.transition.replace('slide', '').toLowerCase());
+    break;
+      case 'scaleout':
+      applyScaleOutTransition (currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex, opacity, setOpacity);
+      break;
+    case 'fliphorizontal':
+    applyFlipTransition(currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex, 'horizontal');  
+    break;
+    case 'flipvertical':
+    applyFlipTransition(currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex, 'vertical'); 
+    break;
+        case 'rotateclockwise':
+applyRotateTransition(currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex, 'clockwise');  
+
+    break;
+        case 'rotatecounterclockwise':
+applyRotateTransition(currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex, 'counterclockwise');  
     break;
       default:
         setCurrentCanvasIndex(currentCanvasIndex + 1); 
@@ -365,6 +381,7 @@ const slideDirections = [
             icon="mingcute:back-line"
             width="24"
             height="24"
+            color="white"
             onClick={() => setView('slide')}
           />
         </div>

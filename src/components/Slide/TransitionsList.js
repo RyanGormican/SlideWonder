@@ -7,6 +7,10 @@ export const transitions = [
   {id: 'slidetopleft', title: 'Slide Top Left'},
   {id: 'slidetopright', title: 'Slide Top Right'},
   {id: 'slidebottomleft', title: 'Slide Bottom Left'},
-  {id: 'slidebottomright', title: 'Slide Bottom Right'},
-
+  {id: 'slidebottomright', title: 'Slide Bottom Right'},  
+  {id: 'scaleout', title: 'Scale Out'},
+  {id: 'fliphorizontal', title: 'Flip Horizontal' },
+  {id: 'flipvertical', title: 'Flip Vertical' },
+  {id: 'rotateclockwise', title: 'Rotate Clockwise'},
+  {id: 'rotatecounterclockwise', title: 'Rotate Counter Clockwise'},
 ];

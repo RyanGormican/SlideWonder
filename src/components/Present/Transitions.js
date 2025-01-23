@@ -25,8 +25,8 @@ export const applyDissolveTransition = (currentCanvas, nextCanvasRef, canvasRef,
 export const applySlideTransition = (currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex, direction) => {
   const canvasDiv = document.getElementById('presentation-canvas');
 
-  // Use the dynamic duration from currentCanvas
-  const duration = currentCanvas.duration * 1000; // Convert from seconds to milliseconds
+
+  const duration = currentCanvas.duration * 1000;
 
   // Set the initial position of the current canvas based on the direction
   const startPosition = {
@@ -49,6 +49,69 @@ export const applySlideTransition = (currentCanvas, nextCanvasRef, canvasRef, cu
   // When the transition finishes, update the canvas index and position of the next canvas
   setTimeout(() => {
     // After the slide-out is done, move to the next canvas
+    setCurrentCanvasIndex(currentCanvasIndex + 1); // Move to the next canvas
+  }, duration);
+};
+
+export const applyScaleOutTransition = (currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex) => {
+  const canvasDiv = document.getElementById('presentation-canvas');
+  
+
+  const duration = currentCanvas.duration * 1000; 
+  
+  // Apply initial transform to shrink the canvas and move it to the center
+  canvasDiv.style.transition = `transform ${duration}ms ease-out`; 
+  canvasDiv.style.transform = 'scale(0.001) translate(-50%, -50%)';  // Shrink and center the canvas
+
+  // When the transition finishes, update the canvas index and move to the next canvas
+  setTimeout(() => {
+    setCurrentCanvasIndex(currentCanvasIndex + 1); // Move to the next canvas
+  }, duration);
+};
+
+export const applyFlipTransition = (currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex, flipDirection) => {
+  const canvasDiv = document.getElementById('presentation-canvas');
+  
+  // Use the dynamic duration from currentCanvas
+  const duration = currentCanvas.duration * 1000; // Convert from seconds to milliseconds
+  
+  // Apply initial flip effect based on the flipDirection
+  let flipTransform = '';
+  if (flipDirection === 'horizontal') {
+    flipTransform = 'rotateY(180deg)'; // Flip horizontally
+  } else if (flipDirection === 'vertical') {
+    flipTransform = 'rotateX(180deg)'; // Flip vertically
+  }
+
+  // Apply the flip transition
+  canvasDiv.style.transition = `transform ${duration}ms ease-out`; 
+  canvasDiv.style.transform = flipTransform;  // Apply the flip
+
+  // After the flip transition finishes, move to the next canvas
+  setTimeout(() => {
+    setCurrentCanvasIndex(currentCanvasIndex + 1); // Move to the next canvas
+  }, duration);
+};
+export const applyRotateTransition = (currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex, direction) => {
+  const canvasDiv = document.getElementById('presentation-canvas');
+  
+  // Use the dynamic duration from currentCanvas
+  const duration = currentCanvas.duration * 1000; // Convert from seconds to milliseconds
+  
+  // Determine the rotate direction
+  let rotateDirection = '';
+  if (direction === 'clockwise') {
+    rotateDirection = 'rotate(360deg)'; // Rotate clockwise
+  } else if (direction === 'counterclockwise') {
+    rotateDirection = 'rotate(-360deg)'; // Rotate counterclockwise
+  }
+
+  // Apply the rotate transition
+  canvasDiv.style.transition = `transform ${duration}ms ease-out`; 
+  canvasDiv.style.transform = rotateDirection;  // Apply rotation
+
+  // After the rotate transition finishes, move to the next canvas
+  setTimeout(() => {
     setCurrentCanvasIndex(currentCanvasIndex + 1); // Move to the next canvas
   }, duration);
 };

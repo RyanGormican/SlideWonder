@@ -255,7 +255,10 @@ canvas {
     height: 50vh;
     overflow-y:auto;
 }
-
+.template-list{
+    height: 60vh;
+    overflow-y:auto;
+}
 body {
   transition: background-color 0.3s, color 0.3s;
 }
