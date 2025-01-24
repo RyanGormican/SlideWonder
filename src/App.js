@@ -31,6 +31,11 @@ function App({theme,setTheme}) {
       ],
       pins:[],
       tags:[],
+      settings:[
+      {
+    theme:'light',
+      },
+      ],
     };
     setSlides(savedData.slides);
     setPins(savedData.pins);
