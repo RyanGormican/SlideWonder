@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Canvas } from 'fabric';
 import { renderCanvasContent } from '../Slide/CanvasRender';
 import { Icon } from '@iconify/react';
-import { applyDissolveTransition , applySlideTransition ,applyScaleOutTransition, applyFlipTransition, applyRotateTransition } from './Transitions';
+import { applyDissolveTransition , applySlideTransition ,applyScaleOutTransition, applyFlipTransition, applyZoomInTransition, applyRotateTransition } from './Transitions';
 import { Keybinds } from './Keybinds';
 function Present({ currentSlide, setView }) {
   const [currentCanvasIndex, setCurrentCanvasIndex] = useState(0);
@@ -44,7 +44,7 @@ const initializeCanvas = () => {
   });
 
   // Determine the next canvas index (wraps around if at the end)
-  const nextCanvasIndex = (currentCanvasIndex + 1) % currentSlide.deck.length;
+  const nextCanvasIndex = (currentCanvasIndex + 1) % currentSlide?.deck.length;
 
   // Dispose of the previous nextCanvasInstance if it exists
   if (nextCanvasInstance.current) {
@@ -56,13 +56,13 @@ const initializeCanvas = () => {
     width: window.innerWidth,
     height: window.innerHeight,
     preserveObjectStacking: true,
-    backgroundColor: currentSlide.deck[nextCanvasIndex].backgroundColor || '#ffffff',
+    backgroundColor: currentSlide?.deck[nextCanvasIndex].backgroundColor || '#ffffff',
     zIndex: 1,
   });
 
   // Render canvas content
   renderCanvasContent(canvasInstance.current, currentCanvasData.content, window.innerWidth, window.innerHeight, opacity);
-  renderCanvasContent(nextCanvasInstance.current, currentSlide.deck[nextCanvasIndex].content, window.innerWidth, window.innerHeight, opacity);
+  renderCanvasContent(nextCanvasInstance.current, currentSlide?.deck[nextCanvasIndex].content, window.innerWidth, window.innerHeight, opacity);
 };
 const handlePopoutNotes = () => {
   if (showPopoutNotes) {
@@ -135,8 +135,9 @@ useEffect(() => {
       nextCanvasInstance.current.setWidth(window.innerWidth);
       nextCanvasInstance.current.setHeight(window.innerHeight);
     }
-  
-    renderCanvasContent(canvasInstance.current, currentCanvasData.content, window.innerWidth, window.innerHeight, opacity);
+  if (currentCanvasData){
+    renderCanvasContent(canvasInstance.current, currentCanvasData?.content, window.innerWidth, window.innerHeight, opacity);
+    }
   };
 
   window.addEventListener('resize', handleResize);
@@ -150,17 +151,17 @@ useEffect(() => {
       nextCanvasInstance.current.dispose();
     }
   };
-}, [currentCanvasIndex, currentCanvasData, currentSlide.deck]);
+}, [currentCanvasIndex, currentCanvasData, currentSlide?.deck]);
   
 const slideDirections = [
   'slideleft', 'slideright', 'slideup', 'slidedown', 
   'slidetopleft', 'slidetopright', 'slidebottomleft', 'slidebottomright'
 ];
  const goToNextCanvas = () => {
-  if (currentCanvasIndex < currentSlide.deck.length - 1) {
-    const currentCanvas = currentSlide.deck[currentCanvasIndex];
-    const nextCanvas = currentSlide.deck[currentCanvasIndex + 1];
-      renderCanvasContent(nextCanvasInstance.current, currentSlide.deck[(currentCanvasIndex + 1) % currentSlide.deck.length].content, window.innerWidth, window.innerHeight, opacity);
+  if (currentCanvasIndex < currentSlide?.deck.length - 1) {
+    const currentCanvas = currentSlide?.deck[currentCanvasIndex];
+    const nextCanvas = currentSlide?.deck[currentCanvasIndex + 1];
+      renderCanvasContent(nextCanvasInstance.current, currentSlide?.deck[(currentCanvasIndex + 1) % currentSlide?.deck.length].content, window.innerWidth, window.innerHeight, opacity);
     switch (currentCanvas.transition) {
       case 'dissolve':
         applyDissolveTransition(currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex,opacity,setOpacity);
@@ -179,7 +180,10 @@ const slideDirections = [
     break;
         case 'rotateclockwise':
 applyRotateTransition(currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex, 'clockwise');  
-
+    break;
+    case 'zoomin':
+applyZoomInTransition(currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex, 'clockwise');  
+    break;
     break;
         case 'rotatecounterclockwise':
 applyRotateTransition(currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex, 'counterclockwise');  

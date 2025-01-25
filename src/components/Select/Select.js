@@ -5,7 +5,7 @@ import * as SlideManagement from './SlideManagement';
 import GridView from './GridView'; 
 import ListView from './ListView';
 import Buttons from './Buttons';
-const Select = ({ slides, setSlides, pins,setPins,tags,setTags, handleGridClick,theme, setTheme}) => {
+const Select = ({ slides, setSlides, pins,setPins,tags,setTags, handleGridClick,theme, setTheme,view}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [editingTitle, setEditingTitle] = useState(null);
   const [newTitle, setNewTitle] = useState('');
@@ -200,6 +200,7 @@ tags?.forEach(tag => {
   setPins={setPins}
   tags={tags}
   setTags={setTags}
+  view={view}
 />
 
 

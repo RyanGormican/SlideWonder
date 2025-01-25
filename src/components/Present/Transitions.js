@@ -115,3 +115,19 @@ export const applyRotateTransition = (currentCanvas, nextCanvasRef, canvasRef, c
     setCurrentCanvasIndex(currentCanvasIndex + 1); // Move to the next canvas
   }, duration);
 };
+export const applyZoomInTransition = (currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex) => {
+  const canvasDiv = document.getElementById('presentation-canvas');
+
+  // Use the dynamic duration from currentCanvas
+  const duration = currentCanvas.duration * 1000; // Convert from seconds to milliseconds
+
+  // Set the initial state for zoom-in
+  canvasDiv.style.transform = 'scale(50)'; // Start small
+  canvasDiv.style.transition = `transform ${duration}ms ease-out`; // Smooth zoom-in effect
+
+ 
+  // Once the transition is complete, move to the next canvas
+  setTimeout(() => {
+    setCurrentCanvasIndex(currentCanvasIndex + 1); // Move to the next canvas
+  }, duration);
+};

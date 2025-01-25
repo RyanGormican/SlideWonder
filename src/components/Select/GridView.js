@@ -21,6 +21,7 @@ const GridView = ({
   setPins,
   tags,
   setTags,
+  view
 }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [tagsAnchorEl, setTagsAnchorEl] = useState(null);
@@ -83,7 +84,7 @@ useEffect(() => {
       }
     });
   };
-}, [sortedSlides, slides,currentPageGrid]); 
+}, [sortedSlides, slides,currentPageGrid,view]); 
 
 
   const handleClickDots = (event, slide,slideId) => {

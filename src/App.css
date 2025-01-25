@@ -231,7 +231,7 @@ canvas {
   display: none;
 }
 .additions-panel {
-  width: 10vw; 
+  width: 20vw; 
   top: 0;
   background-color: #f1f1f1;
   padding: 1vw;
@@ -249,7 +249,6 @@ canvas {
 
 .transition-type {
   margin-top: 10px;
-  padding: 10px;
   background-color: #e0e0e0;
   border-radius: 5px;
   cursor: pointer;
@@ -331,4 +330,16 @@ body {
 .dark-mode .scrollable-column .iconify 
 .dark-mode .dropdown .iconify{
   color: black;
+}
+.button-container {
+  display: flex;
+  gap: 0.1vw; 
+  align-items: center;
+  flex-wrap: wrap; 
+}
+
+button h3 {
+  margin: 0; 
+  display: inline-flex;
+  align-items: center; 
 }

@@ -8,7 +8,7 @@ import { templates } from './TemplatesList';
 import CanvasControls from './CanvasControls'; 
 import {handleDragStart, handleDragOver, handleDrop, formatTransition, deleteTransition, updateCanvasDuration} from './TransitionsManagement'; 
 import {handleObjectModified} from './Modifications';
-import { IconButton } from '@mui/material';
+import { Card, CardMedia, CardContent, Typography, IconButton, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import {handleCanvasClick, copyCanvasElement, copyCanvas} from './CanvasManagement'; 
 import { saveSlideToLocalStorage} from '../Helper'
 function SlideManager({ slides, setSlides, currentSlide, setCurrentSlide,pins }) {
@@ -22,6 +22,11 @@ function SlideManager({ slides, setSlides, currentSlide, setCurrentSlide,pins })
   const [additionsMode, setAdditionsMode] = useState('transitions');
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [contentLock,setContentLock] = useState(false);
+  const [expandedAccordion, setExpandedAccordion] = useState(null);
+  
+  const handleAccordionToggle = (accordionId) => {
+    setExpandedAccordion(expandedAccordion === accordionId ? null : accordionId);
+  };
   const templatesRef = useRef({}); 
   const [selectedProperties, setSelectedProperties] = useState({
   fill: null,
@@ -54,7 +59,6 @@ const updateSlideData = (updatedSlide) => {
         loadTemplate(`${id}.js`).then((canvasTemplate) => {
           if (canvasTemplate) {
             const { content, backgroundColor } = canvasTemplate;
-
             // Create a new canvas
             const newCanvas = new Canvas(canvasElement, {
               width: 150,
@@ -340,7 +344,6 @@ useEffect(() => {
 if (!contentLock && selectedContent){
 
     const { type, id, fill, fontSize, radius, height, width, scaleX, scaleY } = selectedContent;
-
     setSelectedProperties({
       type,
       id,
@@ -351,6 +354,7 @@ if (!contentLock && selectedContent){
       width: width || 12,    
       scaleX: scaleX || 1,   
       scaleY: scaleY || 1,   
+
     });
   }
 },[selectedContent]);
@@ -461,14 +465,17 @@ const getSizeValue = () => {
 return (
     <div className="main-container">
       <div className="additions-panel">
-      <IconButton onClick={() => setAdditionsMode("transitions")}>
-        <h3>Transitions <Icon icon="fluent-mdl2:transition-pop" width="24" height="24" /> </h3>
-    </IconButton>
-         <IconButton  onClick={() => setAdditionsMode("templates")}>
-        <h3>Templates <Icon icon="ion:easel" width="24" height="24" /></h3>
-    </IconButton>
-      {additionsMode === "transitions" ? (
-        <div className="transition-list">
+  <div className="button-container">
+  <IconButton onClick={() => setAdditionsMode("transitions")}>
+    <h3>Transitions <Icon icon="fluent-mdl2:transition-pop" width="1vw" height="1.5vh" /> </h3>
+  </IconButton>
+  <IconButton onClick={() => setAdditionsMode("templates")}>
+    <h3>Templates <Icon icon="ion:easel" width="1vw" height="1.5vh" /></h3>
+  </IconButton>
+</div>
+
+  
+        <div style={{ display: additionsMode === 'transitions' ? 'block' : 'none' }}  className="transition-list">
           {sortedTransitions.map((transition) => (
             <div
               key={transition.id}
@@ -476,31 +483,63 @@ return (
               draggable
               onDragStart={(e) => handleDragStart(e, transition.id)}
             >
-              {transition.title}
+                   <Accordion style={{backgroundColor: '#e0e0e0',border: '1px solid black', borderBottom: 'none'}}>
+                   <AccordionSummary style={{borderBottom: '1px solid black'}}>
+              {transition.title}   <Icon icon={transition.icon} height="auto" width="auto"     style={{ marginLeft: 'auto' }}  />
+                </AccordionSummary>
+                <AccordionDetails>
+                <div> {transition.description}</div>
+                </AccordionDetails>
+                </Accordion>
             </div>
           ))}
         </div>
-        ) : ( <div>  
-          <div className="template-list">
-        {sortedTemplates.map((template) => (
-         
-           <div
-              key={template.id}
-               onClick={() => setSelectedTemplate(selectedTemplate === template ? null : template)} 
-        style={{
-          backgroundColor: selectedTemplate === template ? '#e0e0e0' : 'transparent', 
-          padding: '10px',
-          margin: '5px',
-          cursor: 'pointer',
-        }}
-            >         <div className="locked">
-                <canvas ref={(el) => (templatesRef.current[template.id] = el)}></canvas>
+     <div>  
+          <div style={{ display: additionsMode === 'templates' ? 'block' : 'none' }} className="template-list">
+   
+
+{sortedTemplates.map((template) => (
+  <div
+    key={template.id}
+    onClick={() => setSelectedTemplate(selectedTemplate === template ? null : template)}
+    style={{
+      margin: '5px',
+      cursor: 'pointer',
+    }}
+  >
+<Accordion key={template.id}
+          expanded={expandedAccordion === template.id}
+          onChange={() => handleAccordionToggle(template.id)}
+          style={{ backgroundColor: selectedTemplate === template ? '#e0e0e0' : 'transparent', boxShadow: 'none' }}>
+  <AccordionSummary style={{ display: 'flex', flexDirection: 'column', padding: '0' }}>
+
+    <Card style={{
+      width: '8.49vw',
+      height: '100%',
+      backgroundColor: selectedTemplate === template ? '#e0e0e0' : 'transparent',
+      boxShadow: 'none', 
+      border: 'none', 
+      padding: '0',
+    }}>
+      <CardMedia>
+        <div className="locked" style={{ width: '100%' }}>
+          <canvas ref={(el) => (templatesRef.current[template.id] = el)} style={{ width: '100%' }}></canvas>
+        </div>
+      </CardMedia>
+      <CardContent style={{ textAlign: 'center', padding: '8px 16px' }}>
+        <Typography variant="h6">{template.title}</Typography> 
+      </CardContent>
+    </Card>
+  </AccordionSummary>
+  <AccordionDetails>
+    <div>{template.description}</div>
+  </AccordionDetails>
+</Accordion>
+  </div>
+))}
+
                 </div>
-              {template.title}
-            </div>
-        ))}
-                </div>
-        </div>)}
+        </div>
       </div>
       
       <div className="scrollable-column">
