@@ -17,6 +17,6 @@ export const templates = [
   {
     id: 'GreenGreatness',
     title: 'Green Greatness',
-    description: 'The Green Greatness template showcases a dynamic arrangement of geometric shapes in varying shades of green, from deep forest tones to bright lime accents. Its bold and modern design leverages the versatility of green to create a visually engaging and balanced layout. Perfect for creative portfolios, tech-focused presentations, or projects needing a fresh, contemporary aesthetic. With its striking use of shapes and gradients, Green Fiend ensures your content stands out with energy and sophistication.'
+    description: 'The Green Greatness template showcases a dynamic arrangement of geometric shapes in varying shades of green, from deep forest tones to bright lime accents. Its bold and modern design leverages the versatility of green to create a visually engaging and balanced layout. Perfect for creative portfolios, tech-focused presentations, or projects needing a fresh, contemporary aesthetic. With its striking use of shapes and gradients, Green Greatness ensures your content stands out with energy and sophistication.'
   },
 ];

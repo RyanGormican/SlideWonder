@@ -17,23 +17,20 @@ const calculateScaledProps = (width, height, x, y, size = {}, scaleX , scaleY) =
     fontSize: size.fontSize ? size.fontSize * Math.min(xScale, yScale) : 12,
   };
 
- if (size.radius) {
     const originalCircleArea = Math.PI * Math.pow(size.radius, 2); 
     const originalContainerArea = 800 * 600;
     const originalAreaPercentage = (originalCircleArea / originalContainerArea) * 100;
 
     const newRadius = Math.sqrt((originalAreaPercentage / 100) * width * height / Math.PI);
     scaledSize.radius = newRadius;
-  }
 
-  if (size.fontSize) {
+
     const originalTextArea = Math.pow(size.fontSize, 2); 
-    const originalContainerArea = 800 * 600;
     const originalTextAreaPercentage = (originalTextArea / originalContainerArea) * 100;
 
     const newFontSize = Math.sqrt((originalTextAreaPercentage / 100) * width * height);
     scaledSize.fontSize = newFontSize;
-  }
+  
   const reverseScaleX = scaleX * 1;
   const reverseScaleY = scaleY * 1;
 
@@ -105,7 +102,6 @@ export const renderCanvasContent = (canvas, content, width, height, opacity) => 
           width: scaledWidth || 12, // Use the scaled width calculation
           height: scaledWidth || 12, // Use the scaled height calculation
         });
-        console.log(square);
         canvas.add(square);
 
       } else if (item.type === 'triangle') {

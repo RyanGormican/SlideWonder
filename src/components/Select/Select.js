@@ -5,7 +5,7 @@ import * as SlideManagement from './SlideManagement';
 import GridView from './GridView'; 
 import ListView from './ListView';
 import Buttons from './Buttons';
-const Select = ({ slides, setSlides, pins,setPins,tags,setTags, handleGridClick,theme, setTheme,view}) => {
+const Select = ({ slides, setSlides, pins,setPins,tags,setTags, handleGridClick,theme, setTheme,view, fileLastModified}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [editingTitle, setEditingTitle] = useState(null);
   const [newTitle, setNewTitle] = useState('');
@@ -282,7 +282,7 @@ tags?.forEach(tag => {
         </div>
       )}
         
-      <InfoModal open={Boolean(selectedSlide)} slide={selectedSlide} onClose={() => setSelectedSlide(null)} />
+      <InfoModal open={Boolean(selectedSlide)} slide={selectedSlide} fileLastModified={fileLastModified} onClose={() => setSelectedSlide(null)} />
     </div>
   );
 };

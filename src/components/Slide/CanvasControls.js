@@ -118,7 +118,7 @@ const CanvasControls = ({
           />
           <input
             type="number"
-            value={selectedProperties?.size || 12}
+            value={selectedProperties?.size/2 || 12}
             onChange={handleSizeChange}
             style={{ width: '50px' }}
           />

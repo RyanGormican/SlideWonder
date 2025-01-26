@@ -19,7 +19,7 @@ function App({ theme, setTheme }) {
   const [pins, setPins] = useState([]);
   const [tags, setTags] = useState([]);
   const [user, setUser] = useState(null);
-
+  const [fileLastModified, setFileLastModified] = useState('');
   useEffect(() => {
     const savedData = JSON.parse(localStorage.getItem('SlideWonderdata')) || {
       slides: [
@@ -88,6 +88,8 @@ function App({ theme, setTheme }) {
             setUser={setUser}
             theme={theme}
             setTheme={setTheme}
+            fileLastModified={fileLastModified}
+            setFileLastModified={setFileLastModified}
           />
         </div>
 
@@ -107,6 +109,7 @@ function App({ theme, setTheme }) {
             theme={theme}
             setTheme={setTheme}
             view={view}
+            fileLastModified={fileLastModified}
           />
         </div>
 

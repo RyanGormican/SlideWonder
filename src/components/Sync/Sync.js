@@ -6,9 +6,8 @@ import { Icon } from '@iconify/react';
 import { ref, uploadString, getMetadata, getDownloadURL } from 'firebase/storage'; 
 import * as SelectUtility from '../Select/SelectUtility';
 
-const Sync = ({ slides, setSlides, pins, setPins, tags, setTags, user, setUser, theme, setTheme }) => {
+const Sync = ({ slides, setSlides, pins, setPins, tags, setTags, user, setUser, theme, setTheme , fileLastModified,setFileLastModified }) => {
   const [fileStatus, setFileStatus] = useState('');
-  const [fileLastModified, setFileLastModified] = useState('');
   const [downloadUrl, setDownloadUrl] = useState('');
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);  
   const [actionToConfirm, setActionToConfirm] = useState(null); 

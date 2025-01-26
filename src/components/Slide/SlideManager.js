@@ -344,6 +344,7 @@ useEffect(() => {
 if (!contentLock && selectedContent){
 
     const { type, id, fill, fontSize, radius, height, width, scaleX, scaleY } = selectedContent;
+const size = Math.max(radius, height, width);
     setSelectedProperties({
       type,
       id,
@@ -354,7 +355,7 @@ if (!contentLock && selectedContent){
       width: width || 12,    
       scaleX: scaleX || 1,   
       scaleY: scaleY || 1,   
-
+      size: size || 12,
     });
   }
 },[selectedContent]);
