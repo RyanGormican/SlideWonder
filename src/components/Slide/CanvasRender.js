@@ -53,12 +53,12 @@ export const renderCanvasContent = (canvas, content, width, height, opacity) => 
   if (content) {
     content.forEach((item) => {
       const { 
-        x, y, angle, fill, scaleX, scaleY, id, 
+        x, y, angle, fill, scaleX, scaleY, size, id, 
         url = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvk-ecPeKuRvec5czcoK2H7axiY9XZtcqopQ&s' 
       } = item;
 
       // Directly access width, height, and radius from item
-      const { width: itemWidth, height: itemHeight, radius: itemRadius, fontSize: itemFontSize } = item;
+      const { width: itemWidth, height: itemHeight, radius: itemRadius, fontSize: itemFontSize} = item;
 
       // Calculate scaled position, size, scaleX, and scaleY for each item
       const { 
@@ -85,30 +85,39 @@ export const renderCanvasContent = (canvas, content, width, height, opacity) => 
       if (item.type === 'text' && item.text.trim() !== '') {
         const text = new IText(item.text, {
           ...commonProps,
-          fontSize: scaledFontSize || 30, // Use the scaled font size
+          scaleX: scaledScaleX * (width/800),
+          scaleY: scaledScaleY * (height/600),
+          fontSize: itemFontSize || 30, 
         });
         canvas.add(text);
 
       } else if (item.type === 'circle') {
         const circle = new Circle({
           ...commonProps,
-          radius: scaledRadius || 12, // Use the scaled radius calculation
+          scaleX: scaledScaleX * (width/800),
+          scaleY: scaledScaleY * (height/600),
+          radius: itemRadius || 12, 
         });
         canvas.add(circle);
 
       } else if (item.type === 'square') {
         const square = new Rect({
           ...commonProps,
-          width: scaledWidth || 12, // Use the scaled width calculation
-          height: scaledWidth || 12, // Use the scaled height calculation
+          scaleX: scaledScaleX * (width/800),
+          scaleY: scaledScaleY * (height/600),
+          width: itemWidth || 12, 
+          height: itemWidth || 12,
         });
+ 
         canvas.add(square);
 
       } else if (item.type === 'triangle') {
         const triangle = new Triangle({
           ...commonProps,
-          width: scaledWidth || 12, // Use the scaled width calculation
-          height: scaledWidth || 12, // Use the scaled height calculation
+          scaleX: scaledScaleX * (width/800),
+          scaleY: scaledScaleY * (height/600),
+          width: itemWidth || 12, 
+          height: itemWidth || 12, 
         });
         canvas.add(triangle);
 
