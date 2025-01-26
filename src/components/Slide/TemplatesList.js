@@ -23,5 +23,11 @@ export const templates = [
     id: 'StoneWall',
     title: 'Stone Wall',
     description: 'The Stone Wall template mimics the look of a classic stone brick wall, featuring a rugged and textured design with the gray, and dark stone tones. Perfect for presentations with a historical, architectural, or industrial focus, this template gives off a strong, grounded vibe. It’s ideal for projects looking to evoke strength, durability, and a sense of timelessness, while maintaining a professional and clean aesthetic.'
-  }
+  },
+  {
+  id: 'MovieMadness',
+  title: 'Movie Madness',
+  description: 'The Movie Madness template is designed with a fun, cinematic theme, featuring an eye-catching edging at the top and bottom that resembles the classic popcorn bucket design. A bold yellow border frames a brown text space in the middle, evoking the look of a movie night snack. Perfect for movie-related presentations, film reviews, event promotions, or any project that aims to capture the excitement and energy of the silver screen. This template adds a playful and nostalgic touch to your slides while keeping the focus on your content.'
+}
+
 ];
