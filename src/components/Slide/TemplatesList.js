@@ -28,6 +28,12 @@ export const templates = [
   id: 'MovieMadness',
   title: 'Movie Madness',
   description: 'The Movie Madness template is designed with a fun, cinematic theme, featuring an eye-catching edging at the top and bottom that resembles the classic popcorn bucket design. A bold yellow border frames a brown text space in the middle, evoking the look of a movie night snack. Perfect for movie-related presentations, film reviews, event promotions, or any project that aims to capture the excitement and energy of the silver screen. This template adds a playful and nostalgic touch to your slides while keeping the focus on your content.'
-}
+},
+{
+  "id": "SimpleSunset",
+  "title": "Simple Sunset",
+  "description": "The Simple Sunset template features a warm, inviting background with tones of orange, yellow, and blue, evoking the serene beauty of a sunset. The design is complemented by soft geometric shapes, creating a tranquil yet modern aesthetic. Ideal for presentations focused on creativity, relaxation, or any project aiming to evoke warmth and simplicity. This template maintains a clean, elegant style while capturing the soothing essence of a sunset."
+},
+
 
 ];

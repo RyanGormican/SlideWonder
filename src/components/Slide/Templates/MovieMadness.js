@@ -1,5 +1,4 @@
 const MovieMadness = {
-  {
     "id": 0,
     "content": [
         {
