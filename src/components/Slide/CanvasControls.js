@@ -15,7 +15,9 @@ const CanvasControls = ({
   setToggleMode,
   toggleMode,
   contentLock,
-  setContentLock
+  setContentLock,
+  handlePositionChange,
+  handleOpacityChange,
 }) => {
   return (
     <div className="canvas-controls" style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px', alignItems: 'center' }}>
@@ -55,6 +57,78 @@ const CanvasControls = ({
 <Icon icon={contentLock ? "material-symbols:lock" : "material-symbols:lock-open"}   onClick={() => setContentLock(!contentLock)}  width="24" height="24" />
 </Tooltip>
       </div>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '10px' }}>
+  
+  {/* X Position */}
+  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%' }}>
+    <Tooltip title="X Position" arrow>
+      <Icon icon="tabler:axis-x" width="24" height="24" />
+    </Tooltip>
+           <input
+            id="x-Position-range"
+            type="range"
+            min="1"
+            max="800"
+        value={selectedProperties?.x || 0}
+      onChange={(e) => handlePositionChange(e, 'x')}
+            style={{ width: '100px', marginRight: '10px' }}
+          />
+              <input
+      id="x-position"
+      type="number"
+      value={selectedProperties?.x || 0}
+      onChange={(e) => handlePositionChange(e, 'x')}
+      style={{ width: '50px' }}
+    />
+  </div>
+
+  {/* Y Position */}
+  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%' }}>
+    <Tooltip title="Y Position" arrow>
+      <Icon icon="tabler:axis-y" width="24" height="24" />
+    </Tooltip>
+          <input
+            id="y-Position-range"
+            type="range"
+            min="1"
+            max="600"
+        value={selectedProperties?.y || 0}
+      onChange={(e) => handlePositionChange(e, 'y')}
+            style={{ width: '100px', marginRight: '10px' }}
+          />
+    <input
+      id="y-position"
+      type="number"
+      value={selectedProperties?.y || 0}
+      onChange={(e) => handlePositionChange(e, 'y')}
+      style={{ width: '50px' }}
+    />
+  </div>
+
+  {/* Opacity */}
+  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%' }}>
+    <Tooltip title="Opacity" arrow>
+      <Icon icon="material-symbols:opacity" width="24" height="24" />
+    </Tooltip>
+    <input
+      id="opacity"
+      type="range"
+      min="0"
+      max="1"
+      step="0.01"
+      value={selectedProperties?.opacity || 1}
+      onChange={(e) => handleOpacityChange(e)}
+      style={{ width: '100px', marginRight: '10px' }}
+    />
+    <input
+      type="number"
+      value={selectedProperties?.opacity || 1}
+      onChange={(e) => handleOpacityChange(e)}
+      style={{ width: '50px' }}
+    />
+  </div>
+</div>
+
       {/* Scale and Size Controls */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
         

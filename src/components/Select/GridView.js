@@ -48,13 +48,14 @@ useEffect(() => {
       if (fabricCanvas) {
         fabricCanvas.dispose(); // Dispose the previous fabric canvas instance
       }
-        const parentGridItem = canvasElement.closest(".MuiGrid-item");
-      const parentWidth = parentGridItem?.getBoundingClientRect().width || 0;
-     
-      if (deckItem) {
+        const parentGridItem = canvasElement.closest(".locked");
+
+         const parentWidth = parentGridItem?.offsetWidth || 0;
+     console.log(parentWidth);
+      if (deckItem) { 
         // If deck[0] exists, render the content for that item
         const newFabricCanvas = new Canvas(canvasElement, {
-          width: parentWidth,
+          width:parentWidth,
           height: canvasElement.height,
           preserveObjectStacking: true,
           backgroundColor: deckItem.backgroundColor,
@@ -62,7 +63,7 @@ useEffect(() => {
    
         // Save the fabricCanvas instance to the canvas element for later disposal
         canvasElement.fabricCanvas = newFabricCanvas;
-        renderCanvasContent(newFabricCanvas, deckItem.content,parentWidth,  window.innerHeight * HEIGHT,1);
+        renderCanvasContent(newFabricCanvas, deckItem.content,parentWidth, canvasElement.height,1);
       } else {
         // If deck[0] does not exist, clear the canvas (render blank)
         const context = canvasElement.getContext('2d');

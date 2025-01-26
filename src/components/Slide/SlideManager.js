@@ -33,6 +33,9 @@ function SlideManager({ slides, setSlides, currentSlide, setCurrentSlide,pins })
   scaleX: 1,
   scaleY: 1,
   size: 12,
+  x: 1,
+  y: 1,
+  opacity:1,
 });
 const updateSlideData = (updatedSlide) => {
 
@@ -186,6 +189,7 @@ const pasteCanvas = () => {
     fill: selectedContent.fill,
     scaleX: copiedContent.scaleX,
     scaleY: copiedContent.scaleY,
+    opacity:copiedContent.opacity,
   };
  
   // Add the new content to the current canvas
@@ -343,7 +347,7 @@ const getUpdatedProperties = (item, newSize) => {
 useEffect(() => {
 if (!contentLock && selectedContent){
 
-    const { type, id, fill, fontSize, radius, height, width, scaleX, scaleY } = selectedContent;
+    const { type, id, fill, fontSize, radius, height, width, scaleX, scaleY,opacity, left, top } = selectedContent;
 const size = Math.max(radius, height, width);
     setSelectedProperties({
       type,
@@ -356,6 +360,9 @@ const size = Math.max(radius, height, width);
       scaleX: scaleX || 1,   
       scaleY: scaleY || 1,   
       size: size || 12,
+      opacity: opacity || 1,
+      x: left || 1,
+      y: top || 1,
     });
   }
 },[selectedContent]);
@@ -419,6 +426,76 @@ const handleScaleChange = (event, axis) => {
               content: canvas.content.map((item) =>
                 item.id === selectedContent.id
                   ? { ...item, [axis === 'x' ? 'scaleX' : 'scaleY']: newValue }
+                  : item
+              ),
+            };
+          }
+          return canvas;
+        }),
+      };
+      setCurrentSlide(updatedSlide);
+      updateSlideData(updatedSlide);
+    }
+
+    return updatedProperties;
+  });
+};
+const handlePositionChange = (event, axis) => {
+  const newValue = parseFloat(event.target.value);
+
+  setSelectedProperties((prevProperties) => {
+    // Update position for the selected axis
+    const updatedProperties = {
+      ...prevProperties,
+      [axis === 'x' ? 'x' : 'y']: newValue,
+    };
+
+    // Update the content in the canvas
+    if (selectedContent?.id) {
+      const updatedSlide = {
+        ...currentSlide,
+        deck: currentSlide.deck.map((canvas) => {
+          if (canvas.id === currentCanvas) {
+            return {
+              ...canvas,
+              content: canvas.content.map((item) =>
+                item.id === selectedContent.id
+                  ? { ...item, [axis === 'x' ? 'x' : 'y']: newValue }
+                  : item
+              ),
+            };
+          }
+          return canvas;
+        }),
+      };
+      setCurrentSlide(updatedSlide);
+      updateSlideData(updatedSlide);
+    }
+
+    return updatedProperties;
+  });
+};
+const handleOpacityChange = (event) => {
+  let newOpacity = parseFloat(event.target.value);
+    newOpacity = Math.max(0.01, Math.min(newOpacity, 1));
+  setSelectedProperties((prevProperties) => {
+    // Update opacity
+    const updatedProperties = {
+      ...prevProperties,
+      opacity: newOpacity,
+    };
+
+    // Update the content in the canvas
+    if (selectedContent?.id) {
+      const updatedSlide = {
+        ...currentSlide,
+        deck: currentSlide.deck.map((canvas) => {
+          if (canvas.id === currentCanvas) {
+            return {
+              ...canvas,
+              content: canvas.content.map((item) =>
+                item.id === selectedContent.id
+                  ? { ...item, opacity: newOpacity }
                   : item
               ),
             };
@@ -661,6 +738,8 @@ return (
               toggleMode={toggleMode}
               contentLock={contentLock}
               setContentLock={setContentLock}
+              handlePositionChange={handlePositionChange}
+              handleOpacityChange={handleOpacityChange}
             />
           </div>
        </div>
@@ -669,6 +748,8 @@ return (
     </div>
   );
 };
+
+
 
 
 export default SlideManager;

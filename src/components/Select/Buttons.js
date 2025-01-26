@@ -32,6 +32,11 @@ const Buttons = ({ theme,setTheme,sortOrder,setSortOrder,searchQuery,setSearchQu
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
+                      {searchQuery.length>0? (
+              <IconButton onClick={() => setSearchQuery('')}>
+                    <Icon icon="mdi:close" width="24" height="24" />
+                        </IconButton>
+                        ) : ('')}
               {tags?.length>0? (
               <div>
                 <IconButton onClick={handleTagMenuOpen}>
@@ -90,7 +95,6 @@ const Buttons = ({ theme,setTheme,sortOrder,setSortOrder,searchQuery,setSearchQu
         <IconButton onClick={() => SelectUtility.handleDownloadAll()}>
           <Icon icon="mdi:download" width="24" height="24" />
         </IconButton>
-      
        <IconButton component="label" htmlFor="importFileInput">
   <Icon icon="mdi:import" width="24" height="24" />
   <input

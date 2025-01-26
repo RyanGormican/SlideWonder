@@ -58,7 +58,7 @@ export const renderCanvasContent = (canvas, content, width, height, opacity) => 
       } = item;
 
       // Directly access width, height, and radius from item
-      const { width: itemWidth, height: itemHeight, radius: itemRadius, fontSize: itemFontSize} = item;
+      const { width: itemWidth, height: itemHeight, radius: itemRadius, fontSize: itemFontSize, opacity: itemOpacity} = item;
 
       // Calculate scaled position, size, scaleX, and scaleY for each item
       const { 
@@ -69,6 +69,7 @@ export const renderCanvasContent = (canvas, content, width, height, opacity) => 
         scaleX, scaleY
       );
 
+      
       // Common object properties to be used for all types
       const commonProps = {
         left,
@@ -79,7 +80,7 @@ export const renderCanvasContent = (canvas, content, width, height, opacity) => 
         scaleY: scaledScaleY, 
         editable: true,
         fill: fill || 'black',
-        opacity: opacity || 1,
+        opacity: Math.min(opacity || 1, itemOpacity || 1), 
       };
 
       if (item.type === 'text' && item.text.trim() !== '') {

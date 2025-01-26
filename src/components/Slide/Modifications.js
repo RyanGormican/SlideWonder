@@ -38,6 +38,7 @@ export const handleObjectModified = (e, getSelectedContentType,currentSlide,curr
                       fill: object.fill || '#FFFFFF',
                       scaleX: object.scaleX || 1,
                       scaleY: object.scaleY || 1,
+                      opacity: object.opacity || 1,
                     }
                   : item
               )

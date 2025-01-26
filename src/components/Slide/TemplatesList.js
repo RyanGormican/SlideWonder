@@ -19,4 +19,9 @@ export const templates = [
     title: 'Green Greatness',
     description: 'The Green Greatness template showcases a dynamic arrangement of geometric shapes in varying shades of green, from deep forest tones to bright lime accents. Its bold and modern design leverages the versatility of green to create a visually engaging and balanced layout. Perfect for creative portfolios, tech-focused presentations, or projects needing a fresh, contemporary aesthetic. With its striking use of shapes and gradients, Green Greatness ensures your content stands out with energy and sophistication.'
   },
+  {
+    id: 'StoneWall',
+    title: 'Stone Wall',
+    description: 'The Stone Wall template mimics the look of a classic stone brick wall, featuring a rugged and textured design with the gray, and dark stone tones. Perfect for presentations with a historical, architectural, or industrial focus, this template gives off a strong, grounded vibe. It’s ideal for projects looking to evoke strength, durability, and a sense of timelessness, while maintaining a professional and clean aesthetic.'
+  }
 ];
