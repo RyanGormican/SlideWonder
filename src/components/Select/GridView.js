@@ -3,7 +3,7 @@ import { Grid, Card, CardContent, Typography, IconButton, TextField, Menu, MenuI
 import { Icon } from '@iconify/react';
 import * as SelectUtility from './SelectUtility';
 import * as SlideManagement from './SlideManagement';
-import { renderCanvasContent } from '../Slide/CanvasRender'; 
+import { renderCanvasContent } from '../Slide/Canvas/CanvasRender'; 
 import { Canvas } from 'fabric';
 const GridView = ({ 
   slides, 
@@ -51,7 +51,6 @@ useEffect(() => {
         const parentGridItem = canvasElement.closest(".locked");
 
          const parentWidth = parentGridItem?.offsetWidth || 0;
-     console.log(parentWidth);
       if (deckItem) { 
         // If deck[0] exists, render the content for that item
         const newFabricCanvas = new Canvas(canvasElement, {

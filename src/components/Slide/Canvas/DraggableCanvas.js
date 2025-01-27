@@ -3,14 +3,13 @@ import { useDrag, useDrop } from 'react-dnd';
 import { renderCanvasContent } from './CanvasRender';
 import { Icon } from '@iconify/react';
 import { Canvas } from 'fabric';
-import NotesModal from './NotesModal';  // Import the NotesModal component
-
+import NotesModal from '../NotesModal';  
 const ITEM_TYPE = 'CANVAS_ITEM';
 
 function DraggableCanvas({ canvas, index, moveCanvas, setCurrentCanvas, deleteCanvas, currentSlide, setCurrentSlide, copyCanvas, updateSlideData }) {
   const dragCanvasRef = useRef(null);
   const dragInstance = useRef(null);
-  const [openNotesModal, setOpenNotesModal] = useState(false); // Modal state
+  const [openNotesModal, setOpenNotesModal] = useState(false); 
 
   // Drag functionality
   const [, dragRef] = useDrag({

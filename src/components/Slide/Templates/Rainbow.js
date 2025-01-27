@@ -33,7 +33,7 @@ const Rainbow = {
       "type": "square",
       "id": 1737516363064,
       "x": -600,
-      "y": 62,
+      "y": 61,
       "width": 12,
       "radius": 1,
       "height": 12,

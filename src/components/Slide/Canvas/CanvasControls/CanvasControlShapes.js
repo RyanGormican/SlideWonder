@@ -1,9 +1,10 @@
 import React from 'react';
 import { Icon } from '@iconify/react';
 import Tooltip from '@mui/material/Tooltip';
+import { SketchPicker } from 'react-color';
 import { Box } from '@mui/material';
 
-const CanvasControls = ({
+const CanvasControlShapes = ({
   backgroundColor,
   selectedContent,
   selectedProperties,
@@ -16,47 +17,69 @@ const CanvasControls = ({
   toggleMode,
   contentLock,
   setContentLock,
+  eyedropper,
+  setEyedropper,
+  paintbrush,
+  setPaintbrush,
   handlePositionChange,
   handleOpacityChange,
 }) => {
   return (
-    <div className="canvas-controls" style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px', alignItems: 'center' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '10px' }}>
-        
-        {/* Background Color */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%' }}>
-          <Tooltip title="Background Color" arrow>
-            <Icon icon="material-symbols-light:background-grid-small-sharp" width="24" height="24" />
-          </Tooltip>
-          <input
-            id="background-color"
-            type="color"
-            value={backgroundColor}
-            onChange={handleBackgroundColorChange}
-            style={{ cursor: 'pointer', flexGrow: '1' }}
-          />
-        </div>
-
-        {/* Content Color */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%' }}>
-          <Tooltip title="Content Color" arrow>
-            <Icon icon="mdi:shape" width="24" height="24" />
-          </Tooltip>
-          <input
-            id="content-color"
-            type="color"
-            key={selectedProperties?.fill || '000000'}
-            value={selectedProperties?.fill || '000000'}
-            onChange={handleColorChange}
-            style={{ cursor: 'pointer', flexGrow: '1' }}
-          />
-        </div>
-      </div>
-      <div>
-<Tooltip title="Toggle Properties Copying" arrow>
-<Icon icon={contentLock ? "material-symbols:lock" : "material-symbols:lock-open"}   onClick={() => setContentLock(!contentLock)}  width="24" height="24" />
-</Tooltip>
-      </div>
+    <div className="canvas-controls" style={{ display: 'flex', justifyContent: 'space-between',  alignItems: 'center',   height: '11vh' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+  <div>
+    <Tooltip title="Toggle Properties Copying" arrow>
+      <Icon
+        icon={contentLock ? "material-symbols:lock" : "material-symbols:lock-open"}
+        onClick={() => setContentLock(!contentLock)}
+        width="24"
+        height="24"
+        style={{
+          backgroundColor: contentLock ? '#e0e0e0' : 'transparent',
+          cursor: 'pointer',
+        }}
+      />
+    </Tooltip>
+  </div>
+  <div>
+    <Tooltip title="Toggle Object Eyedropper" arrow>
+      <Icon
+        icon="mdi:eyedropper"
+        onClick={() => setEyedropper(!eyedropper)}
+        width="24"
+        height="24"
+        style={{
+          backgroundColor: eyedropper ? '#e0e0e0' : 'transparent',
+          cursor: 'pointer',
+        }}
+      />
+    </Tooltip>
+  </div>
+  <div>
+    <Tooltip title="Toggle Paint Mode" arrow>
+      <Icon
+        icon="mdi:paintbrush"
+        onClick={() => setPaintbrush(!paintbrush)}
+        width="24"
+        height="24"
+        style={{
+          backgroundColor: paintbrush ? '#e0e0e0' : 'transparent',
+          cursor: 'pointer',
+        }}
+      />
+    </Tooltip>
+  </div>
+</div>
+      <div
+  style={{
+    width: '2.5vw',
+    height: '2.5vw',
+    backgroundColor: selectedProperties?.fill || '#000000',
+    border: '1px solid black',
+    marginTop: '20px',
+  }}
+>
+</div>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '10px' }}>
   
   {/* X Position */}
@@ -192,7 +215,7 @@ const CanvasControls = ({
           />
           <input
             type="number"
-            value={selectedProperties?.size/2 || 12}
+            value={selectedProperties?.size|| 12}
             onChange={handleSizeChange}
             style={{ width: '50px' }}
           />
@@ -225,4 +248,4 @@ const CanvasControls = ({
   );
 };
 
-export default CanvasControls;
+export default CanvasControlShapes;

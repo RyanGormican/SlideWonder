@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Canvas } from 'fabric';
-import { renderCanvasContent } from '../Slide/CanvasRender';
+import { renderCanvasContent } from '../Slide/Canvas/CanvasRender';
 import { Icon } from '@iconify/react';
 import { applyDissolveTransition , applySlideTransition ,applyScaleOutTransition, applyFlipTransition, applyZoomInTransition, applyRotateTransition } from './Transitions';
 import { Keybinds } from './Keybinds';

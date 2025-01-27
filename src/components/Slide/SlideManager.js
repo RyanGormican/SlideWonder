@@ -1,20 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { renderCanvasContent } from './CanvasRender'; 
-import DraggableCanvas from './DraggableCanvas';
+import { renderCanvasContent } from './Canvas/CanvasRender'; 
+import DraggableCanvas from './Canvas/DraggableCanvas';
 import { Icon } from '@iconify/react';
 import { Canvas, IText } from 'fabric';
 import { transitions } from './TransitionsList';
 import { templates } from './TemplatesList';
-import CanvasControls from './CanvasControls'; 
+import CanvasControlShapes from './Canvas/CanvasControls/CanvasControlShapes'; 
+import CanvasControlColors from './Canvas/CanvasControls/CanvasControlColors'; 
 import {handleDragStart, handleDragOver, handleDrop, formatTransition, deleteTransition, updateCanvasDuration} from './TransitionsManagement'; 
 import {handleObjectModified} from './Modifications';
 import { Card, CardMedia, CardContent, Typography, IconButton, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
-import {handleCanvasClick, copyCanvasElement, copyCanvas} from './CanvasManagement'; 
+import {handleCanvasClick, copyCanvasElement, copyCanvas} from './Canvas/CanvasManagement'; 
 import { saveSlideToLocalStorage} from '../Helper'
 function SlideManager({ slides, setSlides, currentSlide, setCurrentSlide,pins }) {
   const [currentCanvas, setCurrentCanvas] = useState(null);
   const [backgroundColor, setBackgroundColor] = useState('#ffffff');
   const [toggleMode, setToggleMode] = useState(null);
+  const [canvasMode, setCanvasMode] = useState('shapes');
+  const [eyedropper, setEyedropper]=useState(false);
+  const [paintbrush, setPaintbrush] = useState(false);
   const canvasRef = useRef(null);
   const canvasInstance = useRef(null);
   const [selectedContent, setSelectedContent] = useState([]);
@@ -104,7 +108,7 @@ const updateSlideData = (updatedSlide) => {
         return null; // Return null if there is an error
       });
   };
-
+  
 const addCanvasToDeck = async () => {
   if (!currentSlide) {
     alert('Please select a slide first!');
@@ -157,8 +161,8 @@ const addCanvasToDeck = async () => {
     updateSlideData(updatedSlide);
   };
 
-  const handleBackgroundColorChange = (event) => {
-    const newColor = event.target.value;
+  const handleBackgroundColorChange = (color) => {
+    const newColor = color.hex;
     setBackgroundColor(newColor);
 
     if (currentCanvas) {
@@ -170,7 +174,6 @@ const addCanvasToDeck = async () => {
       updateSlideData(updatedSlide);
     }
   };
-
 
 const pasteCanvas = () => {
   if (!copiedContent ||  Array.isArray(copiedContent) && copiedContent.length === 0 ||   typeof copiedContent === 'string') return; 
@@ -237,6 +240,7 @@ useEffect(() => {
 
     // Event handlers for canvas interactions
     const handleSelection = (e) => {
+
       const selectedObjects = canvasInstance.current.getActiveObjects();
       if (selectedObjects?.length) {
         setSelectedContent(selectedObjects[0]);
@@ -267,12 +271,14 @@ useEffect(() => {
 
   
   // Handle color change
-  const handleColorChange = (event) => {
-  const newColor = event.target.value;
-
+  const handleColorChange = (color) => {
+  const newColor = color.hex;
   setSelectedProperties((prevProperties) => {
+     let updatedProperties = { ...prevProperties};
     // Update only the color property and retain others
-    const updatedProperties = { ...prevProperties, fill: newColor };
+    if (!paintbrush){
+     updatedProperties = { ...prevProperties, fill: newColor };
+    }
 
     // Update the content in the canvas
     if (selectedContent?.id) {
@@ -303,6 +309,7 @@ const handleSizeChange = (event) => {
 
   setSelectedProperties((prevProperties) => {
     // Update the size property
+
     const updatedProperties = { ...prevProperties, size: newSize };
 
     // Update the content in the canvas
@@ -345,6 +352,20 @@ const getUpdatedProperties = (item, newSize) => {
   return updatedProps;
 };
 useEffect(() => {
+ 
+ if (eyedropper && selectedContent) {
+    setSelectedProperties((prevProperties) => ({
+      ...prevProperties,
+      fill: selectedContent.fill, 
+    }));
+  }
+
+   if (paintbrush && selectedContent) {
+      const color = selectedProperties?.fill || '#000000';
+      handleColorChange({ hex: color });
+      setSelectedContent(null);
+    }
+
 if (!contentLock && selectedContent){
 
     const { type, id, fill, fontSize, radius, height, width, scaleX, scaleY,opacity, left, top } = selectedContent;
@@ -585,36 +606,35 @@ return (
       cursor: 'pointer',
     }}
   >
-<Accordion key={template.id}
-          expanded={expandedAccordion === template.id}
-          onChange={() => handleAccordionToggle(template.id)}
-          style={{ backgroundColor: selectedTemplate === template ? '#e0e0e0' : 'transparent', boxShadow: 'none' }}>
-  <AccordionSummary style={{ display: 'flex', flexDirection: 'column', padding: '0' }}>
-
-    <Card style={{
-      width: '8.49vw',
-      height: '100%',
-      backgroundColor: selectedTemplate === template ? '#e0e0e0' : 'transparent',
-      boxShadow: 'none', 
-      border: 'none', 
-      padding: '0',
-    }}>
-      <CardMedia>
+    <Card
+      style={{
+        display: 'flex',
+        width: 'auto',  
+        height: 'auto',
+        backgroundColor: selectedTemplate === template ? '#e0e0e0' : 'transparent',
+        boxShadow: 'none',
+        border: 'none',
+        padding: '10px',
+        flexDirection: 'row',  
+      }}
+    >
+      <CardMedia style={{ width: '200px', height: 'auto' }}>
         <div className="locked" style={{ width: '100%' }}>
           <canvas ref={(el) => (templatesRef.current[template.id] = el)} style={{ width: '100%' }}></canvas>
         </div>
       </CardMedia>
-      <CardContent style={{ textAlign: 'center', padding: '8px 16px' }}>
-        <Typography variant="h6">{template.title}</Typography> 
-      </CardContent>
+      <div style={{ padding: '10px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <Typography variant="h6" style={{ marginBottom: '8px' }}>
+          {template.title}
+        </Typography>
+        <div style={{ fontSize: '14px', color: '#555' }}>
+          {template.description}
+        </div>
+      </div>
     </Card>
-  </AccordionSummary>
-  <AccordionDetails>
-    <div>{template.description}</div>
-  </AccordionDetails>
-</Accordion>
   </div>
 ))}
+
 
                 </div>
         </div>
@@ -722,10 +742,11 @@ return (
         {currentCanvas && (
       <div className="canvas-container">
           <div>
-             <div onClick={(e) => handleCanvasClick(e, toggleMode, setToggleMode, currentSlide, setCurrentSlide, currentCanvas, selectedContent, updateSlideData,selectedProperties)}>
+             <div   onClick={(e) => handleCanvasClick(e, toggleMode, setToggleMode, currentSlide, setCurrentSlide, currentCanvas, selectedContent, updateSlideData,selectedProperties)}>
               <canvas id="canvas" ref={canvasRef}></canvas>
             </div>
-            <CanvasControls
+            <div      style={{ display: canvasMode === 'shapes' ? 'block' : 'none' }}>
+            <CanvasControlShapes
               backgroundColor={backgroundColor}
               selectedContent={selectedContent}
               selectedProperties={selectedProperties}
@@ -738,12 +759,57 @@ return (
               toggleMode={toggleMode}
               contentLock={contentLock}
               setContentLock={setContentLock}
+              eyedropper={eyedropper}
+  setEyedropper={setEyedropper}
+  paintbrush={paintbrush}
+  setPaintbrush={setPaintbrush}
               handlePositionChange={handlePositionChange}
               handleOpacityChange={handleOpacityChange}
+
             />
+            </div>
+        
+            <div     style={{ display: canvasMode === 'colors' ? 'block' : 'none' }}>
+             <CanvasControlColors
+              backgroundColor={backgroundColor}
+              selectedProperties={selectedProperties}
+              handleBackgroundColorChange={handleBackgroundColorChange}
+              handleColorChange={handleColorChange}
+            />
+            </div>
           </div>
+           <div style={{
+  width: '4vw',
+  paddingLeft: '1vw',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'flex-start',
+  border: '1px solid #ddd',
+  padding: '10px',
+  boxSizing: 'border-box'
+}}>
+  <div style={{
+    marginBottom: '10px',
+    border: '1px solid #ccc',
+    padding: '10px',
+    borderRadius: '5px',
+    backgroundColor: canvasMode === 'shapes' ? '#e0e0e0'  : 'transparent' 
+  }}>
+<Icon icon="fluent-mdl2:shape-solid" width="2vw" height="2vh"  onClick={() => setCanvasMode('shapes')} />
+  </div>
+  
+  <div style={{
+    border: '1px solid #ccc',
+    padding: '10px',
+    borderRadius: '5px',
+   backgroundColor: canvasMode === 'colors' ? '#e0e0e0'  : 'transparent' 
+  }}>
+   <Icon icon="mdi:paintbrush" width="2vw" height="2vh"    onClick={() => setCanvasMode('colors')}  />
+  </div>
+</div>
        </div>
         )}
+          
 
     </div>
   );
