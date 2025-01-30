@@ -102,7 +102,7 @@ useEffect(() => {
   };
 
   const handleDownload = () => {
-    SelectUtility.handleDownloadCSV(selectedSlide);
+    SelectUtility.handleDownloadJSON(selectedSlide);
     handleCloseMenu();
   };
 

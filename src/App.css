@@ -257,11 +257,11 @@ canvas {
   font-weight: 500;
 }
 .transition-list{
-    height: 50vh;
+    height: 60vh;
     overflow-y:auto;
 }
 .template-list{
-    height: 50vh;
+    height: 60vh;
     overflow-y:auto;
 }
 body {
@@ -342,4 +342,42 @@ button h3 {
   margin: 0; 
   display: inline-flex;
   align-items: center; 
+}
+.pagination-container {
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.pagination-grid {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.left-controls {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 16px;
+}
+
+.center-controls {
+  display: flex;
+  justify-content: center;
+}
+
+.right-controls {
+  display: flex;
+  justify-content: flex-start;
+  padding-left: 16px;
+  gap: 8px;
+}
+
+.page-indicator {
+  margin-top: 8px;
+  font-weight: bold;
+  color: #666;
 }

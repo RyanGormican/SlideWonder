@@ -24,35 +24,24 @@ export const timeAgo = (date) => {
 export  const formatDate = (date) => {
     return new Date(date).toLocaleString(); 
   };
-
-   // Function to convert slide data to CSV
-export const convertToCSV = (slide) => {
+  // Function to convert slide data to JSON
+export const convertToJSON = (slide) => {
   // Check if slide is a valid object
   if (!slide || typeof slide !== 'object') {
     console.error('Invalid slide data');
     return ''; // Return an empty string if the slide is invalid
   }
 
-  // Create header row based on the slide's properties
-  const header = Object.keys(slide).join(',');
-
-  // Create row from slide values
-  const row = Object.values(slide).map(value => {
-    // If the value is an object or array, convert it to a string 
-    return typeof value === 'object' ? JSON.stringify(value) : value;
-  }).join(',');
-
-  return `${header}\n${row}`;
+  // Convert the slide object to a JSON string
+  return JSON.stringify(slide, null, 2); // Pretty print with 2 spaces indentation
+};
+// Function to download slide as a JSON file
+export const handleDownloadJSON = (slide) => {
+  const jsonData = convertToJSON(slide);
+  const blob = new Blob([jsonData], { type: 'application/json;charset=utf-8;' });
+  saveAs(blob, `${slide.title}.json`);
 };
 
-
-
-  // Function to download CSV
- export const handleDownloadCSV = (slide) => {
-    const csvData = convertToCSV(slide);
-    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
-    saveAs(blob, `${slide.title}.csv`);
-  };
 
 export const handleDownloadAll = () => {
   const slideWonderData = JSON.parse(localStorage.getItem('SlideWonderdata'));

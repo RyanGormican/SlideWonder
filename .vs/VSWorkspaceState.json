@@ -6,9 +6,10 @@
     "\\src\\components\\Present",
     "\\src\\components\\Select",
     "\\src\\components\\Slide",
-    "\\src\\components\\Slide\\Templates",
+    "\\src\\components\\Slide\\Canvas",
+    "\\src\\components\\Slide\\Canvas\\CanvasControls",
     "\\src\\components\\Sync"
   ],
-  "SelectedNode": "\\src\\components\\Slide\\Templates\\Rainbow.js",
+  "SelectedNode": "\\src\\components\\Slide\\SlideManager.js",
   "PreviewInSolutionExplorer": false
 }

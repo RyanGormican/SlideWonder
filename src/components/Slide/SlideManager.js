@@ -5,6 +5,7 @@ import { Icon } from '@iconify/react';
 import { Canvas, IText } from 'fabric';
 import { transitions } from './TransitionsList';
 import { templates } from './TemplatesList';
+import CanvasControlElements from './Canvas/CanvasControls/CanvasControlElements'; 
 import CanvasControlShapes from './Canvas/CanvasControls/CanvasControlShapes'; 
 import CanvasControlColors from './Canvas/CanvasControls/CanvasControlColors'; 
 import {handleDragStart, handleDragOver, handleDrop, formatTransition, deleteTransition, updateCanvasDuration} from './TransitionsManagement'; 
@@ -193,6 +194,8 @@ const pasteCanvas = () => {
     scaleX: copiedContent.scaleX,
     scaleY: copiedContent.scaleY,
     opacity:copiedContent.opacity,
+    stroke: copiedContent.stroke || null,
+    strokeWidth: copiedContent.strokeWidth || 1,
   };
  
   // Add the new content to the current canvas
@@ -358,6 +361,7 @@ useEffect(() => {
       ...prevProperties,
       fill: selectedContent.fill, 
     }));
+    setEyedropper(false);
   }
 
    if (paintbrush && selectedContent) {
@@ -368,8 +372,10 @@ useEffect(() => {
 
 if (!contentLock && selectedContent){
 
-    const { type, id, fill, fontSize, radius, height, width, scaleX, scaleY,opacity, left, top } = selectedContent;
-const size = Math.max(radius, height, width);
+    const { type, id, fill, fontSize, radius, height, width, scaleX, scaleY,opacity, left, top, stroke, strokeWidth} = selectedContent;
+   const size = fontSize || Math.max(
+    ...( [radius, height, width].filter(value => value !== undefined && value !== null) )
+  ) || 12;
     setSelectedProperties({
       type,
       id,
@@ -384,6 +390,8 @@ const size = Math.max(radius, height, width);
       opacity: opacity || 1,
       x: left || 1,
       y: top || 1,
+      stroke: stroke || null,
+      strokeWidth: strokeWidth || 1,
     });
   }
 },[selectedContent]);
@@ -531,6 +539,71 @@ const handleOpacityChange = (event) => {
     return updatedProperties;
   });
 };
+const handleStrokeChange = (newColor) => {
+  setSelectedProperties((prevProperties) => {
+    const updatedProperties = {
+      ...prevProperties,
+      stroke: newColor,  // Update stroke color
+    };
+
+    // Update the content in the canvas
+    if (selectedContent?.id) {
+      const updatedSlide = {
+        ...currentSlide,
+        deck: currentSlide.deck.map((canvas) => {
+          if (canvas.id === currentCanvas) {
+            return {
+              ...canvas,
+              content: canvas.content.map((item) =>
+                item.id === selectedContent.id
+                  ? { ...item, stroke: newColor }  // Update stroke for the selected item
+                  : item
+              ),
+            };
+          }
+          return canvas;
+        }),
+      };
+      setCurrentSlide(updatedSlide);
+      updateSlideData(updatedSlide);
+    }
+
+    return updatedProperties;
+  });
+};
+const handleStrokeWidthChange = (newWidth) => {
+  const parsedWidth = parseFloat(newWidth);
+  setSelectedProperties((prevProperties) => {
+    const updatedProperties = {
+      ...prevProperties,
+      strokeWidth: Math.max(1, parsedWidth),  // Ensure the stroke width is at least 1
+    };
+
+    // Update the content in the canvas
+    if (selectedContent?.id) {
+      const updatedSlide = {
+        ...currentSlide,
+        deck: currentSlide.deck.map((canvas) => {
+          if (canvas.id === currentCanvas) {
+            return {
+              ...canvas,
+              content: canvas.content.map((item) =>
+                item.id === selectedContent.id
+                  ? { ...item, strokeWidth: Math.max(1, parsedWidth) }  // Update stroke width
+                  : item
+              ),
+            };
+          }
+          return canvas;
+        }),
+      };
+      setCurrentSlide(updatedSlide);
+      updateSlideData(updatedSlide);
+    }
+
+    return updatedProperties;
+  });
+};
 
 const getSelectedContentType = (selectedContentId) => {
   if (!selectedContentId) return null;  // Ensure selectedContentId is valid
@@ -610,7 +683,7 @@ return (
       style={{
         display: 'flex',
         width: 'auto',  
-        height: 'auto',
+        maxHeight: '20vh',
         backgroundColor: selectedTemplate === template ? '#e0e0e0' : 'transparent',
         boxShadow: 'none',
         border: 'none',
@@ -624,10 +697,10 @@ return (
         </div>
       </CardMedia>
       <div style={{ padding: '10px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-        <Typography variant="h6" style={{ marginBottom: '8px' }}>
+        <Typography variant="h6" style={{ fontSize: '1rem', marginBottom: '8px' }}>
           {template.title}
         </Typography>
-        <div style={{ fontSize: '14px', color: '#555' }}>
+        <div style={{ fontSize: '0.9rem', color: '#555', overflow: 'auto' }}>
           {template.description}
         </div>
       </div>
@@ -745,13 +818,11 @@ return (
              <div   onClick={(e) => handleCanvasClick(e, toggleMode, setToggleMode, currentSlide, setCurrentSlide, currentCanvas, selectedContent, updateSlideData,selectedProperties)}>
               <canvas id="canvas" ref={canvasRef}></canvas>
             </div>
-            <div      style={{ display: canvasMode === 'shapes' ? 'block' : 'none' }}>
-            <CanvasControlShapes
+            <div      style={{ display: canvasMode === 'elements' ? 'block' : 'none' }}>
+            <CanvasControlElements
               backgroundColor={backgroundColor}
               selectedContent={selectedContent}
               selectedProperties={selectedProperties}
-              handleBackgroundColorChange={handleBackgroundColorChange}
-              handleColorChange={handleColorChange}
               handleScaleChange={handleScaleChange}
               handleSizeChange={handleSizeChange}
               getSizeValue={getSizeValue}
@@ -765,10 +836,18 @@ return (
   setPaintbrush={setPaintbrush}
               handlePositionChange={handlePositionChange}
               handleOpacityChange={handleOpacityChange}
-
+              handleStrokeChange={handleStrokeChange}
+              handleStrokeWidthChange={handleStrokeWidthChange}
             />
+
             </div>
-        
+          <div      style={{ display: canvasMode === 'shapes' ? 'block' : 'none' }}>
+            <CanvasControlShapes
+              setToggleMode={setToggleMode}
+              toggleMode={toggleMode}
+            />
+
+            </div>
             <div     style={{ display: canvasMode === 'colors' ? 'block' : 'none' }}>
              <CanvasControlColors
               backgroundColor={backgroundColor}
@@ -797,7 +876,15 @@ return (
   }}>
 <Icon icon="fluent-mdl2:shape-solid" width="2vw" height="2vh"  onClick={() => setCanvasMode('shapes')} />
   </div>
-  
+    <div style={{
+    marginBottom: '10px',
+    border: '1px solid #ccc',
+    padding: '10px',
+    borderRadius: '5px',
+    backgroundColor: canvasMode === 'elements' ? '#e0e0e0'  : 'transparent' 
+  }}>
+<Icon icon="mdi:ruler" width="2vw" height="2vh"  onClick={() => setCanvasMode('elements')} />
+  </div>
   <div style={{
     border: '1px solid #ccc',
     padding: '10px',

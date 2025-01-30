@@ -5,6 +5,7 @@ import * as SlideManagement from './SlideManagement';
 import GridView from './GridView'; 
 import ListView from './ListView';
 import Buttons from './Buttons';
+import PaginationControls from './PaginationControls';
 const Select = ({ slides, setSlides, pins,setPins,tags,setTags, handleGridClick,theme, setTheme,view, fileLastModified}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [editingTitle, setEditingTitle] = useState(null);
@@ -146,6 +147,9 @@ const slideList = [...uniqueSlides].sort((a, b) => {
   const handlePageChangeList = (newPage) => {
     setCurrentPageList(newPage);
   };
+   const onAddSlide = () => {
+    SlideManagement.handleAddSlide(slides, setSlides);
+  };
 const uniqueTags = [];
 const seenTitles = new Set();
 
@@ -158,133 +162,28 @@ tags?.forEach(tag => {
   });
 });
 
-  return (
-    <div>
-      {/* Buttons  */}
-      <Buttons 
-      
-      theme={theme}
-      setTheme={setTheme}
-      sortOrder={sortOrder}
-      setSortOrder={setSortOrder}
-      searchQuery={searchQuery}
-      setSearchQuery={setSearchQuery}
-      slides={slides}
-      tags={tags}
-      toggleTag={toggleTag}
-      tagStates={tagStates}
-      toggleAllTags={toggleAllTags}
-      uniqueTags={uniqueTags}
-      setViewType={setViewType}
-      setSlides={setSlides}
-      setPins={setPins}
-      setTags={setTags}
-      />
+ return (
+  <div>
+    {/* Buttons */}
+    <Buttons theme={theme} setTheme={setTheme} sortOrder={sortOrder} setSortOrder={setSortOrder} searchQuery={searchQuery} setSearchQuery={setSearchQuery} slides={slides} tags={tags} toggleTag={toggleTag} tagStates={tagStates} toggleAllTags={toggleAllTags} uniqueTags={uniqueTags} setViewType={setViewType} setSlides={setSlides} setPins={setPins} setTags={setTags} />
 
-      {/* Conditional rendering of grid or list view */}
-      {viewType === 'grid' ? (
-        <div>
-       <GridView
-  sortedSlides={sortedSlides}
-  currentPageGrid={currentPageGrid}
-  slidesPerPageGrid={slidesPerPageGrid}
-  handleGridClick={handleGridClick}
-  editingTitle={editingTitle}
-  setEditingTitle={setEditingTitle}
-  newTitle={newTitle}
-  setNewTitle={setNewTitle}
-  slides={slides}
-  setSlides={setSlides}
-  setSelectedSlide={setSelectedSlide}
-  pins={pins}
-  setPins={setPins}
-  tags={tags}
-  setTags={setTags}
-  view={view}
-/>
+    {/* Conditional rendering of grid or list view */}
+    {viewType === 'grid' ? (
+      <div>
+        <GridView sortedSlides={sortedSlides} currentPageGrid={currentPageGrid} slidesPerPageGrid={slidesPerPageGrid} handleGridClick={handleGridClick} editingTitle={editingTitle} setEditingTitle={setEditingTitle} newTitle={newTitle} setNewTitle={setNewTitle} slides={slides} setSlides={setSlides} setSelectedSlide={setSelectedSlide} pins={pins} setPins={setPins} tags={tags} setTags={setTags} view={view} />
+        <PaginationControls currentPage={currentPageGrid} slidesPerPage={slidesPerPageGrid} sortedSlides={sortedSlides} handlePageChange={handlePageChangeGrid} onAddSlide={onAddSlide} slides={slides} setSlides={setSlides}/>
+      </div>
+    ) : (
+      <div>
+        <ListView sortedSlides={sortedSlides} currentPageList={currentPageList} slidesPerPageList={slidesPerPageList} handleGridClick={handleGridClick} setHoveredDate={setHoveredDate} hoveredDate={hoveredDate} />
+        <PaginationControls currentPage={currentPageList} slidesPerPage={slidesPerPageList} sortedSlides={sortedSlides} handlePageChange={handlePageChangeList} onAddSlide={onAddSlide} slides={slides} setSlides={setSlides} />
+      </div>
+    )}
 
+    <InfoModal open={Boolean(selectedSlide)} slide={selectedSlide} fileLastModified={fileLastModified} onClose={() => setSelectedSlide(null)} />
+  </div>
+);
 
-          {/* Pagination controls with Add Slide button */}
-          <div style={{ width: '100vw', display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '16px', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <button
-                onClick={() => handlePageChangeGrid(currentPageGrid - 1)}
-                disabled={currentPageGrid === 1}
-                style={{ marginRight: '16px' }}
-              >
-                Previous
-              </button>
-
-              {/* Add Slide Button */}
-              <IconButton onClick={() => SlideManagement.handleAddSlide(slides, setSlides)} style={{ margin: '0 16px' }}>
-                New Slide
-              </IconButton>
-              <button
-                onClick={() => handlePageChangeGrid(currentPageGrid + 1)}
-                disabled={currentPageGrid * slidesPerPageGrid >= sortedSlides.length}
-                style={{ marginLeft: '16px' }}
-              >
-                Next
-              </button>
-            </div>
-
-            {/* Page indicator */}
-            {Math.ceil(sortedSlides.length / slidesPerPageGrid) >= 1 && (
-              <Typography variant="body1" style={{ marginTop: '8px' }}>
-                Page {currentPageGrid} of {Math.ceil(sortedSlides.length / slidesPerPageGrid)}
-              </Typography>
-            )}
-          </div>
-        </div>
-      ) : (
-        <div>
-         <ListView
-  sortedSlides={sortedSlides}
-  currentPageList={currentPageList}
-  slidesPerPageList={slidesPerPageList}
-  handleGridClick={handleGridClick}
-  setHoveredDate={setHoveredDate}
-  hoveredDate={hoveredDate}
-/>
-
-          {/* Pagination controls with Add Slide button */}
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <button
-                onClick={() => handlePageChangeList(currentPageList - 1)}
-                disabled={currentPageList === 1}
-                style={{ marginRight: '16px' }}
-              >
-                Previous
-              </button>
-
-              {/* Add Slide Button */}
-              <IconButton onClick={() => SlideManagement.handleAddSlide(slides, setSlides)} style={{ height: '4vh' }}>
-                New Slide
-              </IconButton>
-
-              <button
-                onClick={() => handlePageChangeList(currentPageList + 1)}
-                disabled={currentPageList * slidesPerPageList >= sortedSlides.length}
-                style={{ marginLeft: '16px' }}
-              >
-                Next
-              </button>
-            </div>
-
-            {/* Page indicator */}
-            {Math.ceil(sortedSlides.length / slidesPerPageList) >= 1 && (
-              <Typography variant="body1">
-                Page {currentPageList} of {Math.ceil(sortedSlides.length / slidesPerPageList)}
-              </Typography>
-            )}
-          </div>
-        </div>
-      )}
-        
-      <InfoModal open={Boolean(selectedSlide)} slide={selectedSlide} fileLastModified={fileLastModified} onClose={() => setSelectedSlide(null)} />
-    </div>
-  );
 };
 
 export default Select;

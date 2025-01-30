@@ -53,7 +53,7 @@ export const renderCanvasContent = (canvas, content, width, height, opacity) => 
   if (content) {
     content.forEach((item) => {
       const { 
-        x, y, angle, fill, scaleX, scaleY, size, id, 
+        x, y, angle, fill, scaleX, scaleY, size, id, stroke,strokeWidth,
         url = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvk-ecPeKuRvec5czcoK2H7axiY9XZtcqopQ&s' 
       } = item;
 
@@ -80,6 +80,8 @@ export const renderCanvasContent = (canvas, content, width, height, opacity) => 
         scaleY: scaledScaleY, 
         editable: true,
         fill: fill || 'black',
+        stroke: stroke || null,
+        strokeWidth: strokeWidth *  (width/800) || 1,
         opacity: Math.min(opacity || 1, itemOpacity || 1), 
       };
 
@@ -109,7 +111,6 @@ export const renderCanvasContent = (canvas, content, width, height, opacity) => 
           width: itemWidth || 12, 
           height: itemWidth || 12,
         });
- 
         canvas.add(square);
 
       } else if (item.type === 'triangle') {

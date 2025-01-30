@@ -103,3 +103,32 @@ export const deleteTag = (slideId, tagTitle, tags, setTags) => {
   setTags(updatedTags);
   saveSlideToLocalStorage(1, 1, updatedTags);  
 };
+export const handleImportSlide = (event, slides, setSlides) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = (e) => {
+    try {
+      const importedSlide = JSON.parse(e.target.result);
+      const currentDate = new Date().toISOString();
+      const currentTimestamp = Date.now();
+
+      // Add a new ID and update the lastUpdated time
+      const updatedImportedSlide = {
+        ...importedSlide,
+        id: currentTimestamp,
+        lastUpdated: currentDate,
+      };
+
+      const updatedSlides = [...slides, updatedImportedSlide];
+      setSlides(updatedSlides);
+      saveSlideToLocalStorage(updatedSlides, 1, 1);
+    } catch (error) {
+      console.error("Failed to parse JSON", error);
+    }
+  };
+
+  reader.readAsText(file);
+};

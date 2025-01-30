@@ -34,6 +34,14 @@ export const templates = [
   "title": "Simple Sunset",
   "description": "The Simple Sunset template features a warm, inviting background with tones of orange, yellow, and blue, evoking the serene beauty of a sunset. The design is complemented by soft geometric shapes, creating a tranquil yet modern aesthetic. Ideal for presentations focused on creativity, relaxation, or any project aiming to evoke warmth and simplicity. This template maintains a clean, elegant style while capturing the soothing essence of a sunset."
 },
-
-
+{
+  id: 'TranquilBlue',
+  title: 'Tranquil Blue',
+  description: 'The Tranquil Blue template combines soothing shades of blue with a dynamic arrangement of circles, creating a calm yet engaging design. With its modern and geometric layout, this template is perfect for presentations that need a balanced, professional look with a touch of creativity. The varying blue tones, complemented by subtle gradients, make it ideal for business pitches, creative portfolios, or any project requiring a serene yet impactful aesthetic. Whether you’re showcasing ideas, products, or personal projects, Tranquil Blue ensures your content stands out with a refreshing and visually appealing design.'
+},
+{
+  id: 'TropicalGetaway',
+  title: 'Tropical Getaway',
+  description: 'The Tropical Getaway template captures the essence of a relaxing beach vacation, featuring vibrant tropical colors. The background is filled with water and plants, setting a serene, lush mood. Ideal for travel promotions, vacation planners, or lifestyle projects, this template brings a sense of warmth and relaxation to any presentation. The tropical theme is perfect for evoking images of paradise, helping your content feel fresh, inviting, and fun.'
+}
 ];
