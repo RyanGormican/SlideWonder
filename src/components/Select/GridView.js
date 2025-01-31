@@ -132,7 +132,7 @@ useEffect(() => {
                 </div>
               </CardContent>
             </Card>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', }}>
               {editingTitle === slide.title ? (
                 <TextField
                   value={newTitle}
@@ -147,7 +147,9 @@ useEffect(() => {
                   onClick={() => SelectUtility.handleTitleClick(slide, setEditingTitle, setNewTitle)}
                   style={{ cursor: 'pointer', flexGrow: 1 }}
                 >
+                <h6>
                   {slide.title}
+                </h6>
                 </Typography>
               )}
 
@@ -233,7 +235,7 @@ useEffect(() => {
     tag.titles.map((title, index) => (
       <MenuItem key={index}>
         <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-          <Typography variant="body2">{title} </Typography>
+          <Typography variant="body2"   component="div">{title} </Typography>
           <IconButton onClick={() => {
             SlideManagement.deleteTag(tagId, title, tags, setTags);
           }} sx={{ boxShadow: 'none' }}>

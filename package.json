@@ -12,6 +12,7 @@
     "file-saver": "^2.0.5",
     "firebase": "^11.1.0",
     "lodash": "^4.17.21",
+    "next": "^15.1.6",
     "react": "^19.0.0",
     "react-color": "^2.19.3",
     "react-dnd": "^16.0.1",
@@ -21,10 +22,9 @@
     "webpack": "^5.97.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+   "dev": "next dev",
+  "build": "next build",
+  "start": "next start"
   },
   "eslintConfig": {
     "extends": [

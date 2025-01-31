@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import './App.css';
 import Feedback from './components/Feedback/Feedback';
 import Navigate from './components/Navigate';
 import Select from './components/Select/Select';
@@ -72,7 +71,7 @@ function App({ theme, setTheme }) {
         {view !== 'present' && (
           <>
             <Navigate toggleFeedbackModal={() => setIsModalOpen(!isModalOpen)} />
-            <div className="title">SlideWonder</div>
+            <h1 className="title">SlideWonder</h1>
           </>
         )}
 

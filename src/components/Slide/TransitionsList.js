@@ -8,7 +8,7 @@ export const transitions = [
   { 
     id: 'slideleft', 
     title: 'Slide Left', 
-    description: 'Slide content dynamically to the left with a sleek transition effect, perfect for modern, engaging presentations that keep your audience’s attention.',
+    description: 'Slide content dynamically to the left with a sleek transition effect, perfect for modern, engaging presentations that keep your audience\'s attention.',
     icon: 'mdi:arrow-left',
   },
   { 

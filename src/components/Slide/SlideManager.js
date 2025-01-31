@@ -58,47 +58,59 @@ const updateSlideData = (updatedSlide) => {
 };
 
  const sortedTemplates = [...templates].sort((a, b) => a.title.localeCompare(b.title));
-    useEffect(() => {
-    const loadTemplates = () => {
-      // Iterate over templates using forEach
-      templates.forEach((template) => {
-        const { id, title } = template; // Destructure id from template
-        const canvasElement = templatesRef.current[id]; // Access the canvas ref by id
-        loadTemplate(`${id}.js`).then((canvasTemplate) => {
-          if (canvasTemplate) {
-            const { content, backgroundColor } = canvasTemplate;
-            // Create a new canvas
-            const newCanvas = new Canvas(canvasElement, {
-              width: 150,
-              height: 150,
-              preserveObjectStacking: true,
-              backgroundColor: backgroundColor || '#ffffff', 
-            });
+  useEffect(() => {
+  const loadTemplates = () => {
+    // Iterate over templates using forEach
+    templates.forEach((template) => {
+      const { id, title } = template; // Destructure id from template
+      const canvasElement = templatesRef.current[id]; // Access the canvas ref by id
+      
+      loadTemplate(`${id}.js`).then((canvasTemplate) => {
+        if (canvasTemplate) {
+          const { content, backgroundColor } = canvasTemplate;
 
-            // Render the content on the canvas
-            renderCanvasContent(newCanvas, content, 150, 150, 1);
+          // Check if the canvas already exists, and dispose of it if it does
+          const existingCanvas = canvasElement.fabricCanvas;
+          if (existingCanvas) {
+            existingCanvas.dispose(); // Dispose of the old canvas
           }
-        }).catch((error) => {
-          console.error('Error loading template:', error);
-        });
-      });
-    };
 
-    loadTemplates(); 
+          // Create a new canvas
+          const newCanvas = new Canvas(canvasElement, {
+            width: 150,
+            height: 150,
+            preserveObjectStacking: true,
+            backgroundColor: backgroundColor || '#ffffff', 
+          });
 
-    // Cleanup function to dispose of the fabric canvas instances when component unmounts or data changes
-    return () => {
-      // Loop through each canvas reference by keys in templatesRef.current
-      Object.values(templatesRef.current).forEach((canvasElement) => {
-        if (canvasElement) {
-          const fabricCanvas = canvasElement.fabricCanvas;
-          if (fabricCanvas) {
-            fabricCanvas.dispose(); // Dispose of the canvas when cleaning up
-          }
+          // Attach the new canvas to the DOM element
+          canvasElement.fabricCanvas = newCanvas;
+
+          // Render the content on the canvas
+          renderCanvasContent(newCanvas, content, 150, 150, 1);
         }
+      }).catch((error) => {
+        console.error('Error loading template:', error);
       });
-    };
-  }, [additionsMode]); 
+    });
+  };
+
+  loadTemplates(); 
+
+  // Cleanup function to dispose of the fabric canvas instances when component unmounts or data changes
+  return () => {
+    // Loop through each canvas reference by keys in templatesRef.current
+    Object.values(templatesRef.current).forEach((canvasElement) => {
+      if (canvasElement) {
+        const fabricCanvas = canvasElement.fabricCanvas;
+        if (fabricCanvas) {
+          fabricCanvas.dispose(); // Dispose of the canvas when cleaning up
+        }
+      }
+    });
+  };
+}, [additionsMode]);
+
 
   // Function to dynamically import the template content
   const loadTemplate = (templateTitle) => {

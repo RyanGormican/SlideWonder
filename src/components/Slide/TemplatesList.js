@@ -12,7 +12,7 @@ export const templates = [
   { 
     id: 'FullRainbow', 
     title: 'Full Rainbow', 
-    description: 'The Full Rainbow template offers a complete rainbow gradient—red, orange, yellow, green, blue, and purple—spanning the entire slide. Designed to be bold, colorful, and eye-catching, it is perfect for creative presentations, marketing pitches, or any project requiring a dynamic and energetic vibe. This template ensures your slides leave a lasting impression with its striking use of color.' 
+    description: 'The Full Rainbow template offers a complete rainbow gradient - red, orange, yellow, green, blue, and purple - spanning the entire slide. Designed to be bold, colorful, and eye-catching, it is perfect for creative presentations, marketing pitches, or any project requiring a dynamic and energetic vibe. This template ensures your slides leave a lasting impression with its striking use of color.' 
   },
   {
     id: 'GreenGreatness',
@@ -22,26 +22,26 @@ export const templates = [
   {
     id: 'StoneWall',
     title: 'Stone Wall',
-    description: 'The Stone Wall template mimics the look of a classic stone brick wall, featuring a rugged and textured design with the gray, and dark stone tones. Perfect for presentations with a historical, architectural, or industrial focus, this template gives off a strong, grounded vibe. It’s ideal for projects looking to evoke strength, durability, and a sense of timelessness, while maintaining a professional and clean aesthetic.'
+    description: 'The Stone Wall template mimics the look of a classic stone brick wall, featuring a rugged and textured design with gray and dark stone tones. Perfect for presentations with a historical, architectural, or industrial focus, this template gives off a strong, grounded vibe. It is ideal for projects looking to evoke strength, durability, and a sense of timelessness, while maintaining a professional and clean aesthetic.'
   },
   {
-  id: 'MovieMadness',
-  title: 'Movie Madness',
-  description: 'The Movie Madness template is designed with a fun, cinematic theme, featuring an eye-catching edging at the top and bottom that resembles the classic popcorn bucket design. A bold yellow border frames a brown text space in the middle, evoking the look of a movie night snack. Perfect for movie-related presentations, film reviews, event promotions, or any project that aims to capture the excitement and energy of the silver screen. This template adds a playful and nostalgic touch to your slides while keeping the focus on your content.'
-},
-{
-  "id": "SimpleSunset",
-  "title": "Simple Sunset",
-  "description": "The Simple Sunset template features a warm, inviting background with tones of orange, yellow, and blue, evoking the serene beauty of a sunset. The design is complemented by soft geometric shapes, creating a tranquil yet modern aesthetic. Ideal for presentations focused on creativity, relaxation, or any project aiming to evoke warmth and simplicity. This template maintains a clean, elegant style while capturing the soothing essence of a sunset."
-},
-{
-  id: 'TranquilBlue',
-  title: 'Tranquil Blue',
-  description: 'The Tranquil Blue template combines soothing shades of blue with a dynamic arrangement of circles, creating a calm yet engaging design. With its modern and geometric layout, this template is perfect for presentations that need a balanced, professional look with a touch of creativity. The varying blue tones, complemented by subtle gradients, make it ideal for business pitches, creative portfolios, or any project requiring a serene yet impactful aesthetic. Whether you’re showcasing ideas, products, or personal projects, Tranquil Blue ensures your content stands out with a refreshing and visually appealing design.'
-},
-{
-  id: 'TropicalGetaway',
-  title: 'Tropical Getaway',
-  description: 'The Tropical Getaway template captures the essence of a relaxing beach vacation, featuring vibrant tropical colors. The background is filled with water and plants, setting a serene, lush mood. Ideal for travel promotions, vacation planners, or lifestyle projects, this template brings a sense of warmth and relaxation to any presentation. The tropical theme is perfect for evoking images of paradise, helping your content feel fresh, inviting, and fun.'
-}
+    id: 'MovieMadness',
+    title: 'Movie Madness',
+    description: 'The Movie Madness template is designed with a fun, cinematic theme, featuring an eye-catching edging at the top and bottom that resembles the classic popcorn bucket design. A bold yellow border frames a brown text space in the middle, evoking the look of a movie night snack. Perfect for movie-related presentations, film reviews, event promotions, or any project that aims to capture the excitement and energy of the silver screen. This template adds a playful and nostalgic touch to your slides while keeping the focus on your content.'
+  },
+  {
+    id: 'SimpleSunset',
+    title: 'Simple Sunset',
+    description: 'The Simple Sunset template features a warm, inviting background with tones of orange, yellow, and blue, evoking the serene beauty of a sunset. The design is complemented by soft geometric shapes, creating a tranquil yet modern aesthetic. Ideal for presentations focused on creativity, relaxation, or any project aiming to evoke warmth and simplicity. This template maintains a clean, elegant style while capturing the soothing essence of a sunset.'
+  },
+  {
+    id: 'TranquilBlue',
+    title: 'Tranquil Blue',
+    description: 'The Tranquil Blue template combines soothing shades of blue with a dynamic arrangement of circles, creating a calm yet engaging design. With its modern and geometric layout, this template is perfect for presentations that need a balanced, professional look with a touch of creativity. The varying blue tones, complemented by subtle gradients, make it ideal for business pitches, creative portfolios, or any project requiring a serene yet impactful aesthetic. Whether you are showcasing ideas, products, or personal projects, Tranquil Blue ensures your content stands out with a refreshing and visually appealing design.'
+  },
+  {
+    id: 'TropicalGetaway',
+    title: 'Tropical Getaway',
+    description: 'The Tropical Getaway template captures the essence of a relaxing beach vacation, featuring vibrant tropical colors. The background is filled with water and plants, setting a serene, lush mood. Ideal for travel promotions, vacation planners, or lifestyle projects, this template brings a sense of warmth and relaxation to any presentation. The tropical theme is perfect for evoking images of paradise, helping your content feel fresh, inviting, and fun.'
+  }
 ];

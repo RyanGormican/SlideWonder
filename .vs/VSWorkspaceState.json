@@ -3,13 +3,14 @@
     "",
     "\\src",
     "\\src\\components",
-    "\\src\\components\\Present",
     "\\src\\components\\Select",
     "\\src\\components\\Slide",
     "\\src\\components\\Slide\\Canvas",
     "\\src\\components\\Slide\\Canvas\\CanvasControls",
-    "\\src\\components\\Sync"
+    "\\src\\components\\Slide\\Templates",
+    "\\src\\components\\Sync",
+    "\\styles"
   ],
-  "SelectedNode": "\\src\\components\\Slide\\SlideManager.js",
+  "SelectedNode": "\\src\\globals.css",
   "PreviewInSolutionExplorer": false
 }
