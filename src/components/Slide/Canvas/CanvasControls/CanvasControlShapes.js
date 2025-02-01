@@ -20,15 +20,16 @@ const CanvasControlShapes = ({
     >
         {/* Toggle Icons */}
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        {['text', 'circle', 'square', 'triangle'].map((mode, idx) => (
+        {['text', 'circle', 'square', 'triangle', 'polygon'].map((mode, idx) => (
           <Tooltip title={mode.charAt(0).toUpperCase() + mode.slice(1)} arrow key={idx}>
             <Icon
               icon={mode === 'text' ? "humbleicons:text" :
                     mode === 'circle' ? "material-symbols:circle" :
                     mode === 'square' ? "material-symbols:square" :
-                    mode === 'triangle' ? "mdi:triangle" : ""}
-              width="24"
-              height="24"
+                    mode === 'triangle' ? "mdi:triangle" : 
+                    mode === 'polygon' ? "tabler:polygon" : ""}
+              width="4rem"
+              height="4rem"
               onClick={() => setToggleMode(toggleMode === mode ? null : mode)}
               style={{
                 cursor: 'pointer',

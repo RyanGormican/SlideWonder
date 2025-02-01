@@ -20,6 +20,8 @@ function SlideManager({ slides, setSlides, currentSlide, setCurrentSlide,pins })
   const [canvasMode, setCanvasMode] = useState('shapes');
   const [eyedropper, setEyedropper]=useState(false);
   const [paintbrush, setPaintbrush] = useState(false);
+  const [points,setPoints] =useState([]);
+  const [connectionPoint, setConnectionPoint] = useState(false);
   const canvasRef = useRef(null);
   const canvasInstance = useRef(null);
   const [selectedContent, setSelectedContent] = useState([]);
@@ -56,7 +58,13 @@ const updateSlideData = (updatedSlide) => {
   setSlides(updatedSlides);
   saveSlideToLocalStorage(updatedSlides,1,1);
 };
+useEffect(() => { handleCanvasClick({ target: { width: 500, height: 500 }, nativeEvent: { offsetX: 100, offsetY: 150 } }, toggleMode, setToggleMode, currentSlide, setCurrentSlide, currentCanvas, selectedContent, updateSlideData, selectedProperties, points, setPoints, connectionPoint, setConnectionPoint); }, [connectionPoint]);
 
+useEffect(() => {
+ if (toggleMode !== 'polygon') {
+    setPoints([]);
+  }
+},[toggleMode]);
  const sortedTemplates = [...templates].sort((a, b) => a.title.localeCompare(b.title));
   useEffect(() => {
   const loadTemplates = () => {
@@ -232,6 +240,8 @@ const pasteCanvas = () => {
 
 
 useEffect(() => {
+
+
   const currentCanvasData = currentSlide?.deck.find((canvas) => canvas.id === currentCanvas);
   const backgroundColor = currentCanvasData?.backgroundColor || '#ffffff';
 
@@ -825,11 +835,50 @@ return (
         <button onClick={addCanvasToDeck}>Add Slide</button>
       </div>
         {currentCanvas && (
-      <div className="canvas-container">
-          <div>
-             <div   onClick={(e) => handleCanvasClick(e, toggleMode, setToggleMode, currentSlide, setCurrentSlide, currentCanvas, selectedContent, updateSlideData,selectedProperties)}>
-              <canvas id="canvas" ref={canvasRef}></canvas>
-            </div>
+      <div className="canvas-container" style={{maxHeight:'74.2vh' }}>
+          <div style={{maxHeight:'74.2vh' }}>
+       
+           <div
+  style={{
+    maxHeight: '600px',
+    position: 'relative',
+  }}
+  onClick={(e) => handleCanvasClick(e, toggleMode, setToggleMode, currentSlide, setCurrentSlide, currentCanvas, selectedContent, updateSlideData, selectedProperties, points, setPoints,connectionPoint, setConnectionPoint)}
+>
+  {/* Canvas Element */}
+  <canvas
+    id="canvas"
+    ref={canvasRef}
+    style={{
+      width: '100%', 
+      height: '100%',
+      position: 'absolute', 
+      top: 0,
+      left: 0,
+    }}
+  ></canvas>
+
+  {/* Points Over Canvas */}
+  {points.map((point, index) => (
+    <div
+      key={index}
+      style={{
+        position: 'absolute', 
+        top: `${point.y}px`,
+        left: `${point.x}px`,
+        width: '10px', 
+        height: '10px', 
+        borderRadius: '50%', 
+        backgroundColor: 'red', 
+      }}
+        onClick={(e) => {
+        e.stopPropagation(); 
+        setConnectionPoint(true);
+      }}
+    > {index+1} </div>
+  ))}
+</div>
+
             <div      style={{ display: canvasMode === 'elements' ? 'block' : 'none' }}>
             <CanvasControlElements
               backgroundColor={backgroundColor}

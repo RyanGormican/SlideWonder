@@ -43,5 +43,13 @@ export const templates = [
     id: 'TropicalGetaway',
     title: 'Tropical Getaway',
     description: 'The Tropical Getaway template captures the essence of a relaxing beach vacation, featuring vibrant tropical colors. The background is filled with water and plants, setting a serene, lush mood. Ideal for travel promotions, vacation planners, or lifestyle projects, this template brings a sense of warmth and relaxation to any presentation. The tropical theme is perfect for evoking images of paradise, helping your content feel fresh, inviting, and fun.'
-  }
+  },
+  {
+  id: 'PolygonPowers',
+  title: 'Polygon Powers',
+  description: 'The Polygon Powers template features a bold and creative design where abstract, colorful polygons form a striking border around the content. This geometric border frames your slides, adding a modern and dynamic touch without overwhelming the presentation. Perfect for creative projects, tech presentations, or any project that needs a visually engaging and energetic border design. The polygons varied shapes and vibrant colors ensure your content stands out while maintaining a balanced and stylish aesthetic.'
+},
+
+
+
 ];

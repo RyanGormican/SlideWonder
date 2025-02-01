@@ -53,7 +53,7 @@ export const renderCanvasContent = (canvas, content, width, height, opacity) => 
   if (content) {
     content.forEach((item) => {
       const { 
-        x, y, angle, fill, scaleX, scaleY, size, id, stroke,strokeWidth,
+        x, y, angle, fill, scaleX, scaleY, size, id, stroke,strokeWidth, points,
         url = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvk-ecPeKuRvec5czcoK2H7axiY9XZtcqopQ&s' 
       } = item;
 
@@ -132,7 +132,18 @@ export const renderCanvasContent = (canvas, content, width, height, opacity) => 
           });
           canvas.add(img);
         });
-      }
+      } else if (item.type === 'polygon') {
+      if (item.points.length > 1) {
+  const polygon = new Polygon(item.points, {
+  ...commonProps,
+     scaleX: scaledScaleX * (width/800),
+          scaleY: scaledScaleY * (height/600),
+  });
+
+  canvas.add(polygon);
+  }
+}
+
     });
   }
 
