@@ -31,14 +31,19 @@ const isWithinDistance = (point1, point2, distance = 5) => {
   return Math.sqrt(dx * dx + dy * dy) <= distance;
 };
 
-export const handleCanvasClick = (event, toggleMode, setToggleMode, currentSlide, setCurrentSlide, currentCanvas, selectedContent, updateSlideData, selectedProperties, points, setPoints,connectionPoint, setConnectionPoint) => {
+export const handleCanvasClick = (event, toggleMode, setToggleMode, currentSlide, setCurrentSlide, currentCanvas, selectedContent, updateSlideData, selectedProperties, points, setPoints,connectionPoint, setConnectionPoint,gridLines) => {
   if (toggleMode === null) return;
- console.log(connectionPoint);
   const canvasElement = event.target;
   const canvasWidth = canvasElement.width;
   const canvasHeight = canvasElement.height;
 
- 
+ let posX = event.nativeEvent.offsetX;
+ let posY = event.nativeEvent.offsetY;
+
+ if (gridLines){
+ posX = Math.round(posX / 10) * 10;
+  posY = Math.round(posY / 10) * 10;
+ }
 
   const updatedSlide = {
     ...currentSlide,
@@ -52,8 +57,8 @@ export const handleCanvasClick = (event, toggleMode, setToggleMode, currentSlide
         const createNewObject = (type, additionalProperties) => ({
           type,
           id: Date.now(),
-          x: event.nativeEvent.offsetX,
-          y: event.nativeEvent.offsetY,
+          x:posX,
+          y: posY,
           fill: selectedProperties?.fill || '#000000',
           fontSize: selectedProperties?.size,
           radius: selectedProperties?.size,
@@ -67,7 +72,7 @@ export const handleCanvasClick = (event, toggleMode, setToggleMode, currentSlide
         // Handle "polygon" mode
     
 if (toggleMode === 'polygon') {
-  const newPoint = { x: event.nativeEvent.offsetX, y: event.nativeEvent.offsetY };
+  const newPoint = { x: posX, y: posY };
 
   // If there are more than 1 point, check if the new point is within distance of any existing points
   if (points.length > 1) {

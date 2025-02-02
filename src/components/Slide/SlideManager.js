@@ -5,9 +5,11 @@ import { Icon } from '@iconify/react';
 import { Canvas, IText } from 'fabric';
 import { transitions } from './TransitionsList';
 import { templates } from './TemplatesList';
+import Template from './Template';
 import CanvasControlElements from './Canvas/CanvasControls/CanvasControlElements'; 
 import CanvasControlShapes from './Canvas/CanvasControls/CanvasControlShapes'; 
 import CanvasControlColors from './Canvas/CanvasControls/CanvasControlColors'; 
+import CanvasControlTools from './Canvas/CanvasControls/CanvasControlTools'; 
 import {handleDragStart, handleDragOver, handleDrop, formatTransition, deleteTransition, updateCanvasDuration} from './TransitionsManagement'; 
 import {handleObjectModified} from './Modifications';
 import { Card, CardMedia, CardContent, Typography, IconButton, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
@@ -20,6 +22,8 @@ function SlideManager({ slides, setSlides, currentSlide, setCurrentSlide,pins })
   const [canvasMode, setCanvasMode] = useState('shapes');
   const [eyedropper, setEyedropper]=useState(false);
   const [paintbrush, setPaintbrush] = useState(false);
+  const [gridLines, setGridLines] = useState(false);
+  const [gridSnap, setGridSnap] = useState(false)
   const [points,setPoints] =useState([]);
   const [connectionPoint, setConnectionPoint] = useState(false);
   const canvasRef = useRef(null);
@@ -40,8 +44,8 @@ function SlideManager({ slides, setSlides, currentSlide, setCurrentSlide,pins })
   scaleX: 1,
   scaleY: 1,
   size: 12,
-  x: 1,
-  y: 1,
+  x: 0,
+  y: 0,
   opacity:1,
 });
 const updateSlideData = (updatedSlide) => {
@@ -65,7 +69,6 @@ useEffect(() => {
     setPoints([]);
   }
 },[toggleMode]);
- const sortedTemplates = [...templates].sort((a, b) => a.title.localeCompare(b.title));
   useEffect(() => {
   const loadTemplates = () => {
     // Iterate over templates using forEach
@@ -197,7 +200,7 @@ const addCanvasToDeck = async () => {
   };
 
 const pasteCanvas = () => {
-  if (!copiedContent ||  Array.isArray(copiedContent) && copiedContent.length === 0 ||   typeof copiedContent === 'string') return; 
+  if (!copiedContent ||  Array.isArray(copiedContent) && copiedContent?.length === 0 ||   typeof copiedContent === 'string') return; 
   // Clone the copied content and place it at a new position 
   const newContent = {
     type: getSelectedContentType(selectedContent.id),
@@ -216,6 +219,7 @@ const pasteCanvas = () => {
     opacity:copiedContent.opacity,
     stroke: copiedContent.stroke || null,
     strokeWidth: copiedContent.strokeWidth || 1,
+    points: copiedContent.points || [],
   };
  
   // Add the new content to the current canvas
@@ -237,7 +241,18 @@ const pasteCanvas = () => {
 };
 
 
+const buttonStyles = {
+  border: '1px solid #ccc',
+  padding: '10px',
+  borderRadius: '5px',
+};
 
+const buttons = [
+  { mode: 'shapes', icon: 'fluent-mdl2:shape-solid' },
+  { mode: 'elements', icon: 'mdi:ruler' },
+  { mode: 'colors', icon: 'mdi:paintbrush' },
+  { mode: 'tools', icon: 'mdi:wrench' },
+];
 
 useEffect(() => {
 
@@ -276,7 +291,7 @@ useEffect(() => {
 
     // Handle object modification
     canvasInstance.current.on('object:modified', (e) => {
-      handleObjectModified(e, getSelectedContentType, currentSlide, currentCanvas, setCurrentSlide, updateSlideData);
+      handleObjectModified(e, getSelectedContentType, currentSlide, currentCanvas, setCurrentSlide, updateSlideData,gridSnap);
     });
 
     // Handle selection creation, update, and clearing
@@ -689,48 +704,13 @@ return (
           ))}
         </div>
      <div>  
-          <div style={{ display: additionsMode === 'templates' ? 'block' : 'none' }} className="template-list">
-   
-
-{sortedTemplates.map((template) => (
-  <div
-    key={template.id}
-    onClick={() => setSelectedTemplate(selectedTemplate === template ? null : template)}
-    style={{
-      margin: '5px',
-      cursor: 'pointer',
-    }}
-  >
-    <Card
-      style={{
-        display: 'flex',
-        width: 'auto',  
-        maxHeight: '20vh',
-        backgroundColor: selectedTemplate === template ? '#e0e0e0' : 'transparent',
-        boxShadow: 'none',
-        border: 'none',
-        padding: '10px',
-        flexDirection: 'row',  
-      }}
-    >
-      <CardMedia style={{ width: '200px', height: 'auto' }}>
-        <div className="locked" style={{ width: '100%' }}>
-          <canvas ref={(el) => (templatesRef.current[template.id] = el)} style={{ width: '100%' }}></canvas>
-        </div>
-      </CardMedia>
-      <div style={{ padding: '10px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-        <Typography variant="h6" style={{ fontSize: '1rem', marginBottom: '8px' }}>
-          {template.title}
-        </Typography>
-        <div style={{ fontSize: '0.9rem', color: '#555', overflow: 'auto' }}>
-          {template.description}
-        </div>
-      </div>
-    </Card>
-  </div>
-))}
-
-
+  <div style={{ display: additionsMode === 'templates' ? 'block' : 'none' }} className="template-list">
+  <Template
+  templates={templates}
+  selectedTemplate={selectedTemplate}
+  setSelectedTemplate={setSelectedTemplate}
+  templatesRef={templatesRef}
+/>
                 </div>
         </div>
       </div>
@@ -843,7 +823,7 @@ return (
     maxHeight: '600px',
     position: 'relative',
   }}
-  onClick={(e) => handleCanvasClick(e, toggleMode, setToggleMode, currentSlide, setCurrentSlide, currentCanvas, selectedContent, updateSlideData, selectedProperties, points, setPoints,connectionPoint, setConnectionPoint)}
+  onClick={(e) => handleCanvasClick(e, toggleMode, setToggleMode, currentSlide, setCurrentSlide, currentCanvas, selectedContent, updateSlideData, selectedProperties, points, setPoints,connectionPoint, setConnectionPoint,gridLines)}
 >
   {/* Canvas Element */}
   <canvas
@@ -857,6 +837,46 @@ return (
       left: 0,
     }}
   ></canvas>
+
+  {gridLines && (
+    <div
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        pointerEvents: 'none', 
+      }}
+    >
+      {[...Array(Math.floor(600 / 10))].map((_, i) => (
+        <div
+          key={i}
+          style={{
+            position: 'absolute',
+            top: `${i * 10}px`, 
+            left: '0',
+            width: '100%',
+            height: '1px',
+            backgroundColor: '#ccc',
+          }}
+        />
+      ))}
+      {[...Array(Math.floor(800 / 10))].map((_, i) => (
+        <div
+          key={i + 600}
+          style={{
+            position: 'absolute',
+            left: `${i * 10}px`, 
+            top: '0',
+            width: '1px',
+            height: '100%',
+            backgroundColor: '#ccc',
+          }}
+        />
+      ))}
+    </div>
+  )}
 
   {/* Points Over Canvas */}
   {points.map((point, index) => (
@@ -887,14 +907,6 @@ return (
               handleScaleChange={handleScaleChange}
               handleSizeChange={handleSizeChange}
               getSizeValue={getSizeValue}
-              setToggleMode={setToggleMode}
-              toggleMode={toggleMode}
-              contentLock={contentLock}
-              setContentLock={setContentLock}
-              eyedropper={eyedropper}
-  setEyedropper={setEyedropper}
-  paintbrush={paintbrush}
-  setPaintbrush={setPaintbrush}
               handlePositionChange={handlePositionChange}
               handleOpacityChange={handleOpacityChange}
               handleStrokeChange={handleStrokeChange}
@@ -917,8 +929,26 @@ return (
               handleColorChange={handleColorChange}
             />
             </div>
+              <div      style={{ display: canvasMode === 'tools' ? 'block' : 'none' }}>
+           <CanvasControlTools
+  contentLock={contentLock}
+  setContentLock={setContentLock}
+  eyedropper={eyedropper}
+  setEyedropper={setEyedropper}
+  paintbrush={paintbrush}
+  setPaintbrush={setPaintbrush}
+  toggleMode={toggleMode}
+  setToggleMode={setToggleMode}
+  selectedProperties={selectedProperties}
+  gridLines={gridLines}
+  setGridLines={setGridLines}
+  gridSnap={gridSnap}
+  setGridSnap={setGridSnap}
+/>
+
+            </div>
           </div>
-           <div style={{
+        <div style={{
   width: '4vw',
   paddingLeft: '1vw',
   display: 'flex',
@@ -928,32 +958,14 @@ return (
   padding: '10px',
   boxSizing: 'border-box'
 }}>
-  <div style={{
-    marginBottom: '10px',
-    border: '1px solid #ccc',
-    padding: '10px',
-    borderRadius: '5px',
-    backgroundColor: canvasMode === 'shapes' ? '#e0e0e0'  : 'transparent' 
-  }}>
-<Icon icon="fluent-mdl2:shape-solid" width="2vw" height="2vh"  onClick={() => setCanvasMode('shapes')} />
-  </div>
-    <div style={{
-    marginBottom: '10px',
-    border: '1px solid #ccc',
-    padding: '10px',
-    borderRadius: '5px',
-    backgroundColor: canvasMode === 'elements' ? '#e0e0e0'  : 'transparent' 
-  }}>
-<Icon icon="mdi:ruler" width="2vw" height="2vh"  onClick={() => setCanvasMode('elements')} />
-  </div>
-  <div style={{
-    border: '1px solid #ccc',
-    padding: '10px',
-    borderRadius: '5px',
-   backgroundColor: canvasMode === 'colors' ? '#e0e0e0'  : 'transparent' 
-  }}>
-   <Icon icon="mdi:paintbrush" width="2vw" height="2vh"    onClick={() => setCanvasMode('colors')}  />
-  </div>
+  {buttons.map(({ mode, icon }) => (
+    <div key={mode} style={{
+      ...buttonStyles,
+      backgroundColor: canvasMode === mode ? '#e0e0e0' : 'transparent'
+    }}>
+      <Icon icon={icon} width="2vw" height="2vh" onClick={() => setCanvasMode(mode)} />
+    </div>
+  ))}
 </div>
        </div>
         )}

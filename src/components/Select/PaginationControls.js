@@ -1,5 +1,5 @@
 import React from 'react';
-import { IconButton, Typography, Box, Grid, Tooltip } from '@mui/material';
+import { IconButton, Button, Typography, Box, Grid, Tooltip } from '@mui/material';
 import { Icon } from '@iconify/react';
 import * as SlideManagement from './SlideManagement';
 const PaginationControls = ({ 
@@ -74,18 +74,37 @@ const PaginationControls = ({
             </IconButton>
           </Tooltip>
 
-
-          <Tooltip title="Add New Slide" arrow>
-            <IconButton onClick={onAddSlide} color="primary" sx={{ fontSize: '2rem' }}>
-              New Slide
-            </IconButton>
-          </Tooltip>
+<Tooltip title="Add New Slide" arrow>
+  <Button 
+    onClick={onAddSlide} 
+    sx={{
+      fontSize: '1.25rem', 
+      fontWeight: 'bold', 
+      color: 'white', 
+      backgroundColor: 'primary.main', 
+      '&:hover': {
+        backgroundColor: 'primary.dark',
+      },
+      padding: '10px 20px', 
+    }}
+  >
+    New Slide
+  </Button>
+</Tooltip>
           
 
-      <Tooltip title="Import Slide" arrow>
-  <IconButton 
-    color="primary" 
-    sx={{ fontSize: '2rem' }} 
+     <Tooltip title="Import Slide" arrow>
+  <Button 
+    sx={{
+      fontSize: '1.25rem', 
+      fontWeight: 'bold', 
+      color: 'white', 
+      backgroundColor: 'primary.main', 
+      '&:hover': {
+        backgroundColor: 'primary.dark',
+      },
+      padding: '10px 20px', 
+    }} 
     component="label"
   >
     Import Slide
@@ -95,7 +114,7 @@ const PaginationControls = ({
       hidden 
       onChange={(e) => SlideManagement.handleImportSlide(e, slides, setSlides)} 
     />
-  </IconButton>
+  </Button>
 </Tooltip>
 
         </Grid>

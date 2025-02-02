@@ -131,3 +131,35 @@ export const applyZoomInTransition = (currentCanvas, nextCanvasRef, canvasRef, c
     setCurrentCanvasIndex(currentCanvasIndex + 1); // Move to the next canvas
   }, duration);
 };
+export const applyWipesTransition = (currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex, direction) => {
+  const canvasDiv = document.getElementById('presentation-canvas');
+  
+  const duration = currentCanvas.duration * 1000; // Convert from seconds to milliseconds
+  const wipeDuration = duration; // Time duration for the wipe transition
+
+  // Set the initial state for the wipe effect
+  const startPosition = {
+    left: 'translateX(100%)',    // Wipe from right to left
+    right: 'translateX(-100%)',  // Wipe from left to right
+  }[direction] || 'translateX(100%)'; // Default to 'left'
+
+  nextCanvasRef.current.style.zIndex = 2;
+  
+  // Apply the initial transform to "wipe" the current canvas out
+  canvasDiv.style.transition = `transform ${wipeDuration}ms ease-out`; // Smooth transition for wipe
+  canvasDiv.style.transform = startPosition;
+
+  // Use clip-path for wipe reveal effect, if you want to reveal content in a more stylistic way
+  nextCanvasRef.current.style.clipPath = 'inset(0 100% 0 0)'; // Start with the content hidden on the right
+  nextCanvasRef.current.style.transition = `clip-path ${wipeDuration}ms ease-out`;
+  
+  // Delay to create a wipe-in effect for the next slide
+  setTimeout(() => {
+    nextCanvasRef.current.style.clipPath = 'inset(0 0 0 0)'; // Reveal the content by wiping from right to left
+  }, 0);
+
+  // Once the transition is done, update the canvas index
+  setTimeout(() => {
+    setCurrentCanvasIndex(currentCanvasIndex + 1); // Move to the next canvas
+  }, wipeDuration);
+};

@@ -133,7 +133,7 @@ export const renderCanvasContent = (canvas, content, width, height, opacity) => 
           canvas.add(img);
         });
       } else if (item.type === 'polygon') {
-      if (item.points.length > 1) {
+      if (item?.points?.length > 1) {
   const polygon = new Polygon(item.points, {
   ...commonProps,
      scaleX: scaledScaleX * (width/800),

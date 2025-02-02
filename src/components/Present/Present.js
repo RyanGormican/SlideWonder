@@ -2,9 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Canvas } from 'fabric';
 import { renderCanvasContent } from '../Slide/Canvas/CanvasRender';
 import { Icon } from '@iconify/react';
-import { applyDissolveTransition , applySlideTransition ,applyScaleOutTransition, applyFlipTransition, applyZoomInTransition, applyRotateTransition } from './Transitions';
+import { applyDissolveTransition , applySlideTransition ,applyScaleOutTransition, applyFlipTransition, applyZoomInTransition, applyRotateTransition,applyWipesTransition } from './Transitions';
 import { Keybinds } from './Keybinds';
-function Present({ currentSlide, setView }) {
+function Present({ currentSlide, view, setView }) {
   const [currentCanvasIndex, setCurrentCanvasIndex] = useState(0);
   const [hovering, setHovering] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
@@ -23,6 +23,7 @@ function Present({ currentSlide, setView }) {
   const [showPopoutNotes, setShowPopoutNotes] = useState(false);
   const [popoutWindow, setPopoutWindow] = useState(null);
 
+  const [progress,setProgress]=useState(0);
 const initializeCanvas = () => {
   if (!currentCanvasData || !canvasRef.current) return;
 
@@ -30,7 +31,7 @@ const initializeCanvas = () => {
   if (canvasInstance.current) {
     canvasInstance.current.dispose();
   }
-
+  setProgress(((currentCanvasIndex + 1) / currentSlide.deck.length) * 100);
   // Reset opacity before rendering
   canvasRef.current.style.opacity = 1;
 
@@ -112,8 +113,9 @@ const handlePopoutNotes = () => {
   }
 };
 
-
-
+useEffect(() => {
+setCurrentCanvasIndex(0);
+}, [view]);
 
 
 
@@ -184,10 +186,17 @@ applyRotateTransition(currentCanvas, nextCanvasRef, canvasRef, currentCanvasInde
     case 'zoomin':
 applyZoomInTransition(currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex, 'clockwise');  
     break;
-    break;
         case 'rotatecounterclockwise':
 applyRotateTransition(currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex, 'counterclockwise');  
     break;
+    case 'wipeleft':
+  applyWipesTransition(currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex, 'right');
+  break;
+
+case 'wiperight':
+  applyWipesTransition(currentCanvas, nextCanvasRef, canvasRef, currentCanvasIndex, setCurrentCanvasIndex, 'left');
+  break;
+
       default:
         setCurrentCanvasIndex(currentCanvasIndex + 1); 
         break;
@@ -287,8 +296,7 @@ applyRotateTransition(currentCanvas, nextCanvasRef, canvasRef, currentCanvasInde
     return <div>No content to present!</div>;
   }
 
-  // Calculate progress percentage
-  const progress = ((currentCanvasIndex + 1) / currentSlide.deck.length) * 100;
+  
 
 
  

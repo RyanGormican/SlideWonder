@@ -140,6 +140,7 @@ function App({ theme, setTheme }) {
         <div style={{ display: view === 'present' ? 'block' : 'none' }}>
           <Present
             currentSlide={slides.find((slide) => slide.id === currentSlide?.id) || null}
+            view={view}
             setView={setView}
           />
         </div>

@@ -88,5 +88,5 @@ export const transitions = [
     title: 'Zoom In', 
     description: 'Zoom in smoothly to focus attention on new content, adding a dynamic shift that enhances the visual appeal and engagement of your presentation.', 
     icon: 'mdi:magnify',
-  }
+  },
 ];

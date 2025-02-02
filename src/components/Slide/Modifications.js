@@ -1,5 +1,5 @@
 
-export const handleObjectModified = (e, getSelectedContentType,currentSlide,currentCanvas, setCurrentSlide, updateSlideData) => {
+export const handleObjectModified = (e, getSelectedContentType,currentSlide,currentCanvas, setCurrentSlide, updateSlideData,gridSnap) => {
 
   const object = e.target;
   const contentType = getSelectedContentType(object.id); // Get the content type
@@ -13,7 +13,10 @@ export const handleObjectModified = (e, getSelectedContentType,currentSlide,curr
     const minDimension = Math.min(width, height);
     width = height = minDimension; // Make height and width equal
   }
-  
+  if (gridSnap) {
+    object.left = Math.round(object.left / 10) * 10;
+    object.top = Math.round(object.top / 10) * 10;
+  }
   // Create a shallow copy of the current slide
   const updatedSlide = {
     ...currentSlide,
