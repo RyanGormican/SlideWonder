@@ -1,5 +1,12 @@
 import { saveSlideToLocalStorage } from '../Helper';
 export const handleAddSlide = (slides,setSlides) => {
+    if (typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'click', {
+      event_category: 'Slide Actions',
+      event_label: 'Add New Slide',
+      value: 1,
+    });
+  }
     const currentDate = new Date().toISOString();
     const currentTimestamp = Date.now();
     const newSlide = {
