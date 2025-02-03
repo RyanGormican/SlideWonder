@@ -6,7 +6,7 @@ import GridView from './GridView';
 import ListView from './ListView';
 import Buttons from './Buttons';
 import PaginationControls from './PaginationControls';
-const Select = ({ slides, setSlides, pins,setPins,tags,setTags, handleGridClick,theme, setTheme,view, fileLastModified}) => {
+const Select = ({ slides, setSlides, pins,setPins,tags,setTags, personalTemplates, setPersonalTemplates, handleGridClick,theme, setTheme,view, fileLastModified}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [editingTitle, setEditingTitle] = useState(null);
   const [newTitle, setNewTitle] = useState('');

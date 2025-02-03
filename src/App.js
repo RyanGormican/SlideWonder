@@ -18,6 +18,7 @@ function App({ theme, setTheme }) {
   const [pins, setPins] = useState([]);
   const [tags, setTags] = useState([]);
   const [user, setUser] = useState(null);
+  const [personalTemplates, setPersonalTemplates] =useState([]);
   const [fileLastModified, setFileLastModified] = useState('');
   useEffect(() => {
     const savedData = JSON.parse(localStorage.getItem('SlideWonderdata')) || {
@@ -37,11 +38,14 @@ function App({ theme, setTheme }) {
           theme: 'light',
         },
       ],
+      personalTemplates:[],
+      downloadedtemplates:[],
     };
     setSlides(savedData.slides);
     setPins(savedData.pins);
     setTags(savedData.tags);
     setTheme(savedData.settings.theme);
+    setPersonalTemplates(savedData.personaltemplates);
   }, []);
 
   useEffect(() => {
@@ -87,6 +91,8 @@ function App({ theme, setTheme }) {
             setUser={setUser}
             theme={theme}
             setTheme={setTheme}
+            personalTemplates={personalTemplates}
+            setPersonalTemplates={setPersonalTemplates}
             fileLastModified={fileLastModified}
             setFileLastModified={setFileLastModified}
           />
@@ -100,6 +106,8 @@ function App({ theme, setTheme }) {
             setPins={setPins}
             tags={tags}
             setTags={setTags}
+            personalTemplates={personalTemplates}
+            setPersonalTemplates={setPersonalTemplates}
             handleGridClick={(id) => {
               const selectedSlide = slides.find((slide) => slide.id === id);
               setCurrentSlide(selectedSlide);
@@ -133,6 +141,8 @@ function App({ theme, setTheme }) {
               setSlides={setSlides}
               currentSlide={currentSlide}
               setCurrentSlide={setCurrentSlide}
+              personalTemplates={personalTemplates}
+              setPersonalTemplates={setPersonalTemplates}
             />
           </div>
         </div>

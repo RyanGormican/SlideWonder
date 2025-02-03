@@ -15,7 +15,7 @@ import {handleObjectModified} from './Modifications';
 import { Card, CardMedia, CardContent, Typography, IconButton, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import {handleCanvasClick, copyCanvasElement, copyCanvas} from './Canvas/CanvasManagement'; 
 import { saveSlideToLocalStorage} from '../Helper'
-function SlideManager({ slides, setSlides, currentSlide, setCurrentSlide,pins }) {
+function SlideManager({ slides, setSlides, currentSlide, setCurrentSlide,personalTemplates, setPersonalTemplates }) {
   const [currentCanvas, setCurrentCanvas] = useState(null);
   const [backgroundColor, setBackgroundColor] = useState('#ffffff');
   const [toggleMode, setToggleMode] = useState(null);
@@ -34,7 +34,7 @@ function SlideManager({ slides, setSlides, currentSlide, setCurrentSlide,pins })
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [contentLock,setContentLock] = useState(false);
   const [expandedAccordion, setExpandedAccordion] = useState(null);
-  
+  const [activeCategory, setActiveCategory] = useState('Default'); 
   const handleAccordionToggle = (accordionId) => {
     setExpandedAccordion(expandedAccordion === accordionId ? null : accordionId);
   };
@@ -120,7 +120,7 @@ useEffect(() => {
       }
     });
   };
-}, [additionsMode]);
+}, [additionsMode,activeCategory]);
 
 
   // Function to dynamically import the template content
@@ -135,27 +135,39 @@ useEffect(() => {
   
 const addCanvasToDeck = async () => {
   if (!currentSlide) {
-    alert('Please select a slide first!');
     return;
   }
 
-  // Initialize content and backgroundColor with defaults
+
   let content = null;
   let backgroundColor = '#ffffff';
 
   if (selectedTemplate) {
-    // If there's a selected template, load the content and background color from it
-    const canvasTemplate = await loadTemplate(selectedTemplate.id);
-    if (canvasTemplate) {
-      content = canvasTemplate.content || null;
-      backgroundColor = canvasTemplate.backgroundColor || '#ffffff';
+    const slideWonderData = JSON.parse(localStorage.getItem('SlideWonderdata')) || {};
+    const personalTemplates = slideWonderData.personaltemplates || [];
+
+    // Check if the selectedTemplate exists in personal templates
+    const existingTemplate = personalTemplates.find(template => template.id === selectedTemplate.id);
+
+    if (existingTemplate) {
+
+      content = existingTemplate.content || null;
+      backgroundColor = existingTemplate.backgroundColor || '#ffffff';
+    } else {
+
+      const canvasTemplate = await loadTemplate(selectedTemplate.id);
+      if (canvasTemplate) {
+        content = canvasTemplate.content || null;
+        backgroundColor = canvasTemplate.backgroundColor || '#ffffff';
+      }
     }
   }
+
   const newCanvas = {
     id: Date.now(),
     content: content,
     backgroundColor: backgroundColor,
-    text: '', 
+    text: '',
   };
 
   const updatedSlide = {
@@ -164,8 +176,9 @@ const addCanvasToDeck = async () => {
   };
 
   setCurrentSlide(updatedSlide);
-  updateSlideData(updatedSlide); 
+  updateSlideData(updatedSlide);
 };
+
 
 
   const deleteCanvas = (canvasId) => {
@@ -710,6 +723,10 @@ return (
   selectedTemplate={selectedTemplate}
   setSelectedTemplate={setSelectedTemplate}
   templatesRef={templatesRef}
+  activeCategory={activeCategory}
+  setActiveCategory={setActiveCategory}
+  personalTemplates={personalTemplates}
+  setPersonalTemplates={setPersonalTemplates}
 />
                 </div>
         </div>
@@ -730,6 +747,8 @@ return (
                   setCurrentSlide={setCurrentSlide}
                   copyCanvas={copyCanvas}
                   updateSlideData={updateSlideData}
+                  personalTemplates={personalTemplates}
+                  setPersonalTemplates={setPersonalTemplates}
                 />
               </div>
           {index < currentSlide.deck.length - 1 && (

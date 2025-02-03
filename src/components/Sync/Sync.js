@@ -6,7 +6,7 @@ import { Icon } from '@iconify/react';
 import { ref, uploadString, getMetadata, getDownloadURL } from 'firebase/storage'; 
 import * as SelectUtility from '../Select/SelectUtility';
 
-const Sync = ({ slides, setSlides, pins, setPins, tags, setTags, user, setUser, theme, setTheme , fileLastModified,setFileLastModified }) => {
+const Sync = ({ slides, setSlides, pins, setPins, tags, setTags, user, setUser, theme, setTheme ,personalTemplates, setPersonalTemplates, fileLastModified,setFileLastModified }) => {
   const [fileStatus, setFileStatus] = useState('');
   const [downloadUrl, setDownloadUrl] = useState('');
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);  
@@ -14,7 +14,6 @@ const Sync = ({ slides, setSlides, pins, setPins, tags, setTags, user, setUser, 
   const auth = getAuth();
   const googleProvider = new GoogleAuthProvider();
   const [hoveredDate, setHoveredDate] = useState(false);
-
   // Handle SignOut and SignIn
   const handleSignOut = () => {
     auth.signOut();
@@ -101,6 +100,7 @@ const Sync = ({ slides, setSlides, pins, setPins, tags, setTags, user, setUser, 
         setPins(savedData.pins || []);
         setTags(savedData.tags || []);
         setTheme(savedData.settings?.theme || 'light');
+        setPersonalTemplates(savedData.personaltemplates || []);
       } catch (error) {
         console.error('Error downloading file:', error);
       }
@@ -189,7 +189,7 @@ const Sync = ({ slides, setSlides, pins, setPins, tags, setTags, user, setUser, 
           </Button>
         </Box>
       </Paper>
-
+   
       {/* Confirmation Dialog */}
       <Dialog open={openConfirmDialog} onClose={closeDialog}>
         <DialogContent>

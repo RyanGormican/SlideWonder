@@ -4,9 +4,11 @@ import { renderCanvasContent } from './CanvasRender';
 import { Icon } from '@iconify/react';
 import { Canvas } from 'fabric';
 import NotesModal from '../NotesModal';  
+import Tooltip from '@mui/material/Tooltip';
+
 const ITEM_TYPE = 'CANVAS_ITEM';
 
-function DraggableCanvas({ canvas, index, moveCanvas, setCurrentCanvas, deleteCanvas, currentSlide, setCurrentSlide, copyCanvas, updateSlideData }) {
+function DraggableCanvas({ canvas, index, moveCanvas, setCurrentCanvas, deleteCanvas, currentSlide, setCurrentSlide, copyCanvas, updateSlideData, personalTemplates, setPersonalTemplates }) {
   const dragCanvasRef = useRef(null);
   const containerRef = useRef(null); // Reference for container div
   const dragInstance = useRef(null);
@@ -35,21 +37,43 @@ function DraggableCanvas({ canvas, index, moveCanvas, setCurrentCanvas, deleteCa
     dropRef(node);
     containerRef.current = node; // Assign containerRef to the div itself
   };
-   const copyObject = (canvasId, currentSlide) => {
+ const copyObject = (canvasId, currentSlide) => {
   const canvasToCopy = currentSlide.deck.find((canvas) => canvas.id === canvasId);
 
   if (!canvasToCopy) {
     console.error('Canvas not found');
     return;
   }
+    let slideWonderData = JSON.parse(localStorage.getItem('SlideWonderdata')) || {};
+  let templates = slideWonderData.personaltemplates || [];
 
-  // Convert the object to a JSON string to copy it to the clipboard
-  const canvasString = JSON.stringify(canvasToCopy);
+  const newCanvas = { 
+    ...canvasToCopy,
+    text: `My Template [${templates.length+1}]`,
+    description: `This is my template made on ${new Date().toLocaleString()}`, 
+    id: Date.now(),
+  };
 
-  // Copy the string to the clipboard
-  navigator.clipboard.writeText(canvasString)
- 
+
+
+
+  const duplicateIndex = templates.findIndex((template) => 
+    JSON.stringify(template) === JSON.stringify(newCanvas)
+  );
+
+  if (duplicateIndex === -1) {
+    templates.push(newCanvas);
+  } else {
+    templates[duplicateIndex] = newCanvas;
+  }
+
+  slideWonderData.personaltemplates = templates;
+  setPersonalTemplates(templates);
+  localStorage.setItem('SlideWonderdata', JSON.stringify(slideWonderData));
 };
+
+
+
 
   // Initialize and render the canvas dynamically based on container size
   useEffect(() => {
@@ -127,6 +151,7 @@ const containerHeight = ( window.innerHeight * 0.20);
           {index + 1}
         </div>
         {/* Delete icon */}
+       <Tooltip title="Delete Slide" arrow>
         <Icon
           icon="mdi:trash"
           width="2rem"
@@ -142,7 +167,9 @@ const containerHeight = ( window.innerHeight * 0.20);
             border: '1px solid #ccc',
           }}
         />
+        </Tooltip>
         {/* Copy icon */}
+        <Tooltip title="Copy Slide" arrow>
         <Icon
           icon="mdi:content-copy"
           width="2rem"
@@ -161,6 +188,8 @@ const containerHeight = ( window.innerHeight * 0.20);
             border: '1px solid #ccc',
           }}
         />
+       </Tooltip>
+        <Tooltip title="Save Slide To Templates" arrow>
         <Icon
           icon="icon-park-outline:page-template"
           width="2rem"
@@ -179,7 +208,9 @@ const containerHeight = ( window.innerHeight * 0.20);
             border: '1px solid #ccc',
           }}
         />
+        </Tooltip>
         {/* Notes icon */}
+        <Tooltip title="Open Slide Notes" arrow>
         <Icon
           icon="fluent:notepad-20-regular"
           width="2rem"
@@ -198,8 +229,9 @@ const containerHeight = ( window.innerHeight * 0.20);
             border: '1px solid #ccc',
           }}
         />
+          </Tooltip>
       </div>
-
+   
       {/* Notes Modal */}
       <NotesModal
         open={openNotesModal}
