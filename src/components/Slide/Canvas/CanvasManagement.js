@@ -105,27 +105,27 @@ if (toggleMode === 'polygon') {
 
 
         if (toggleMode === 'text') {
-          const newTextObject = createNewObject('text', { text: 'New Text' });
+          const newTextObject = createNewObject('text', { fontSize: selectedProperties?.size > 0 ? selectedProperties.size : 12, text: 'New Text' });
           currentCanvasData.content = [...currentCanvasData.content, newTextObject];
         }
 
         if (toggleMode === 'circle') {
-          const newCircle = createNewObject('circle', { radius: selectedProperties?.radius || 12 });
+          const newCircle = createNewObject('circle', { radius: selectedProperties?.size > 0 ? selectedProperties.size : 12});
           currentCanvasData.content = [...currentCanvasData.content, newCircle];
         }
 
         if (toggleMode === 'square') {
           const newSquare = createNewObject('square', {
-            width: selectedProperties?.width || 12,
-            height: selectedProperties?.height || 12,
+            width: selectedProperties?.size > 0 ? selectedProperties.size : 12,
+            height:selectedProperties?.size > 0 ? selectedProperties.size : 12,
           });
           currentCanvasData.content = [...currentCanvasData.content, newSquare];
         }
 
         if (toggleMode === 'triangle') {
           const newTriangle = createNewObject('triangle', {
-            width: selectedProperties?.size || 12,
-            height: selectedProperties?.size || 12,
+            width: selectedProperties?.size > 0 ? selectedProperties.size : 12,
+            height: selectedProperties?.size > 0 ? selectedProperties.size : 12,
           });
           currentCanvasData.content = [...currentCanvasData.content, newTriangle];
         }

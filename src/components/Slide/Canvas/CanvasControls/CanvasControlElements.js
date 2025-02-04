@@ -154,13 +154,13 @@ const CanvasControlElements = ({
             type="range"
             min="1"
             max="100"
-            value={selectedProperties?.size || 12}
+           value={selectedProperties?.size > 0 ? selectedProperties.size : 12}
             onChange={handleSizeChange}
             style={{ width: '100px', marginRight: '10px' }}
           />
           <input
             type="number"
-            value={selectedProperties?.size|| 12}
+           value={selectedProperties?.size > 0 ? selectedProperties.size : 12}
             onChange={handleSizeChange}
             style={{ width: '50px' }}
           />
