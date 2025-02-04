@@ -685,6 +685,7 @@ const getSizeValue = () => {
  const sortedTransitions = [...transitions].sort((a, b) => a.title.localeCompare(b.title));
 
 return (
+
     <div className="main-container">
       <div className="additions-panel">
   <div className="button-container">

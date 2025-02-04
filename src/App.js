@@ -7,6 +7,8 @@ import Select from './components/Select/Select';
 import Present from './components/Present/Present';
 import SlideManager from './components/Slide/SlideManager';
 import Sync from './components/Sync/Sync';
+import WordCloud from './components/WordCloud/WordCloud';
+import Stats from './components/Stats/Stats';
 import { saveSettingsToLocalStorage } from './components/Helper';
 import { Icon } from '@iconify/react';
 
@@ -18,6 +20,7 @@ function App({ theme, setTheme }) {
   const [pins, setPins] = useState([]);
   const [tags, setTags] = useState([]);
   const [user, setUser] = useState(null);
+  const [loaded,setLoaded] =useState(false);
   const [personalTemplates, setPersonalTemplates] =useState([]);
   const [fileLastModified, setFileLastModified] = useState('');
   useEffect(() => {
@@ -46,6 +49,7 @@ function App({ theme, setTheme }) {
     setTags(savedData.tags);
     setTheme(savedData.settings.theme);
     setPersonalTemplates(savedData.personaltemplates);
+    setLoaded(true);
   }, []);
 
   useEffect(() => {
@@ -70,6 +74,10 @@ function App({ theme, setTheme }) {
             height="4vh"
             onClick={() => setView(view === 'sync' ? 'select' : 'sync')}
           />
+          <Icon icon="carbon:word-cloud"   width="3.13vw"
+            height="4vh"    onClick={() => setView(view === 'cloud' ? 'select' : 'cloud')}/>
+            <Icon icon="gridicons:stats"  width="3.13vw"
+            height="4vh"    onClick={() => setView(view === 'stats' ? 'select' : 'stats')} />
         </div>
 
         {view !== 'present' && (
@@ -100,6 +108,7 @@ function App({ theme, setTheme }) {
 
         <div style={{ display: view === 'select' ? 'block' : 'none' }}>
           <Select
+            loaded={loaded}
             slides={slides}
             setSlides={setSlides}
             pins={pins}
@@ -120,32 +129,37 @@ function App({ theme, setTheme }) {
           />
         </div>
 
-        <div style={{ display: view === 'slide' ? 'block' : 'none' }}>
-          <div style={{ textAlign: 'center' }}>
-            <Icon
-              icon="mingcute:back-line"
-              width="3vw"
-              height="3vh"
-              onClick={() => setView('select')}
-            />
-            {currentSlide && currentSlide.deck.length > 0 && (
-              <Icon
-                icon="gg:play-button"
-                width="3vw"
-                height="3vh"
-                onClick={() => setView('present')}
-              />
-            )}
-            <SlideManager
-              slides={slides}
-              setSlides={setSlides}
-              currentSlide={currentSlide}
-              setCurrentSlide={setCurrentSlide}
-              personalTemplates={personalTemplates}
-              setPersonalTemplates={setPersonalTemplates}
-            />
-          </div>
-        </div>
+     <div style={{ display: view === 'slide' ? 'block' : 'none' }}>
+  <div style={{ textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <Icon
+      icon="mingcute:back-line"
+      width="3vw"
+      height="3vh"
+      onClick={() => setView('select')}
+    />
+    {currentSlide && (
+      <h1 style={{ margin: '0 10px' }}> {currentSlide.title} </h1>
+    )}
+    {currentSlide && currentSlide.deck.length > 0 && (
+      <Icon
+        icon="gg:play-button"
+        width="3vw"
+        height="3vh"
+        onClick={() => setView('present')}
+      />
+    )}
+  </div>
+  <SlideManager
+    slides={slides}
+    setSlides={setSlides}
+    currentSlide={currentSlide}
+    setCurrentSlide={setCurrentSlide}
+    personalTemplates={personalTemplates}
+    setPersonalTemplates={setPersonalTemplates}
+  />
+</div>
+
+
 
         <div style={{ display: view === 'present' ? 'block' : 'none' }}>
           <Present
@@ -154,7 +168,17 @@ function App({ theme, setTheme }) {
             setView={setView}
           />
         </div>
-
+         <div style={{ display: view === 'cloud' ? 'block' : 'none' }}>
+          <WordCloud
+            slides={slides}
+            tags={tags}
+          />
+        </div>
+         <div style={{ display: view === 'stats' ? 'block' : 'none' }}>
+          <Stats
+            slides={slides}
+          />
+        </div>
         {isModalOpen && <Feedback isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />}
       </div>
     </DndProvider>

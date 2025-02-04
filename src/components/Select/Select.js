@@ -6,7 +6,8 @@ import GridView from './GridView';
 import ListView from './ListView';
 import Buttons from './Buttons';
 import PaginationControls from './PaginationControls';
-const Select = ({ slides, setSlides, pins,setPins,tags,setTags, personalTemplates, setPersonalTemplates, handleGridClick,theme, setTheme,view, fileLastModified}) => {
+import { saveSlideToLocalStorage} from '../Helper'
+const Select = ({ loaded, slides, setSlides, pins,setPins,tags,setTags, personalTemplates, setPersonalTemplates, handleGridClick,theme, setTheme,view, fileLastModified}) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [editingTitle, setEditingTitle] = useState(null);
   const [newTitle, setNewTitle] = useState('');
@@ -17,13 +18,14 @@ const Select = ({ slides, setSlides, pins,setPins,tags,setTags, personalTemplate
   const [currentPageGrid, setCurrentPageGrid] = useState(1);
   const [currentPageList, setCurrentPageList] = useState(1);
   const [sortedSlides, setSortedSlides] = useState([]);
+  const[slideCopy, setSlideCopy] = useState([]);
   // Filter slides based on search query
 const filteredSlides = slides.filter(slide => 
   slide.title.toLowerCase().includes(searchQuery.toLowerCase())
 );
   const [tagStates, setTagStates] = useState({});
 
-
+   
  
   useEffect(() => {
     const newTagStates = tags?.reduce((acc, tag) => {
@@ -117,7 +119,12 @@ const slideList = [...uniqueSlides].sort((a, b) => {
     return direction === 'asc'
       ? new Date(a.dateCreated) - new Date(b.dateCreated)
       : new Date(b.dateCreated) - new Date(a.dateCreated);
+  }if (field === 'deckSize') {
+    return direction === 'asc'
+      ? a.deck.length - b.deck.length
+      : b.deck.length - a.deck.length;
   }
+
 
   return 0; // Default sorting if no matching criteria
 });
