@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
-import Head from 'next/head'; // Importing Head for meta management
-import Script from 'next/script'; // Importing Script from next/script
+import Head from 'next/head'; 
+import Script from 'next/script'; 
 import '../styles/globals.css';
 
 const muiTheme = createTheme({
@@ -26,11 +26,11 @@ const muiTheme = createTheme({
 
 function MyApp({ Component, pageProps }) {
   const [themeMode, setThemeMode] = useState('light');
-
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedData = JSON.parse(localStorage.getItem('SlideWonderdata')) || {};
-      setThemeMode(savedData.settings?.theme || 'light');
+      const storedTheme = savedData.settings?.theme || 'light';  
+      setThemeMode(storedTheme);
     }
   }, []);
 

@@ -13,7 +13,6 @@ export const saveSlideToLocalStorage = (updatedSlides, pins, tags) => {
 };
 export const saveSettingsToLocalStorage = (updatedSettings) => {
   const existingData = JSON.parse(localStorage.getItem('SlideWonderdata')) || {};
-
   const updatedData = {
     slides: existingData.slides || [],  // 
     settings: updatedSettings !== 1 ? updatedSettings : existingData.settings || [],  

@@ -9,7 +9,7 @@ function Index() {
   const [theme, setTheme] = useState('light'); 
   const savedData = JSON.parse(localStorage.getItem('SlideWonderdata')) || {};
     useEffect(() => {
-  setTheme(savedData.settings?.theme || 'light'); 
+  setTheme(savedData.settings.theme); 
   },[]);
   useEffect(() => {
     document.body.className = theme === 'light' ? 'light-mode' : 'dark-mode';

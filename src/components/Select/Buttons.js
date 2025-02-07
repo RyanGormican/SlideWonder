@@ -88,16 +88,7 @@ const Buttons = ({
           }}
         />
 
-        <button
-          onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-          style={{ border: 'none', background: 'none', cursor: 'pointer' }}
-        >
-          {theme === 'light' ? (
-            <Icon icon="tabler:sun-filled" width="24" height="24" />
-          ) : (
-            <Icon icon="tabler:moon-filled" width="24" height="24" />
-          )}
-        </button>
+      
 
         <IconButton onClick={() => setViewType('grid')}>
           <Icon icon="mdi:grid" width="24" height="24" />
