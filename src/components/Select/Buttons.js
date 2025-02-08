@@ -19,12 +19,7 @@ const Buttons = ({
     setMenuAnchor(null);
   };
 
-  const handleImportFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      SelectUtility.handleImportJSON(file, setSlides, setPins, setTags);
-    }
-  };
+ 
 
   // Handle sorting directly on MenuItem click
   const handleSortFieldChange = (field) => {
@@ -96,19 +91,7 @@ const Buttons = ({
         <IconButton onClick={() => setViewType('list')}>
           <Icon icon="material-symbols:list" width="24" height="24" />
         </IconButton>
-        <IconButton onClick={() => SelectUtility.handleDownloadAll()}>
-          <Icon icon="mdi:download" width="24" height="24" />
-        </IconButton>
-        <IconButton component="label" htmlFor="importFileInput">
-          <Icon icon="mdi:import" width="24" height="24" />
-          <input
-            type="file"
-            accept="application/json"
-            id="importFileInput"
-            style={{ display: 'none' }}
-            onChange={handleImportFileChange}
-          />
-        </IconButton>
+      
 
         <IconButton onClick={() => SelectUtility.toggleSortOrder(setSortOrder)}>
           <Icon icon={`mdi:arrow-${sortOrder.direction === 'asc' ? 'up' : 'down'}`} width="24" height="24" />

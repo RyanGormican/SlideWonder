@@ -7,11 +7,12 @@ import Select from './components/Select/Select';
 import Present from './components/Present/Present';
 import SlideManager from './components/Slide/SlideManager';
 import Sync from './components/Sync/Sync';
+import Settings from './components/Settings/Settings';
 import WordCloud from './components/WordCloud/WordCloud';
 import Stats from './components/Stats/Stats';
 import { saveSettingsToLocalStorage } from './components/Helper';
 import { Icon } from '@iconify/react';
-
+import { Button } from '@mui/material';
 function App({ theme, setTheme }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [view, setView] = useState('select');
@@ -78,16 +79,22 @@ function App({ theme, setTheme }) {
             height="4vh"    onClick={() => setView(view === 'cloud' ? 'select' : 'cloud')}/>
             <Icon icon="gridicons:stats"  width="3.13vw"
             height="4vh"    onClick={() => setView(view === 'stats' ? 'select' : 'stats')} />
-              <button
+                <Icon icon="mdi:gear"   width="3.13vw"
+            height="4vh"    onClick={() => setView(view === 'settings' ? 'select' : 'settings')} />
+            <button
           onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
           style={{ border: 'none', background: 'none', cursor: 'pointer' }}
         >
+
           {theme === 'light' ? (
-            <Icon icon="tabler:sun-filled" width="24" height="24" />
+            <Icon icon="tabler:sun-filled"  width="3.13vw"
+            height="4vh"  />
           ) : (
-            <Icon icon="tabler:moon-filled" width="24" height="24" />
+            <Icon icon="tabler:moon-filled"  width="3.13vw"
+            height="4vh"   />
           )}
         </button>
+      
         </div>
 
         {view !== 'present' && (
@@ -189,6 +196,17 @@ function App({ theme, setTheme }) {
             slides={slides}
           />
         </div>
+           <div style={{ display: view === 'settings' ? 'block' : 'none' }}>
+          <Settings
+            slides={slides}
+            setSlides={setSlides}
+            setPins={setPins}
+            setTags={setTags}
+            setSettings={setTheme}
+            setPersonalTemplates={setPersonalTemplates}
+          />
+        </div>
+         
         {isModalOpen && <Feedback isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />}
       </div>
     </DndProvider>
