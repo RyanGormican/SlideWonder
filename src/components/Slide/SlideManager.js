@@ -15,7 +15,7 @@ import {handleObjectModified} from './Modifications';
 import { Card, CardMedia, CardContent, Typography, IconButton, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import {handleCanvasClick, copyCanvasElement, copyCanvas} from './Canvas/CanvasManagement'; 
 import { saveSlideToLocalStorage} from '../Helper'
-function SlideManager({ slides, setSlides, currentSlide, setCurrentSlide,personalTemplates, setPersonalTemplates }) {
+function SlideManager({ slides, setSlides, currentSlide, setCurrentSlide,personalTemplates, setPersonalTemplates,modulars }) {
   const [currentCanvas, setCurrentCanvas] = useState(null);
   const [backgroundColor, setBackgroundColor] = useState('#ffffff');
   const [toggleMode, setToggleMode] = useState(null);
@@ -695,6 +695,9 @@ return (
   <IconButton onClick={() => setAdditionsMode("templates")}>
     <h3>Templates <Icon icon="ion:easel" width="1vw" height="1.5vh" /></h3>
   </IconButton>
+    <IconButton onClick={() => setAdditionsMode("modulars")} style={{display:'none'}}>
+    <h3>Modulars <Icon icon="material-symbols:interactive-space" width="1vw" height="1.5vh" /></h3>
+  </IconButton>
 </div>
 
   
@@ -712,6 +715,24 @@ return (
                 </AccordionSummary>
                 <AccordionDetails>
                 <div> {transition.description}</div>
+                </AccordionDetails>
+                </Accordion>
+            </div>
+          ))}
+        </div>
+           <div style={{ display: additionsMode === 'modulars' ? 'block' : 'none' }}  className="transition-list">
+   
+          {modulars.map((modular) => (
+            <div
+              key={modular.id}
+              className="transition-type"
+            >
+                   <Accordion style={{backgroundColor: '#e0e0e0',border: '1px solid black', borderBottom: 'none'}}>
+                   <AccordionSummary style={{borderBottom: '1px solid black'}}>
+              {modular.title}  
+                </AccordionSummary>
+                <AccordionDetails>
+                <div> {modular.type}</div>
                 </AccordionDetails>
                 </Accordion>
             </div>

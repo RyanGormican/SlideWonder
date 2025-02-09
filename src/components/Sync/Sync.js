@@ -6,7 +6,7 @@ import { Icon } from '@iconify/react';
 import { ref, uploadString, getMetadata, getDownloadURL } from 'firebase/storage'; 
 import * as SelectUtility from '../Select/SelectUtility';
 
-const Sync = ({ slides, setSlides, pins, setPins, tags, setTags, user, setUser, theme, setTheme ,personalTemplates, setPersonalTemplates, fileLastModified,setFileLastModified }) => {
+const Sync = ({ slides, setSlides, pins, setPins, tags, setTags, user, setUser, theme, setTheme ,personalTemplates, setPersonalTemplates, setModulars, fileLastModified,setFileLastModified }) => {
   const [fileStatus, setFileStatus] = useState('');
   const [downloadUrl, setDownloadUrl] = useState('');
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);  
@@ -101,6 +101,7 @@ const Sync = ({ slides, setSlides, pins, setPins, tags, setTags, user, setUser, 
         setTags(savedData.tags || []);
         setTheme(savedData.settings?.theme || 'light');
         setPersonalTemplates(savedData.personaltemplates || []);
+        setModulars (savedData.modulars || []);
       } catch (error) {
         console.error('Error downloading file:', error);
       }

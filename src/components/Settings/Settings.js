@@ -3,7 +3,7 @@ import * as SelectUtility from '../Select/SelectUtility';
 import { Typography, Box, IconButton, Stack, Button, Tooltip, Tabs, Tab, Paper, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { Icon } from '@iconify/react';
 
-const Settings = ({ slides,setSlides,setPins,setTags,setSettings,setPersonalTemplates }) => {
+const Settings = ({ slides,setSlides,setPins,setTags,theme, setSettings,setPersonalTemplates }) => {
 
   const [selectedSection, setSelectedSection] = useState('DATA');
   const [openDialog, setOpenDialog] = useState(false);
@@ -40,6 +40,7 @@ const Settings = ({ slides,setSlides,setPins,setTags,setSettings,setPersonalTemp
     ],
     personalTemplates: [],
     downloadedtemplates: [],
+    modulars:[],
   };
 
 
@@ -83,6 +84,7 @@ const Settings = ({ slides,setSlides,setPins,setTags,setSettings,setPersonalTemp
         aria-label="settings sections"
       >
         <Tab label="DATA" value="DATA" />
+        <Tab label="THEME" value="THEME" />
         <Tab label="OTHER" value="OTHER" />
       </Tabs>
       </Paper>
@@ -125,7 +127,36 @@ const Settings = ({ slides,setSlides,setPins,setTags,setSettings,setPersonalTemp
           </Stack>
         </Paper>
       )}
+           
+          {selectedSection === 'THEME' && (
+  <Paper sx={{ padding: 2,width: '100%', mt: 2 }}>
+    <Stack direction="column" spacing={3} alignItems="center">
+      <Tooltip title="Set Light Mode" arrow>
+        <button
+          onClick={() => setSettings('light')}
+          style={{ border: 'none',width:'100%', background: 'none', cursor: 'pointer', backgroundColor:'white', color: 'black'}}
+        >
+          <div>
+            <Icon icon="tabler:sun-filled" width="3.13vw" height="4vh" color="black" /> Light Mode
+          </div>
+        </button>
+      </Tooltip>
+      <Tooltip title="Set Dark Mode" arrow>
+        <button
+          onClick={() => setSettings('dark')}
+          style={{ border: 'none', width:'100%', background: 'none', cursor: 'pointer', backgroundColor:'black', color: 'white'}}
+        >
+          <div>
+            <Icon icon="tabler:moon-filled" width="3.13vw" height="4vh" color="white"/> Dark Mode
+          </div>
+        </button>
+      </Tooltip>
+    </Stack>
+  </Paper>
+)}
 
+          
+      
       {selectedSection === 'OTHER' && (
         <Paper sx={{ padding: 2, width: '100%', mt: 2 }}>
           <Stack direction="column" spacing={3} alignItems="center">

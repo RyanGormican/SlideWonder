@@ -7,6 +7,7 @@ export const saveSlideToLocalStorage = (updatedSlides, pins, tags) => {
     pins: pins !== 1 ? pins : existingData.pins,
     tags: tags !== 1 ? tags : existingData.tags,
     personaltemplates: existingData.personaltemplates,
+    modulars: existingData.modulars,
   };
 
   localStorage.setItem('SlideWonderdata', JSON.stringify(updatedData));
@@ -19,9 +20,25 @@ export const saveSettingsToLocalStorage = (updatedSettings) => {
     pins: existingData.pins || [],      
     tags: existingData.tags || [],    
     personaltemplates: existingData.personaltemplates,
+    modulars: existingData.modulars,
   };
 
   localStorage.setItem('SlideWonderdata', JSON.stringify(updatedData));
 };
+export const saveModularsToLocalStorage = (updatedModulars) => {
+  const existingData = JSON.parse(localStorage.getItem('SlideWonderdata')) || {};
+  const updatedData = {
+    slides: existingData.slides || [],  
+    settings: existingData.settings || [], 
+    pins: existingData.pins || [],      
+    tags: existingData.tags || [],    
+    personaltemplates: existingData.personaltemplates,
+    modulars: updatedModulars !== 1 ? updatedModulars : existingData.modulars || [],  
+  };
+
+  localStorage.setItem('SlideWonderdata', JSON.stringify(updatedData));
+};
+
+
 
 

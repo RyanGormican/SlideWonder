@@ -143,13 +143,13 @@ const chartDensityOptions = {
     x: {
       title: {
         display: true,
-        text: 'Slide Density Ranges', 
+        text: 'Items Per Slide', 
       },
     },
     y: {
       title: {
         display: true,
-        text: 'Items Per Slide', 
+        text: 'Slide Amount', 
       },
       ticks: {
         beginAtZero: true,

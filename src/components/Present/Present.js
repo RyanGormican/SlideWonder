@@ -256,24 +256,29 @@ case 'wiperight':
   handlePopoutNotes();
 }, [currentCanvasIndex, currentCanvasData, showPopoutNotes]);
 
-   useEffect(() => {
-    const keydownHandler = Keybinds({
-      currentSlide,
-      currentCanvasIndex,
-      setCurrentCanvasIndex,
-      setView,
-      loop,
-      goToNextCanvas,
-      goToPreviousCanvas,
-      toggleFullscreen
-    });
-    window.addEventListener('keydown', keydownHandler);
+  useEffect(() => {
+  const keydownHandler = (event) => {
+    if (view === 'present') {
+      Keybinds({
+        currentSlide,
+        currentCanvasIndex,
+        setCurrentCanvasIndex,
+        setView,
+        loop,
+        goToNextCanvas,
+        goToPreviousCanvas,
+        toggleFullscreen
+      })(event); 
+    }
+  };
 
-    return () => {
-      window.removeEventListener('keydown', keydownHandler);
-    };
-  }, [currentCanvasIndex, currentSlide, setView, loop, goToNextCanvas, goToPreviousCanvas, toggleFullscreen]);
-  
+  window.addEventListener('keydown', keydownHandler);
+
+  return () => {
+    window.removeEventListener('keydown', keydownHandler);
+  };
+}, [currentCanvasIndex, currentSlide, setView, loop, goToNextCanvas, goToPreviousCanvas, toggleFullscreen]);
+
 
   // Autoplay functionality
   useEffect(() => {
