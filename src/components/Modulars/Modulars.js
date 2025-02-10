@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Box, Button, Paper, Input, TextField, MenuItem, Select } from '@mui/material';
+import { Typography, Box, Button, Paper, Input, TextField, FormControl, InputLabel, MenuItem, Select, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import ModularChart from './ModularChart';
 import ModularTimer from './ModularTimer';
+import { Icon } from '@iconify/react';
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const Modulars = ({ modulars, setModulars, view }) => {
   const [selectedModularId, setSelectedModularId] = useState(null);
-  const [chartHeight, setChartHeight] = useState(0);
-  const [chartWidth, setChartWidth] = useState(0);
+  const [renderHeight, setRenderHeight] = useState(0);
+  const [renderWidth, setRenderWidth] = useState(0);
   const [newTitle, setNewTitle] = useState('');
   const [newChartTitle, setNewChartTitle] = useState('');
   const [selectedType, setSelectedType] = useState('');
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [modularToDelete, setModularToDelete] = useState(null);
 
   const defaultChartData = {
     labels: ['Data'],
@@ -26,11 +29,21 @@ const Modulars = ({ modulars, setModulars, view }) => {
       title: { display: true, text: 'Basic Bar Chart' },
     },
   };
-
+   const defaultTimerData = {
+    shape: 'circle',
+    lineStyle: 'solid',
+    number: 0,
+    timerDisplay: '',
+    countdownStyle: 'Clockwise',
+    backgroundColor: '#ffffff',
+    borderColor: 'black',
+    primaryColor:'#2196F3',
+    secondaryColor: '#dddddd',
+  };  
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      setChartHeight(window.innerHeight * 0.8);
-      setChartWidth(window.innerWidth * 0.4);
+      setRenderHeight(window.innerHeight * 0.8);
+      setRenderWidth(window.innerWidth * 0.4);
     }
   }, [view]);
 
@@ -50,7 +63,9 @@ const Modulars = ({ modulars, setModulars, view }) => {
   const handleSelectModular = (modular) => {
     setSelectedModularId(modular.id);
     setNewTitle(modular.title);
-    setNewChartTitle(modular.options.plugins.title.text);
+    if (selectedModular?.type === 'Bar Chart'){
+  setNewChartTitle(modular.options?.plugins.title.text || '');
+    }
     setSelectedType(modular.type);
   };
 
@@ -67,14 +82,43 @@ const Modulars = ({ modulars, setModulars, view }) => {
   };
 
   const handleTypeChange = (event) => {
-    const newType = event.target.value;
-    setSelectedType(newType);
-    setModulars((prevModulars) =>
-      prevModulars.map((modular) =>
-        modular.id === selectedModularId ? { ...modular, type: newType } : modular
-      )
-    );
-  };
+  const newType = event.target.value;
+  setSelectedType(newType);
+
+  // Update modulars based on selectedType
+  setModulars((prevModulars) =>
+    prevModulars.map((modular) => {
+      if (modular.id === selectedModular.id) {
+
+        if (newType === 'Timer') {
+          return {
+            ...modular,
+            type: newType,
+            data: defaultTimerData,
+            options: null, 
+          };
+        }
+
+        else if (newType === 'Bar Chart') {
+          return {
+            ...modular,
+            type: newType,
+            data: defaultChartData, 
+            options: defaultChartOptions, 
+          };
+        }
+      }
+      return modular; 
+    })
+  );
+};
+const handleDeleteModular = (modular) => {
+  setModulars((prevModulars) =>
+    prevModulars.filter((item) => item.id !== modular.id)
+  );
+  setSelectedModularId(null); 
+};
+
 
   const selectedModular = modulars.find((modular) => modular.id === selectedModularId);
 
@@ -86,7 +130,7 @@ const Modulars = ({ modulars, setModulars, view }) => {
           sx={{
             position: 'relative',
             left: 0,
-            width: '10vw',
+            width: '12vw',
             height: '80vh',
             display: 'flex',
             flexDirection: 'column',
@@ -94,22 +138,38 @@ const Modulars = ({ modulars, setModulars, view }) => {
             backgroundColor: '#fff',
           }}
         >
-          <Box flex="1" overflow="auto" p={1}>
-            {modulars.map((modular) => (
-              <Paper
-                key={modular.id}
-                sx={{
-                  p: 3,
-                  cursor: 'pointer',
-                  backgroundColor: selectedModularId === modular.id ? '#f0f0f0' : 'white',
-                }}
-                onClick={() => handleSelectModular(modular)}
-              >
-                <Typography variant="h6">{modular.title}</Typography>
-                <Typography variant="body2">Type: {modular.type}</Typography>
-              </Paper>
-            ))}
-          </Box>
+       <Box flex="1" overflow="auto" p={1}>
+  {modulars.map((modular) => (
+    <Paper
+      key={modular.id}
+      sx={{
+        p: 3,
+        cursor: 'pointer',
+        backgroundColor: selectedModular?.id === modular.id ? '#f0f0f0' : 'white',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      }}
+      onClick={() => handleSelectModular(modular)}
+    >
+      <Box>
+        <Typography variant="h6">{modular.title}</Typography>
+        <Typography variant="body2">Type: {modular.type}</Typography>
+      </Box>
+      <Button
+        variant="outlined"
+        color="error"
+        onClick={(e) => {
+          e.stopPropagation(); 
+          setModularToDelete(modular);
+          setOpenDeleteDialog(true); 
+        }}
+      >
+          <Icon color="red" icon="mdi:trash" />
+      </Button>
+    </Paper>
+  ))}
+</Box>
           <Box p={1}>
             <Button fullWidth variant="contained" color="primary" onClick={handleCreateNewModular}>
               NEW MODULAR
@@ -129,16 +189,27 @@ const Modulars = ({ modulars, setModulars, view }) => {
                     onBlur={handleSaveTitle}
                     sx={{ width: '60%', mr: 2 }}
                   />
-                  <Select  value={selectedType} onChange={handleTypeChange} sx={{ width: '30%' }}>
-                    <MenuItem value="Bar Chart">Bar Chart</MenuItem>
-                    <MenuItem value="Timer">Timer</MenuItem>
-                  </Select>
+                 <FormControl sx={{ width: '30%' }}>
+  <InputLabel>Modular Options</InputLabel>
+  <Select
+    value={selectedType}
+    onChange={handleTypeChange}
+    label="Modular Options" 
+  >
+    <MenuItem value="Bar Chart">
+      Bar Chart <Icon icon="ix:barchart" />
+    </MenuItem>
+    <MenuItem value="Timer">
+      Timer <Icon icon="mdi:clock" />
+    </MenuItem>
+  </Select>
+</FormControl>
                 </Box>
                 {selectedModular.type === 'Bar Chart' && (
                   <ModularChart
                     selectedModular={selectedModular}
-                    chartHeight={chartHeight}
-                    chartWidth={chartWidth}
+                    renderHeight={renderHeight}
+                    renderWidth={renderWidth}
                     modulars={modulars}
                     setModulars={setModulars}
                     newChartTitle={newChartTitle}
@@ -148,8 +219,8 @@ const Modulars = ({ modulars, setModulars, view }) => {
                 {selectedModular.type === 'Timer' && <Typography variant="h6">
                  <ModularTimer
                     selectedModular={selectedModular}
-                    chartHeight={chartHeight}
-                    chartWidth={chartWidth}
+                    renderHeight={renderHeight}
+                    renderWidth={renderWidth}
                     modulars={modulars}
                     setModulars={setModulars}
                   />
@@ -161,6 +232,32 @@ const Modulars = ({ modulars, setModulars, view }) => {
           )}
         </Box>
       </Box>
+      <Dialog
+  open={openDeleteDialog}
+  onClose={() => setOpenDeleteDialog(false)}
+>
+  <DialogTitle>
+    Are you sure you want to delete "{modularToDelete?.title}"?
+  </DialogTitle>
+  <DialogContent>
+    This action cannot be undone.
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={() => setOpenDeleteDialog(false)} color="primary">
+      Cancel
+    </Button>
+    <Button
+      onClick={() => {
+        handleDeleteModular(modularToDelete);
+        setOpenDeleteDialog(false); 
+      }}
+      color="error"
+    >
+      Delete
+    </Button>
+  </DialogActions>
+</Dialog>
+
     </div>
   );
 };

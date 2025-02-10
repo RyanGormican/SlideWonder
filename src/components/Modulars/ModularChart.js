@@ -3,7 +3,7 @@ import { Box, Typography, TextField, Button, Input } from '@mui/material';
 import { Bar } from 'react-chartjs-2';
 import { Icon } from '@iconify/react';
 
-const ModularChart = ({selectedModular, chartHeight,chartWidth,modulars,setModulars,newChartTitle,selectedModularId}) => {
+const ModularChart = ({selectedModular, renderHeight,renderWidth,modulars,setModulars,newChartTitle,setNewChartTitle, selectedModularId}) => {
    const addLabel = () => {
   const updatedLabels = [...selectedModular.data.labels, `Label ${selectedModular.data.labels.length + 1}`];
  const updatedDataset = selectedModular.data.datasets.map((dataset) => ({
@@ -83,8 +83,8 @@ const updateModularOptions = (optionKey, newValue) => {
         <Bar
           data={selectedModular.data}
           options={selectedModular.options}
-          height={chartHeight}
-          width={chartWidth}
+          height={renderHeight*0.75}
+          width={renderWidth}
         />
       </Box>
 

@@ -1,6 +1,6 @@
 # SlideWonder
 
-SlideWonder is a modern web application designed for creating, managing, and presenting slide decks. Built with React and leveraging various libraries, SlideWonder provides a user-friendly interface and powerful features to enhance your presentation experience.
+SlideWonder is a modern web application designed for creating, managing, and presenting slide decks. Built with Next.js and leveraging various libraries, SlideWonder provides a user-friendly interface and powerful features to enhance your presentation experience.
 
 ## Table of Contents
 - [Features](#features)
