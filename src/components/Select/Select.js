@@ -19,6 +19,7 @@ const Select = ({ loaded, slides, setSlides, pins,setPins,tags,setTags, personal
   const [currentPageList, setCurrentPageList] = useState(1);
   const [sortedSlides, setSortedSlides] = useState([]);
   const[slideCopy, setSlideCopy] = useState([]);
+  const [slidesPerView, setSlidesPerView] = useState(9);
   // Filter slides based on search query
 const filteredSlides = slides.filter(slide => 
   slide.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -137,15 +138,7 @@ const slideList = [...uniqueSlides].sort((a, b) => {
   });
   }, [uniqueSlides, sortOrder, pins]);
 
-  // Pagination logic for grid view 
-  const slidesPerPageGrid = 9;
-  const startIndexGrid = (currentPageGrid - 1) * slidesPerPageGrid;
-  const paginatedSlidesGrid = sortedSlides.slice(startIndexGrid, startIndexGrid + slidesPerPageGrid);
-
-  // Pagination logic for list view
-  const slidesPerPageList = 15;
-  const startIndexList = (currentPageList - 1) * slidesPerPageList;
-  const paginatedSlidesList = sortedSlides.slice(startIndexList, startIndexList + slidesPerPageList);
+  
 
   const handlePageChangeGrid = (newPage) => {
     setCurrentPageGrid(newPage);
@@ -172,18 +165,18 @@ tags?.forEach(tag => {
  return (
   <div>
     {/* Buttons */}
-    <Buttons theme={theme} setTheme={setTheme} sortOrder={sortOrder} setSortOrder={setSortOrder} searchQuery={searchQuery} setSearchQuery={setSearchQuery} slides={slides} tags={tags} toggleTag={toggleTag} tagStates={tagStates} toggleAllTags={toggleAllTags} uniqueTags={uniqueTags} setViewType={setViewType} setSlides={setSlides} setPins={setPins} setTags={setTags} />
+    <Buttons onAddSlide={onAddSlide} theme={theme} setTheme={setTheme} sortOrder={sortOrder} setSortOrder={setSortOrder} searchQuery={searchQuery} setSearchQuery={setSearchQuery} slides={slides} tags={tags} toggleTag={toggleTag} tagStates={tagStates} toggleAllTags={toggleAllTags} uniqueTags={uniqueTags} setViewType={setViewType} setSlides={setSlides} setPins={setPins} setTags={setTags} setSlidesPerView={setSlidesPerView}/>
 
     {/* Conditional rendering of grid or list view */}
     {viewType === 'grid' ? (
       <div>
-        <GridView sortedSlides={sortedSlides} currentPageGrid={currentPageGrid} slidesPerPageGrid={slidesPerPageGrid} handleGridClick={handleGridClick} editingTitle={editingTitle} setEditingTitle={setEditingTitle} newTitle={newTitle} setNewTitle={setNewTitle} slides={slides} setSlides={setSlides} setSelectedSlide={setSelectedSlide} pins={pins} setPins={setPins} tags={tags} setTags={setTags} view={view} />
-        <PaginationControls currentPage={currentPageGrid} slidesPerPage={slidesPerPageGrid} sortedSlides={sortedSlides} handlePageChange={handlePageChangeGrid} onAddSlide={onAddSlide} slides={slides} setSlides={setSlides}/>
+        <GridView viewType={viewType} sortedSlides={sortedSlides} currentPageGrid={currentPageGrid} slidesPerPageGrid={slidesPerView} handleGridClick={handleGridClick} editingTitle={editingTitle} setEditingTitle={setEditingTitle} newTitle={newTitle} setNewTitle={setNewTitle} slides={slides} setSlides={setSlides} setSelectedSlide={setSelectedSlide} pins={pins} setPins={setPins} tags={tags} setTags={setTags} view={view} />
+        <PaginationControls currentPage={currentPageGrid} slidesPerPage={slidesPerView} sortedSlides={sortedSlides} handlePageChange={handlePageChangeGrid} onAddSlide={onAddSlide} slides={slides} setSlides={setSlides}/>
       </div>
     ) : (
       <div>
-        <ListView sortedSlides={sortedSlides} currentPageList={currentPageList} slidesPerPageList={slidesPerPageList} handleGridClick={handleGridClick} setHoveredDate={setHoveredDate} hoveredDate={hoveredDate} />
-        <PaginationControls currentPage={currentPageList} slidesPerPage={slidesPerPageList} sortedSlides={sortedSlides} handlePageChange={handlePageChangeList} onAddSlide={onAddSlide} slides={slides} setSlides={setSlides} />
+        <ListView sortedSlides={sortedSlides} currentPageList={currentPageList} slidesPerPageList={slidesPerView} handleGridClick={handleGridClick} setHoveredDate={setHoveredDate} hoveredDate={hoveredDate} />
+        <PaginationControls currentPage={currentPageList} slidesPerPage={slidesPerView} sortedSlides={sortedSlides} handlePageChange={handlePageChangeList} onAddSlide={onAddSlide} slides={slides} setSlides={setSlides}/>
       </div>
     )}
 

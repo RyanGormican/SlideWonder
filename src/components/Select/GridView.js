@@ -84,7 +84,7 @@ useEffect(() => {
       }
     });
   };
-}, [sortedSlides, slides,currentPageGrid,view]); 
+}, [sortedSlides, slides,currentPageGrid,view,slidesPerPageGrid]); 
 
 
   const handleClickDots = (event, slide,slideId) => {
@@ -122,7 +122,7 @@ useEffect(() => {
     <>
       <Grid container spacing={2}>
         {paginatedSlidesGrid?.map((slide) => (
-          <Grid item xs={12} sm={6} md={4} key={slide.id}>
+          <Grid item xs={12} sm={6} md={slidesPerPageGrid === 18 ? 2 : 4} key={slide.id}>
             <Card onClick={() => handleGridClick(slide.id)}>
               <CardContent>
               <div className="locked">

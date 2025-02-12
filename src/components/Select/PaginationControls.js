@@ -9,10 +9,10 @@ const PaginationControls = ({
   handlePageChange, 
   onAddSlide,
   slides,
-  setSlides
+  setSlides,
 }) => {
   return (
-    <Box className="pagination-container">
+    <Box className="pagination-container" style={{ display: sortedSlides.length === 0 ? 'none' : 'block' }}>
       
       <Grid container className="pagination-grid">
         
@@ -73,49 +73,6 @@ const PaginationControls = ({
               <Icon icon="material-symbols:last-page" />
             </IconButton>
           </Tooltip>
-
-<Tooltip title="Add New Slide" arrow>
-  <Button 
-    onClick={onAddSlide} 
-    sx={{
-      fontSize: '1.25rem', 
-      fontWeight: 'bold', 
-      color: 'white', 
-      backgroundColor: 'primary.main', 
-      '&:hover': {
-        backgroundColor: 'primary.dark',
-      },
-      padding: '10px 20px', 
-    }}
-  >
-    New Slide
-  </Button>
-</Tooltip>
-          
-
-     <Tooltip title="Import Slide" arrow>
-  <Button 
-    sx={{
-      fontSize: '1.25rem', 
-      fontWeight: 'bold', 
-      color: 'white', 
-      backgroundColor: 'primary.main', 
-      '&:hover': {
-        backgroundColor: 'primary.dark',
-      },
-      padding: '10px 20px', 
-    }} 
-    component="label"
-  >
-    Import Slide
-    <input 
-      type="file" 
-      accept=".json" 
-      hidden 
-      onChange={(e) => SlideManagement.handleImportSlide(e, slides, setSlides)} 
-    />
-  </Button>
-</Tooltip>
 
         </Grid>
 
