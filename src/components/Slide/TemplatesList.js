@@ -53,7 +53,7 @@ export const templates = [
   id: 'Checkered',
   title: 'Checkered',
   description: 'The Checkered template features a bold black-and-white checkered pattern, with a square space in the center of the slide. This striking design provides a modern, high-contrast background while leaving ample space for your content in the middle. Perfect for presentations that need to stand out with a geometric, stylish aesthetic, this template is ideal for fashion, design, or creative portfolios. The simplicity of black and white adds a timeless feel while giving your slides an energetic and dynamic look.'
-}
+},
 
 
 

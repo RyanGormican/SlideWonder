@@ -126,6 +126,17 @@ const Buttons = ({
 
 
 <span style={{ gap: 0 }}>
+  <Tooltip title="Tag View">
+    <IconButton
+      onClick={() => {
+        setViewType('tag');
+        setSlidesPerView(9);
+      }}
+    >
+  <Icon icon="mdi:tag"/>
+    </IconButton>
+</Tooltip>
+
   <Tooltip title="Grid View">
     <IconButton
       onClick={() => {
@@ -136,7 +147,6 @@ const Buttons = ({
       <Icon icon="mdi:grid" />
     </IconButton>
   </Tooltip>
-
   <Tooltip title="Compact Grid View">
     <IconButton
       onClick={() => {

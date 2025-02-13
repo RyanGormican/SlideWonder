@@ -4,6 +4,7 @@ import InfoModal from '../InfoModal/InfoModal';
 import * as SlideManagement from './SlideManagement';
 import GridView from './GridView'; 
 import ListView from './ListView';
+import TagView from './TagView';
 import Buttons from './Buttons';
 import PaginationControls from './PaginationControls';
 import { saveSlideToLocalStorage} from '../Helper'
@@ -14,7 +15,6 @@ const Select = ({ loaded, slides, setSlides, pins,setPins,tags,setTags, personal
   const [selectedSlide, setSelectedSlide] = useState(null);
   const [sortOrder, setSortOrder] = useState({ field: 'lastUpdated', direction: 'desc' });
   const [viewType, setViewType] = useState('grid');
-  const [hoveredDate, setHoveredDate] = useState({});
   const [currentPageGrid, setCurrentPageGrid] = useState(1);
   const [currentPageList, setCurrentPageList] = useState(1);
   const [sortedSlides, setSortedSlides] = useState([]);
@@ -173,12 +173,16 @@ tags?.forEach(tag => {
         <GridView viewType={viewType} sortedSlides={sortedSlides} currentPageGrid={currentPageGrid} slidesPerPageGrid={slidesPerView} handleGridClick={handleGridClick} editingTitle={editingTitle} setEditingTitle={setEditingTitle} newTitle={newTitle} setNewTitle={setNewTitle} slides={slides} setSlides={setSlides} setSelectedSlide={setSelectedSlide} pins={pins} setPins={setPins} tags={tags} setTags={setTags} view={view} />
         <PaginationControls currentPage={currentPageGrid} slidesPerPage={slidesPerView} sortedSlides={sortedSlides} handlePageChange={handlePageChangeGrid} onAddSlide={onAddSlide} slides={slides} setSlides={setSlides}/>
       </div>
-    ) : (
+    ) : viewType === 'list' ? (
       <div>
-        <ListView sortedSlides={sortedSlides} currentPageList={currentPageList} slidesPerPageList={slidesPerView} handleGridClick={handleGridClick} setHoveredDate={setHoveredDate} hoveredDate={hoveredDate} />
+        <ListView sortedSlides={sortedSlides} currentPageList={currentPageList} slidesPerPageList={slidesPerView} handleGridClick={handleGridClick} pins={pins} setPins={setPins} slides={slides} setSlides={setSlides} tags={tags} setTags={setTags} setSelectedSlide={setSelectedSlide} />
         <PaginationControls currentPage={currentPageList} slidesPerPage={slidesPerView} sortedSlides={sortedSlides} handlePageChange={handlePageChangeList} onAddSlide={onAddSlide} slides={slides} setSlides={setSlides}/>
       </div>
-    )}
+    ) : viewType === 'tag' ? (
+     <div>
+    <TagView view={view} slides={slides} sortedSlides={sortedSlides} tags={tags} setTags={setTags} uniqueTags={uniqueTags} />
+  </div>
+    ) : null }
 
     <InfoModal open={Boolean(selectedSlide)} slide={selectedSlide} fileLastModified={fileLastModified} onClose={() => setSelectedSlide(null)} />
   </div>
