@@ -36,6 +36,8 @@ const TagView = ({ view, slides, sortedSlides, tags, setTags, uniqueTags }) => {
         } else {
           const context = canvasElement.getContext('2d');
           context.clearRect(0, 0, parentWidth,  canvasElement.height); // Clear the canvas
+                  context.fillStyle = 'white';
+  context.fillRect(0, 0, parentWidth, canvasElement.height); 
         }
       }
     });

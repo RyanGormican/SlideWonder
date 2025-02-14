@@ -136,6 +136,16 @@ const Buttons = ({
   <Icon icon="mdi:tag"/>
     </IconButton>
 </Tooltip>
+  <Tooltip title="Timeline View">
+    <IconButton
+      onClick={() => {
+        setViewType('timeline');
+        setSlidesPerView(9);
+      }}
+    >
+ <Icon icon="material-symbols:timeline"  />
+    </IconButton>
+</Tooltip>
 
   <Tooltip title="Grid View">
     <IconButton

@@ -64,6 +64,8 @@ useEffect(() => {
         // If deck[0] does not exist, clear the canvas (render blank)
         const context = canvasElement.getContext('2d');
         context.clearRect(0, 0, parentWidth,  canvasElement.height); // Clear the canvas
+                context.fillStyle = 'white';
+  context.fillRect(0, 0, parentWidth, canvasElement.height); 
       }
     }
   });
@@ -92,7 +94,15 @@ useEffect(() => {
       <Grid container spacing={2}>
         {paginatedSlidesGrid?.map((slide) => (
           <Grid item xs={12} sm={6} md={slidesPerPageGrid === 18 ? 2 : 4} key={slide.id}>
-            <Card onClick={() => handleGridClick(slide.id)}>
+            <Card onClick={() => handleGridClick(slide.id)} sx={{
+    borderRadius: '1rem',
+    boxShadow:'0 2px 5px rgba(0, 0, 0, 0.1)',
+    transition: 'all 0.3s ease-in-out',
+    '&:hover': {
+      boxShadow: '0 0.5rem 1rem rgba(0, 0, 0, 0.3)',
+      transform: 'translateY(-2px)',
+    }
+  }}>
               <CardContent>
               <div className="locked">
                 <canvas
@@ -101,36 +111,33 @@ useEffect(() => {
                 </div>
               </CardContent>
             </Card>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px',
+    borderRadius: '0 0 12px 12px', }}>
               {editingTitle === slide.title ? (
                 <TextField
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   onBlur={() => SlideManagement.handleSaveTitle(slide, slides, setSlides, setEditingTitle, newTitle)}
                   autoFocus
-                  style={{ flexGrow: 1, marginRight: '16px' }}
+                  style={{ flexGrow: 1, marginRight: '12px', '& .MuiOutlinedInput-root': {
+          borderRadius: '8px',
+        }, }}
                 />
               ) : (
                 <Typography
                   variant="h6"
                   onClick={() => SelectUtility.handleTitleClick(slide, setEditingTitle, setNewTitle)}
-                  style={{ cursor: 'pointer', flexGrow: 1 }}
+                  style={{ cursor: 'pointer', flexGrow: 1, fontSize: '1rem',
+        fontWeight: 600,
+        padding: '4px 8px',
+        transition: 'color 0.2s ease-in-out', }}
                 >
                 <h6>
                   {slide.title}
                 </h6>
                 </Typography>
               )}
-            <Details 
-              slide={slide} 
-              pins={pins} 
-              setPins={setPins} 
-              slides={slides} 
-              setSlides={setSlides} 
-              tags={tags} 
-              setTags={setTags} 
-              setSelectedSlide={setSelectedSlide} 
-            />
+            <Details slide={slide} pins={pins} setPins={setPins} slides={slides} setSlides={setSlides} tags={tags} setTags={setTags} setSelectedSlide={setSelectedSlide}/>
             </div>
           </Grid>
         ))}

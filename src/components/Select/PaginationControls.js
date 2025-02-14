@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useEffect} from 'react';
 import { IconButton, Button, Typography, Box, Grid, Tooltip } from '@mui/material';
 import { Icon } from '@iconify/react';
 import * as SlideManagement from './SlideManagement';
@@ -10,7 +10,36 @@ const PaginationControls = ({
   onAddSlide,
   slides,
   setSlides,
+  view
 }) => {
+
+
+  useEffect(() => {
+    if (view !== "select") return;
+    const handleKeyDown = (event) => {
+      switch (event.key) {
+        case 'ArrowLeft':
+          if (currentPage > 1) handlePageChange(currentPage - 1);
+          break;
+        case 'ArrowRight':
+          if (currentPage * slidesPerPage < sortedSlides.length) handlePageChange(currentPage + 1);
+          break;
+        case 'Home':
+          handlePageChange(1);
+          break;
+        case 'End': 
+          handlePageChange(Math.ceil(sortedSlides.length / slidesPerPage));
+          break;
+        default:
+          break;
+      }
+    };
+
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentPage, slidesPerPage, sortedSlides, view]);
+
   return (
     <Box className="pagination-container" style={{ display: sortedSlides.length === 0 ? 'none' : 'block' }}>
       
@@ -73,6 +102,7 @@ const PaginationControls = ({
               <Icon icon="material-symbols:last-page" />
             </IconButton>
           </Tooltip>
+       
 
         </Grid>
 

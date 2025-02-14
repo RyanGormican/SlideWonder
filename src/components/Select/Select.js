@@ -5,6 +5,7 @@ import * as SlideManagement from './SlideManagement';
 import GridView from './GridView'; 
 import ListView from './ListView';
 import TagView from './TagView';
+import TimelineView from './TimelineView';
 import Buttons from './Buttons';
 import PaginationControls from './PaginationControls';
 import { saveSlideToLocalStorage} from '../Helper'
@@ -165,24 +166,28 @@ tags?.forEach(tag => {
  return (
   <div>
     {/* Buttons */}
-    <Buttons onAddSlide={onAddSlide} theme={theme} setTheme={setTheme} sortOrder={sortOrder} setSortOrder={setSortOrder} searchQuery={searchQuery} setSearchQuery={setSearchQuery} slides={slides} tags={tags} toggleTag={toggleTag} tagStates={tagStates} toggleAllTags={toggleAllTags} uniqueTags={uniqueTags} setViewType={setViewType} setSlides={setSlides} setPins={setPins} setTags={setTags} setSlidesPerView={setSlidesPerView}/>
+    <Buttons onAddSlide={onAddSlide} theme={theme} setTheme={setTheme} sortOrder={sortOrder} setSortOrder={setSortOrder} searchQuery={searchQuery} setSearchQuery={setSearchQuery} slides={slides} tags={tags} toggleTag={toggleTag} tagStates={tagStates} toggleAllTags={toggleAllTags} uniqueTags={uniqueTags} setViewType={setViewType} setSlides={setSlides} setPins={setPins} setTags={setTags} setSlidesPerView={setSlidesPerView} sortedSlides={sortedSlides}/>
 
     {/* Conditional rendering of grid or list view */}
     {viewType === 'grid' ? (
       <div>
         <GridView viewType={viewType} sortedSlides={sortedSlides} currentPageGrid={currentPageGrid} slidesPerPageGrid={slidesPerView} handleGridClick={handleGridClick} editingTitle={editingTitle} setEditingTitle={setEditingTitle} newTitle={newTitle} setNewTitle={setNewTitle} slides={slides} setSlides={setSlides} setSelectedSlide={setSelectedSlide} pins={pins} setPins={setPins} tags={tags} setTags={setTags} view={view} />
-        <PaginationControls currentPage={currentPageGrid} slidesPerPage={slidesPerView} sortedSlides={sortedSlides} handlePageChange={handlePageChangeGrid} onAddSlide={onAddSlide} slides={slides} setSlides={setSlides}/>
+        <PaginationControls currentPage={currentPageGrid} slidesPerPage={slidesPerView} sortedSlides={sortedSlides} handlePageChange={handlePageChangeGrid} onAddSlide={onAddSlide} slides={slides} setSlides={setSlides} view={view}/>
       </div>
     ) : viewType === 'list' ? (
       <div>
         <ListView sortedSlides={sortedSlides} currentPageList={currentPageList} slidesPerPageList={slidesPerView} handleGridClick={handleGridClick} pins={pins} setPins={setPins} slides={slides} setSlides={setSlides} tags={tags} setTags={setTags} setSelectedSlide={setSelectedSlide} />
-        <PaginationControls currentPage={currentPageList} slidesPerPage={slidesPerView} sortedSlides={sortedSlides} handlePageChange={handlePageChangeList} onAddSlide={onAddSlide} slides={slides} setSlides={setSlides}/>
+        <PaginationControls currentPage={currentPageList} slidesPerPage={slidesPerView} sortedSlides={sortedSlides} handlePageChange={handlePageChangeList} onAddSlide={onAddSlide} slides={slides} setSlides={setSlides} view={view}/>
       </div>
     ) : viewType === 'tag' ? (
      <div>
     <TagView view={view} slides={slides} sortedSlides={sortedSlides} tags={tags} setTags={setTags} uniqueTags={uniqueTags} />
   </div>
-    ) : null }
+    ): viewType === 'timeline' ? (
+     <div>
+    <TimelineView view={view} slides={slides} sortedSlides={sortedSlides}  handleGridClick={handleGridClick} />
+  </div>
+    )  : null }
 
     <InfoModal open={Boolean(selectedSlide)} slide={selectedSlide} fileLastModified={fileLastModified} onClose={() => setSelectedSlide(null)} />
   </div>
