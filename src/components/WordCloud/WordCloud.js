@@ -19,12 +19,13 @@ const shuffleArray = (array) => {
 const WordCloud = ({ slides, tags }) => {
   const [positions, setPositions] = useState([]);
 
-  const titleFrequency = tags.reduce((acc, tag) => {
-    tag.titles.forEach(title => {
-      acc[title] = (acc[title] || 0) + 1;
-    });
-    return acc;
-  }, {});
+ const titleFrequency = tags.filter(tag => tag.id !== 0).reduce((acc, tag) => {
+  tag.titles.forEach(title => {
+    acc[title] = (acc[title] || 0) + 1;
+  });
+  return acc;
+}, {});
+
 
   const totalTags = tags.reduce((acc, tag) => acc + tag.titles.length, 0);
 
@@ -69,7 +70,7 @@ const WordCloud = ({ slides, tags }) => {
 
   return (
     <div style={{
-      width: '100vw',
+      width: '80vw',
       height: '80vh',
       position: 'relative', 
       overflow: 'hidden', 

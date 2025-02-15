@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Canvas } from 'fabric';
 import { renderCanvasContent } from '../Slide/Canvas/CanvasRender';
 import { Icon } from '@iconify/react';
-
+import Details from './Details';
 const CanvasItem = ({ slide, slides, handleGridClick }) => {
   const canvasRef = useRef(null);
 
@@ -52,7 +52,7 @@ const CanvasItem = ({ slide, slides, handleGridClick }) => {
   );
 };
 
-const TimelineView = ({ view, slides, sortedSlides, handleGridClick }) => {
+const TimelineView = ({ view, slides, pins,setPins,setSlides, tags, setTags, setSelectedSlide, sortedSlides, handleGridClick }) => {
   const groupSlidesByDate = () => {
     const groupedSlides = {};
 
@@ -115,13 +115,26 @@ const TimelineView = ({ view, slides, sortedSlides, handleGridClick }) => {
             </div>
             <div style={{ backgroundColor: getColor(date), display: 'flex', flexDirection: 'row', maxWidth: '100vw', overflowX: 'auto', gap: '10px' }}>
               {groupedSlides[date].map((slide) => (
-                <CanvasItem 
+               <div style={{flexDirection: 'column'}}>
+              <CanvasItem 
                   key={slide.id} 
                   slide={slide} 
                   slides={slides} 
                   handleGridClick={handleGridClick} 
                 />
+                    <Details
+              slide={slide}
+              pins={pins}
+              setPins={setPins}
+              slides={slides}
+              setSlides={setSlides}
+              tags={tags}
+              setTags={setTags}
+              setSelectedSlide={setSelectedSlide}
+            />
+            </div>
               ))}
+
             </div>
           </div>
         ))}

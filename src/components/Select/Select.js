@@ -21,6 +21,7 @@ const Select = ({ loaded, slides, setSlides, pins,setPins,tags,setTags, personal
   const [sortedSlides, setSortedSlides] = useState([]);
   const[slideCopy, setSlideCopy] = useState([]);
   const [slidesPerView, setSlidesPerView] = useState(9);
+  const [uniqueTags,setUniqueTags] = useState([]);
   // Filter slides based on search query
 const filteredSlides = slides.filter(slide => 
   slide.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -151,17 +152,23 @@ const slideList = [...uniqueSlides].sort((a, b) => {
    const onAddSlide = () => {
     SlideManagement.handleAddSlide(slides, setSlides);
   };
-const uniqueTags = [];
-const seenTitles = new Set();
 
-tags?.forEach(tag => {
-  tag.titles.forEach(title => {
-    if (!seenTitles.has(title)) {
-      seenTitles.add(title);
-      uniqueTags.push({ title, id: tag.id });
-    }
+  useEffect(() => {
+  const seenTitles = new Set();
+  const updatedUniqueTags = [];
+
+  tags?.forEach(tag => {
+    tag.titles.forEach(title => {
+      if (!seenTitles.has(title)) {
+        seenTitles.add(title);
+        updatedUniqueTags.push({ title, id: tag.id });
+      }
+    });
   });
-});
+
+  setUniqueTags(updatedUniqueTags);
+
+}, [tags]);
 
  return (
   <div>
@@ -185,7 +192,7 @@ tags?.forEach(tag => {
   </div>
     ): viewType === 'timeline' ? (
      <div>
-    <TimelineView view={view} slides={slides} sortedSlides={sortedSlides}  handleGridClick={handleGridClick} />
+    <TimelineView view={view} slides={slides} pins={pins} setPins={setPins} setSlides={setSlides} tags={tags} setTags={setTags} setSelectedSlide={setSelectedSlide} sortedSlides={sortedSlides}  handleGridClick={handleGridClick} />
   </div>
     )  : null }
 

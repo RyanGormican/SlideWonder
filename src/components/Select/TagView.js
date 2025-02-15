@@ -3,7 +3,7 @@ import { Canvas } from 'fabric';
 import { renderCanvasContent } from '../Slide/Canvas/CanvasRender'; 
 import { Icon } from '@iconify/react';
 import { saveSlideToLocalStorage} from '../Helper';
-import { Chip } from  '@mui/material';
+import { Chip,IconButton,TextField } from  '@mui/material';
 const TagView = ({ view, slides, sortedSlides, tags, setTags, uniqueTags }) => {
   const [activeSlideId, setActiveSlideId] = useState(null);
   const canvasRefs = useRef({});
@@ -94,6 +94,64 @@ const TagView = ({ view, slides, sortedSlides, tags, setTags, uniqueTags }) => {
 };
 
 
+useEffect(() => {
+  setTags(prevTags => {
+    const tagWithIdZero = prevTags.find(tag => tag.id === 0);
+    
+    let updatedTags;
+    if (tagWithIdZero) {
+      updatedTags = prevTags.map(tag =>
+        tag.id === 0 ? { ...tag, titles: uniqueTags.map(tag => tag.title) } : tag
+      );
+    } else {
+      updatedTags = [{ id: 0, titles: uniqueTags.map(tag => tag.title) }, ...prevTags];
+    }
+
+    if (JSON.stringify(updatedTags) !== JSON.stringify(prevTags)) {
+      saveSlideToLocalStorage(1, 1, updatedTags);  
+      return updatedTags;
+    }
+
+    return prevTags;  
+  });
+}, [uniqueTags]);
+
+
+const [newTag, setNewTag] = useState("");
+const handleAddTag = () => {
+  if (newTag.trim()) {
+    setTags(prevTags => {
+      const updatedTags = prevTags.map(tag => {
+        if (tag.id === 0) {
+          return { ...tag, titles: [...tag.titles, newTag] };
+        }
+        return tag;
+      });
+
+      saveSlideToLocalStorage(1, 1, updatedTags);
+
+      return updatedTags;
+    });
+    setNewTag("");
+  }
+};
+
+const handleRemoveTag = (tagTitle) => {
+  setTags(prevTags => {
+    const updatedTags = prevTags.map(tag => {
+      return {
+        ...tag, 
+        titles: tag.titles.filter(title => title !== tagTitle)  
+      };
+    });
+
+    saveSlideToLocalStorage(1, 1, updatedTags); 
+
+    return updatedTags;
+  });
+};
+
+
 
   // Find the tag that corresponds to the active slide ID
   const activeSlideTag = tags.find(tag => tag.id === activeSlideId);
@@ -151,7 +209,73 @@ const TagView = ({ view, slides, sortedSlides, tags, setTags, uniqueTags }) => {
           );
         })}
         </div>
+  
       </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', justifyContent: 'flex-start', marginTop: '1rem' }}>
+  {tags
+    .find(tag => tag.id === 0)?.titles
+    .map((title, index) => (
+      <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+        <Chip
+          label={title}
+          style={{
+            borderRadius: '16px',
+            padding: '0.5rem 1rem',
+          }}
+        />
+        <Icon
+          icon="mdi:trash"
+          onClick={() => handleRemoveTag(title)}
+          style={{
+            cursor: 'pointer',
+            color: 'red',
+            transition: 'color 0.3s',
+          }}
+        />
+      </div>
+    ))}
+  <div style={{ display: 'flex', alignItems: 'center',  }}>
+   <TextField
+  type="text"
+  value={newTag}
+  onChange={(e) => setNewTag(e.target.value)}
+  placeholder="Enter new tag"
+  variant="outlined"
+  sx={{
+    padding: '0.5rem',
+    width: '12rem',
+    borderRadius: '8px',
+    '& .MuiOutlinedInput-root': {
+      borderColor: '#ddd',
+      transition: 'border-color 0.3s',
+    },
+    '& .MuiOutlinedInput-root.Mui-focused': {
+      borderColor: '#4caf50',
+    },
+    '& .MuiInputBase-input': {
+      padding: '0.5rem',
+    },
+  }}
+/>
+
+    <IconButton
+      onClick={handleAddTag}
+      style={{
+        backgroundColor: '#4caf50',
+        color: 'white',
+        padding: '0.6rem 1.2rem',
+        borderRadius: '8px',
+        cursor: 'pointer',
+        transition: 'background-color 0.3s',
+      }}
+      onMouseOver={(e) => e.target.style.backgroundColor = '#45a049'}
+      onMouseOut={(e) => e.target.style.backgroundColor = '#4caf50'}
+    >
+      ADD TAG
+    </IconButton>
+  </div>
+</div>
+
     </div>
   );
 };
