@@ -399,7 +399,7 @@ useEffect(() => {
 
    if (paintbrush && selectedContent) {
       const color = selectedProperties?.fill || '#000000';
-      handleColorChange({ hex: color });
+      updateProperty('fill', color.hex);
       setSelectedContent(null);
     }
 
