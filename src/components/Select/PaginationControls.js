@@ -12,8 +12,12 @@ const PaginationControls = ({
   setSlides,
   view
 }) => {
+  useEffect(() => {
+  if (currentPage > Math.ceil(sortedSlides.length / slidesPerPage)){
+  handlePageChange(1);
+  }
 
-
+  } , [sortedSlides]);
   useEffect(() => {
     if (view !== "select") return;
     const handleKeyDown = (event) => {

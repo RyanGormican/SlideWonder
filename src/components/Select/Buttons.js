@@ -8,7 +8,7 @@ import Notifications from './Notifications';
 const Buttons = ({ 
   theme, setTheme, sortOrder, setSortOrder, searchQuery, setSearchQuery, 
   slides, tags, toggleTag, tagStates, toggleAllTags, uniqueTags, 
-  setViewType, setSlides, setPins, setTags,setSlidesPerView,onAddSlide 
+  setViewType, setSlides, setPins, setTags,setSlidesPerView,onAddSlide, onlyPinned, setOnlyPinned 
 }) => {
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [notifications,setNotifications]=useState(false);
@@ -125,7 +125,7 @@ const Buttons = ({
 
 
 
-<span style={{ gap: 0 }}>
+<span style={{ gap: 0, }}>
   <Tooltip title="Tag View">
     <IconButton
       onClick={() => {
@@ -180,12 +180,21 @@ const Buttons = ({
   </Tooltip>
 </span>
 
-
+<span style={{ gap: 0, }}>
+<Tooltip title="Toggle Pinned Items Only">
+    <IconButton
+      onClick={() => {
+        setOnlyPinned(!onlyPinned);
+      }} >
+  <Icon icon={onlyPinned ? "mdi:pin" : "mdi:pin-outline"}/>
+    </IconButton>
+</Tooltip>
 <Tooltip title="Toggle Sorting Direction">
         <IconButton onClick={() => SelectUtility.toggleSortOrder(setSortOrder)}>
           <Icon icon={`mdi:arrow-${sortOrder.direction === 'asc' ? 'up' : 'down'}`}  />
         </IconButton>
 </Tooltip>
+</span>
         <Box display="flex" alignItems="center" gap={2}>
           <FormControl style={{ minWidth: '14rem', maxWidth: '14rem' }}>
             <InputLabel>Sorting Options</InputLabel>

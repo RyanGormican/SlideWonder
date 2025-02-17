@@ -22,10 +22,13 @@ const Select = ({ loaded, slides, setSlides, pins,setPins,tags,setTags, personal
   const[slideCopy, setSlideCopy] = useState([]);
   const [slidesPerView, setSlidesPerView] = useState(9);
   const [uniqueTags,setUniqueTags] = useState([]);
+  const [onlyPinned,setOnlyPinned] = useState(false);
   // Filter slides based on search query
-const filteredSlides = slides.filter(slide => 
-  slide.title.toLowerCase().includes(searchQuery.toLowerCase())
-);
+const filteredSlides = slides.filter(slide => {
+   const isSearchMatch =  slide.title.toLowerCase().includes(searchQuery.toLowerCase())
+   const isPinnedMatch = onlyPinned ? pins?.includes(slide.id) : true;
+     return isSearchMatch && isPinnedMatch;
+});
   const [tagStates, setTagStates] = useState({});
 
    
@@ -60,19 +63,22 @@ const toggleAllTags = (isOn) => {
 };
 
 
+
+
 const filteredTagIds = tags
   ?.filter(tag => 
     tag.titles.some(title => title.toLowerCase().includes(searchQuery.toLowerCase()))
   )
   .map(tag => tag.id);
-  
+
+// Merge filtered slides with tag-based filtering
 const mergedFilteredSlides = [
   ...filteredSlides,
   ...slides.filter(slide => filteredTagIds?.includes(slide.id))
 ];
 
-const allTagsOn = Object.values(tagStates || {}).every((state) => state === true);
 
+const allTagsOn = Object.values(tagStates || {}).every((state) => state === true);
 
 const uniqueFilteredSlides = allTagsOn
   ? Array.from(new Set(mergedFilteredSlides.map(slide => slide.id)))
@@ -83,12 +89,14 @@ const uniqueFilteredSlides = allTagsOn
 const filteredSlidesByTags = mergedFilteredSlides.filter(slide => {
   return tags?.some(tag => 
     tag.titles.some(title => tagStates[title] === true) && 
-    tag.id === slide.id // Ensure the slide's id matches the tag's id
+    tag.id === slide.id
   );
 });
 
+// Conditional filtering based on whether all tags are selected
 const filteredSlidesConditional = allTagsOn ? uniqueFilteredSlides : filteredSlidesByTags;
 
+// Ensure unique slides
 const uniqueSlides = Array.from(new Set(filteredSlidesConditional.map(slide => slide.id)))
   .map(id => filteredSlidesConditional.find(slide => slide.id === id));
 
@@ -173,7 +181,7 @@ const slideList = [...uniqueSlides].sort((a, b) => {
  return (
   <div>
     {/* Buttons */}
-    <Buttons onAddSlide={onAddSlide} theme={theme} setTheme={setTheme} sortOrder={sortOrder} setSortOrder={setSortOrder} searchQuery={searchQuery} setSearchQuery={setSearchQuery} slides={slides} tags={tags} toggleTag={toggleTag} tagStates={tagStates} toggleAllTags={toggleAllTags} uniqueTags={uniqueTags} setViewType={setViewType} setSlides={setSlides} setPins={setPins} setTags={setTags} setSlidesPerView={setSlidesPerView} sortedSlides={sortedSlides}/>
+    <Buttons onAddSlide={onAddSlide} theme={theme} setTheme={setTheme} sortOrder={sortOrder} setSortOrder={setSortOrder} searchQuery={searchQuery} setSearchQuery={setSearchQuery} slides={slides} tags={tags} toggleTag={toggleTag} tagStates={tagStates} toggleAllTags={toggleAllTags} uniqueTags={uniqueTags} setViewType={setViewType} setSlides={setSlides} setPins={setPins} setTags={setTags} setSlidesPerView={setSlidesPerView} sortedSlides={sortedSlides} onlyPinned={onlyPinned} setOnlyPinned={setOnlyPinned}/>
 
     {/* Conditional rendering of grid or list view */}
     {viewType === 'grid' ? (

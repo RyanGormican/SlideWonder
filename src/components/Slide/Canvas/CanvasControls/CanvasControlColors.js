@@ -5,9 +5,8 @@ import { SketchPicker } from 'react-color';
 
 const CanvasControlColors = ({
   backgroundColor,
-  handleBackgroundColorChange,
   selectedProperties,
-  handleColorChange,
+  updateProperty,
 }) => {
   const pickerStyles = {
     default: {
@@ -20,7 +19,7 @@ const CanvasControlColors = ({
       saturation: {
         width: '70%',
         height: '10vh',
-       paddingBottom: '0%',
+        paddingBottom: '0%',
       },
       controls: {
         width: '35%',
@@ -30,6 +29,14 @@ const CanvasControlColors = ({
     },
   };
 
+  const handleContentColorChange = (color) => {
+    updateProperty('fill', color.hex);
+  };
+
+  const handleBackgroundColorChangeWrapper = (color) => {
+    updateProperty('backgroundColor', color.hex);
+  };
+
   return (
     <div
       className="canvas-controls"
@@ -37,7 +44,7 @@ const CanvasControlColors = ({
         display: 'flex',
         width: '31.25vw',
         gap: '20px',
-        height: '11vh'
+        height: '11vh',
       }}
     >
       <div
@@ -63,7 +70,7 @@ const CanvasControlColors = ({
           <SketchPicker
             id="background-color"
             color={backgroundColor}
-            onChange={handleBackgroundColorChange}
+            onChange={handleBackgroundColorChangeWrapper}
             disableAlpha={true}
             styles={pickerStyles}
           />
@@ -89,7 +96,7 @@ const CanvasControlColors = ({
           <SketchPicker
             id="content-color"
             color={selectedProperties?.fill || '#000000'}
-            onChange={handleColorChange}
+            onChange={handleContentColorChange}
             disableAlpha={true}
             styles={pickerStyles}
           />

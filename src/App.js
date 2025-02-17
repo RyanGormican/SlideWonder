@@ -89,6 +89,7 @@ function App({ theme, setTheme }) {
               width="3.13vw"
               height="4vh"
               onClick={() => setView(view === 'cloud' ? 'select' : 'cloud')}
+              style={{display:'none'}}
             />
           </Tooltip>
           <Tooltip title="Statistics">
@@ -105,6 +106,7 @@ function App({ theme, setTheme }) {
               width="3.13vw"
               height="4vh"
               onClick={() => setView(view === 'modulars' ? 'select' : 'modulars')}
+              style={{display:'none'}}
             />
           </Tooltip>
           <Tooltip title="Settings">

@@ -12,7 +12,7 @@ import CanvasControlColors from './Canvas/CanvasControls/CanvasControlColors';
 import CanvasControlTools from './Canvas/CanvasControls/CanvasControlTools'; 
 import {handleDragStart, handleDragOver, handleDrop, formatTransition, deleteTransition, updateCanvasDuration} from './TransitionsManagement'; 
 import {handleObjectModified} from './Modifications';
-import { Card, CardMedia, CardContent, Typography, IconButton, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import { Card, CardMedia, Menu, MenuItem, FormControl, Select, InputLabel, CardContent, Typography, IconButton, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import {handleCanvasClick, copyCanvasElement, copyCanvas} from './Canvas/CanvasManagement'; 
 import { saveSlideToLocalStorage} from '../Helper'
 function SlideManager({ slides, setSlides, currentSlide, setCurrentSlide,personalTemplates, setPersonalTemplates,modulars }) {
@@ -322,74 +322,57 @@ useEffect(() => {
 }, [currentCanvas, currentSlide]);
 
 
-  
-  // Handle color change
-  const handleColorChange = (color) => {
-  const newColor = color.hex;
+ const updateProperty = (property, newValue) => {
   setSelectedProperties((prevProperties) => {
-     let updatedProperties = { ...prevProperties};
-    // Update only the color property and retain others
-    if (!paintbrush){
-     updatedProperties = { ...prevProperties, fill: newColor };
-    }
+    const updatedProperties = {
+      ...prevProperties,
+      [property]: newValue,
+    };
 
-    // Update the content in the canvas
-    if (selectedContent?.id) {
-      const updatedSlide = {
-        ...currentSlide,
-        deck: currentSlide.deck.map((canvas) => {
-          if (canvas.id === currentCanvas) {
+    const updatedSlide = {
+      ...currentSlide,
+      deck: currentSlide.deck.map((canvas) => {
+        if (canvas.id === currentCanvas) {
+
+          if (property === 'backgroundColor') {
             return {
               ...canvas,
-              content: canvas.content.map((item) =>
-                item.id === selectedContent.id ? { ...item, fill: newColor } : item
-              ),
+              backgroundColor: newValue, 
             };
           }
-          return canvas;
-        }),
-      };
-      setCurrentSlide(updatedSlide);
-      updateSlideData(updatedSlide);
-    }
+
+      
+          return {
+            ...canvas,
+            content: canvas.content.map((item) => {
+              if (item.id === selectedContent?.id) {
+                // Apply specific changes based on the property
+                if (property === 'size') {
+                  if (getSelectedContentType(selectedContent.id) === 'circle') {
+                    return { ...item, radius: newValue };
+                  } else if (getSelectedContentType(selectedContent.id) === 'text') {
+                    return { ...item, fontSize: newValue };
+                  } else {
+                    return { ...item, width: newValue };
+                  }
+                }
+                return { ...item, [property]: newValue };
+              }
+              return item;
+            }),
+          };
+        }
+        return canvas;
+      }),
+    };
+
+    setCurrentSlide(updatedSlide);
+    updateSlideData(updatedSlide);
 
     return updatedProperties;
   });
 };
 
-const handleSizeChange = (event) => {
-  const newSize = Math.max(1, Number(event.target.value));
-
-  setSelectedProperties((prevProperties) => {
-    // Update the size property
-
-    const updatedProperties = { ...prevProperties, size: newSize };
-
-    // Update the content in the canvas
-    if (selectedContent?.id) {
-      const updatedSlide = {
-        ...currentSlide,
-        deck: currentSlide.deck.map((canvas) => {
-          if (canvas.id === currentCanvas) {
-            return {
-              ...canvas,
-              content: canvas.content.map((item) =>
-                item.id === selectedContent.id
-                  ? { ...item, ...getUpdatedProperties(item, newSize) }
-                  : item
-              ),
-            };
-          }
-          return canvas;
-        }),
-      };
-      setCurrentSlide(updatedSlide);
-      updateSlideData(updatedSlide);
-    }
-
-    return updatedProperties;
-  });
-};
 
 
 const getUpdatedProperties = (item, newSize) => {
@@ -484,176 +467,6 @@ if (!contentLock && selectedContent){
   };
 }, [selectedContent, copiedContent, currentCanvas, currentSlide]);
 
-const handleScaleChange = (event, axis) => {
-  const newValue = Math.max(1, parseFloat(event.target.value));
-
-  setSelectedProperties((prevProperties) => {
-    // Update scale for the selected axis
-    const updatedProperties = {
-      ...prevProperties,
-      [axis === 'x' ? 'scaleX' : 'scaleY']: newValue,
-    };
-
-    // Update the content in the canvas
-    if (selectedContent?.id) {
-      const updatedSlide = {
-        ...currentSlide,
-        deck: currentSlide.deck.map((canvas) => {
-          if (canvas.id === currentCanvas) {
-            return {
-              ...canvas,
-              content: canvas.content.map((item) =>
-                item.id === selectedContent.id
-                  ? { ...item, [axis === 'x' ? 'scaleX' : 'scaleY']: newValue }
-                  : item
-              ),
-            };
-          }
-          return canvas;
-        }),
-      };
-      setCurrentSlide(updatedSlide);
-      updateSlideData(updatedSlide);
-    }
-
-    return updatedProperties;
-  });
-};
-const handlePositionChange = (event, axis) => {
-  const newValue = parseFloat(event.target.value);
-
-  setSelectedProperties((prevProperties) => {
-    // Update position for the selected axis
-    const updatedProperties = {
-      ...prevProperties,
-      [axis === 'x' ? 'x' : 'y']: newValue,
-    };
-
-    // Update the content in the canvas
-    if (selectedContent?.id) {
-      const updatedSlide = {
-        ...currentSlide,
-        deck: currentSlide.deck.map((canvas) => {
-          if (canvas.id === currentCanvas) {
-            return {
-              ...canvas,
-              content: canvas.content.map((item) =>
-                item.id === selectedContent.id
-                  ? { ...item, [axis === 'x' ? 'x' : 'y']: newValue }
-                  : item
-              ),
-            };
-          }
-          return canvas;
-        }),
-      };
-      setCurrentSlide(updatedSlide);
-      updateSlideData(updatedSlide);
-    }
-
-    return updatedProperties;
-  });
-};
-const handleOpacityChange = (event) => {
-  let newOpacity = parseFloat(event.target.value);
-    newOpacity = Math.max(0.01, Math.min(newOpacity, 1));
-  setSelectedProperties((prevProperties) => {
-    // Update opacity
-    const updatedProperties = {
-      ...prevProperties,
-      opacity: newOpacity,
-    };
-
-    // Update the content in the canvas
-    if (selectedContent?.id) {
-      const updatedSlide = {
-        ...currentSlide,
-        deck: currentSlide.deck.map((canvas) => {
-          if (canvas.id === currentCanvas) {
-            return {
-              ...canvas,
-              content: canvas.content.map((item) =>
-                item.id === selectedContent.id
-                  ? { ...item, opacity: newOpacity }
-                  : item
-              ),
-            };
-          }
-          return canvas;
-        }),
-      };
-      setCurrentSlide(updatedSlide);
-      updateSlideData(updatedSlide);
-    }
-
-    return updatedProperties;
-  });
-};
-const handleStrokeChange = (newColor) => {
-  setSelectedProperties((prevProperties) => {
-    const updatedProperties = {
-      ...prevProperties,
-      stroke: newColor,  // Update stroke color
-    };
-
-    // Update the content in the canvas
-    if (selectedContent?.id) {
-      const updatedSlide = {
-        ...currentSlide,
-        deck: currentSlide.deck.map((canvas) => {
-          if (canvas.id === currentCanvas) {
-            return {
-              ...canvas,
-              content: canvas.content.map((item) =>
-                item.id === selectedContent.id
-                  ? { ...item, stroke: newColor }  // Update stroke for the selected item
-                  : item
-              ),
-            };
-          }
-          return canvas;
-        }),
-      };
-      setCurrentSlide(updatedSlide);
-      updateSlideData(updatedSlide);
-    }
-
-    return updatedProperties;
-  });
-};
-const handleStrokeWidthChange = (newWidth) => {
-  const parsedWidth = parseFloat(newWidth);
-  setSelectedProperties((prevProperties) => {
-    const updatedProperties = {
-      ...prevProperties,
-      strokeWidth: Math.max(1, parsedWidth),  // Ensure the stroke width is at least 1
-    };
-
-    // Update the content in the canvas
-    if (selectedContent?.id) {
-      const updatedSlide = {
-        ...currentSlide,
-        deck: currentSlide.deck.map((canvas) => {
-          if (canvas.id === currentCanvas) {
-            return {
-              ...canvas,
-              content: canvas.content.map((item) =>
-                item.id === selectedContent.id
-                  ? { ...item, strokeWidth: Math.max(1, parsedWidth) }  // Update stroke width
-                  : item
-              ),
-            };
-          }
-          return canvas;
-        }),
-      };
-      setCurrentSlide(updatedSlide);
-      updateSlideData(updatedSlide);
-    }
-
-    return updatedProperties;
-  });
-};
 
 const getSelectedContentType = (selectedContentId) => {
   if (!selectedContentId) return null;  // Ensure selectedContentId is valid
@@ -667,6 +480,22 @@ const getSelectedContentType = (selectedContentId) => {
   return selectedContentItem ? selectedContentItem.type : null;
 };
 
+
+ const handleModularSelection = (e, canvasId, currentSlide, setCurrentSlide, updateSlideData) => {
+  const selectedModularId = e.target.value;
+
+  // Update the deck with the selected modular id
+  const updatedDeck = currentSlide.deck.map((canvas) =>
+    canvas.id === canvasId ? { ...canvas, modular: selectedModularId } : canvas
+  );
+
+  // Update the current slide with the modified deck
+  const updatedSlide = { ...currentSlide, deck: updatedDeck };
+
+  // Update the state and pass the updated slide data to the parent function
+  setCurrentSlide(updatedSlide);
+  updateSlideData(updatedSlide, 1, 1);
+};
 
 const getSizeValue = () => {
   switch (selectedContent?.type) {
@@ -683,7 +512,7 @@ const getSizeValue = () => {
 };
 
  const sortedTransitions = [...transitions].sort((a, b) => a.title.localeCompare(b.title));
-
+  const timerModulars = modulars?.filter(modular => modular.type === 'timer');
 return (
 
     <div className="main-container">
@@ -695,7 +524,7 @@ return (
   <IconButton onClick={() => setAdditionsMode("templates")}>
     <h3>Templates <Icon icon="ion:easel" width="1vw" height="1.5vh" /></h3>
   </IconButton>
-    <IconButton onClick={() => setAdditionsMode("modulars")} style={{display:'none'}}>
+    <IconButton         style={{display:'none'}} onClick={() => setAdditionsMode("modulars")}>
     <h3>Modulars <Icon icon="material-symbols:interactive-space" width="1vw" height="1.5vh" /></h3>
   </IconButton>
 </div>
@@ -774,6 +603,32 @@ return (
                 />
               </div>
           {index < currentSlide.deck.length - 1 && (
+  <div>
+   <div         style={{display:'none'}}>
+     <FormControl fullWidth>
+    <Select
+      labelId="modular-select-label"
+      value={canvas?.modular || ''}
+      onChange={(e) => handleModularSelection(e, canvas.id, currentSlide, setCurrentSlide, updateSlideData)}
+      label=""
+      style={{
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      minHeight: '3vh',
+      backgroundColor: 'lightgrey',
+      borderRadius: '8px',
+    }}
+    >
+      {modulars?.filter(modular => modular.type === 'Timer')
+        .map((modular) => (
+          <MenuItem key={modular.id} value={modular.id}>
+            {modular.title}
+          </MenuItem>
+        ))}
+    </Select>
+  </FormControl>
+  </div>
   <div
     className="canvas-transition-overlay"
     onDragOver={handleDragOver}
@@ -846,6 +701,7 @@ return (
         display: canvas.transition ? 'inline-block' : 'none',
       }}
     />
+  </div>
   </div>
 )}
 
@@ -945,13 +801,8 @@ return (
               backgroundColor={backgroundColor}
               selectedContent={selectedContent}
               selectedProperties={selectedProperties}
-              handleScaleChange={handleScaleChange}
-              handleSizeChange={handleSizeChange}
               getSizeValue={getSizeValue}
-              handlePositionChange={handlePositionChange}
-              handleOpacityChange={handleOpacityChange}
-              handleStrokeChange={handleStrokeChange}
-              handleStrokeWidthChange={handleStrokeWidthChange}
+              updateProperty={updateProperty}
             />
 
             </div>
@@ -966,8 +817,7 @@ return (
              <CanvasControlColors
               backgroundColor={backgroundColor}
               selectedProperties={selectedProperties}
-              handleBackgroundColorChange={handleBackgroundColorChange}
-              handleColorChange={handleColorChange}
+              updateProperty={updateProperty}
             />
             </div>
               <div      style={{ display: canvasMode === 'tools' ? 'block' : 'none' }}>

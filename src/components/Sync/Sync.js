@@ -43,7 +43,7 @@ const Sync = ({ slides, setSlides, pins, setPins, tags, setTags, user, setUser, 
         >
           Sign Out <Icon color="white" icon="uil:signout" width="24" height="24" />
         </Button>
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '10px', display:'none' }}>
   <Button
     variant="contained"
     color={syncSpace === 'data' ? 'secondary' : 'primary'}
